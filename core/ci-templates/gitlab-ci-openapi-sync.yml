@@ -7,19 +7,22 @@ openapi-sync-check:
   image: node:20-alpine
   script:
     - |
+      # Unpredictable temp dir (avoid fixed /tmp paths on shared runners)
+      TMP_DIR="$(mktemp -d)"
+
       # Generate the OpenAPI spec from the backend
-      # Symfony: php bin/console api:doc:dump > /tmp/openapi.json
+      # Symfony: php bin/console api:doc:dump > "$TMP_DIR/openapi.json"
       # Node.js with swagger-jsdoc:
-      #   node scripts/generate-openapi.js > /tmp/openapi.json
+      #   node scripts/generate-openapi.js > "$TMP_DIR/openapi.json"
 
       # Regenerate the Angular types in a temporary directory
       npx @openapitools/openapi-generator-cli generate \
-        -i /tmp/openapi.json \
+        -i "$TMP_DIR/openapi.json" \
         -g typescript-angular \
-        -o /tmp/generated-types
+        -o "$TMP_DIR/generated-types"
 
       # Compare with the committed types
-      diff -r frontend/src/app/generated/ /tmp/generated-types/ || {
+      diff -r frontend/src/app/generated/ "$TMP_DIR/generated-types/" || {
         echo "❌ Angular types out of sync with the backend OpenAPI"
         echo "   Action: re-run npm run api:sync and commit the generated types"
         exit 1
