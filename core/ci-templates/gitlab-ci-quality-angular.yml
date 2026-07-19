@@ -1,0 +1,30 @@
+# .gitlab-ci.yml — Snippet: Angular + Node.js quality gates
+
+quality-angular:
+  stage: quality
+  image: node:20
+  before_script:
+    - cd frontend && npm ci
+  script:
+    - npx eslint src/ --ext .ts --max-warnings=0
+    - npx tsc --noEmit
+    - ng build --configuration production
+    - ng test --watch=false --browsers=ChromeHeadless --code-coverage
+  only:
+    - merge_requests
+    - develop
+    - main
+
+quality-node:
+  stage: quality
+  image: node:20
+  before_script:
+    - cd backend && npm ci
+  script:
+    - npx eslint src/ --ext .ts --max-warnings=0
+    - npx tsc --noEmit
+    - npm test -- --coverage --passWithNoTests
+  only:
+    - merge_requests
+    - develop
+    - main

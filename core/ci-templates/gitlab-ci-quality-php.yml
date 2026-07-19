@@ -1,0 +1,23 @@
+# .gitlab-ci.yml — Snippet: PHP/Symfony quality gates
+# PHPStan + PHP-CS-Fixer + PHPUnit
+
+quality-php:
+  stage: quality
+  image: php:8.3-cli
+  before_script:
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - composer install --no-interaction --no-progress
+  script:
+    - vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+    - vendor/bin/phpstan analyse --level=8 src/ --no-progress
+    - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+  coverage: '/Lines:\s+(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+  only:
+    - merge_requests
+    - develop
+    - main

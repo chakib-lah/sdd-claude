@@ -1,0 +1,31 @@
+# .gitlab-ci.yml — Snippet: frontend/backend OpenAPI sync check
+# For Symfony+Angular or Angular+Node projects with OpenAPI.
+# This job checks that the Angular types are synchronized with the backend OpenAPI.
+
+openapi-sync-check:
+  stage: validate
+  image: node:20-alpine
+  script:
+    - |
+      # Generate the OpenAPI spec from the backend
+      # Symfony: php bin/console api:doc:dump > /tmp/openapi.json
+      # Node.js with swagger-jsdoc:
+      #   node scripts/generate-openapi.js > /tmp/openapi.json
+
+      # Regenerate the Angular types in a temporary directory
+      npx @openapitools/openapi-generator-cli generate \
+        -i /tmp/openapi.json \
+        -g typescript-angular \
+        -o /tmp/generated-types
+
+      # Compare with the committed types
+      diff -r frontend/src/app/generated/ /tmp/generated-types/ || {
+        echo "❌ Angular types out of sync with the backend OpenAPI"
+        echo "   Action: re-run npm run api:sync and commit the generated types"
+        exit 1
+      }
+
+      echo "✅ Angular types synchronized with the backend OpenAPI"
+  only:
+    - merge_requests
+  allow_failure: false
