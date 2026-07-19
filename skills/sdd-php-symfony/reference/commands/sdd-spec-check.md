@@ -48,6 +48,7 @@ For each AC:
 - [ ] **No structural open questions**: no question in "Open questions" that would change the architecture or the scope if resolved differently
 - [ ] **Impacted files mentioned**: the Design section points to specific files/services/entities (not "the users service")
 - [ ] **No undefined jargon**: domain-specific terms are explained at least once
+- [ ] **Constitution respected**: if `.claude/rules/05-constitution.md` exists with `status: ratified`, the spec violates none of its principles (cite the `PN` otherwise). If there is no ratified constitution, count this criterion as ✅ and note "no constitution".
 
 ### 4. Compute a score
 
@@ -79,9 +80,10 @@ Acceptance criteria
 Design
   Specific files mentioned  : ✅
   No undefined jargon       : ✅
+  Constitution respected    : ✅ (or ❌ violates P3 — <principle name>)
 
 ═══════════════════════════════════════════════════
-  Score: 10/13
+  Score: 11/14
   Status: ⚠️ FIXES REQUIRED
 ═══════════════════════════════════════════════════
 
@@ -93,9 +95,9 @@ Actions to take before approving:
 
 ### 6. Announce the result
 
-- **Score 13/13** → `✅ Spec ready for approval. Set status to "approved" and run /sdd-plan.`
-- **Score ≥ 10/13** → `⚠️ Minor fixes required. See the points above.`
-- **Score < 10/13** → `❌ Spec not ready. Significant revisions needed.`
+- **Score 14/14** → `✅ Spec ready for approval. Set status to "approved" and run /sdd-plan.`
+- **Score ≥ 11/14** → `⚠️ Minor fixes required. See the points above (or run /sdd-clarify to resolve them interactively).`
+- **Score < 11/14** → `❌ Spec not ready. Significant revisions needed — run /sdd-clarify.`
 
 ## Stop rules
 

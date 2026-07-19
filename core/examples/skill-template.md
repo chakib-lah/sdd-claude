@@ -1,7 +1,7 @@
 # Skeleton — Create a new `sdd-<stack>` stack skill
 
 > Step-by-step guide to add a stack to the SDD Claude following the **current model**: a standalone skill (`SKILL.md` + `reference/`) installed via `install.sh` / `install.ps1`.
-> A skill brings together **Layer 1** (the 27 masters copied from `core/`) **and** **Layer 2** (the stack-specific conventions and commands). Layer 3 (business) is added by the team as the project evolves, never here.
+> A skill brings together **Layer 1** (the 30 masters copied from `core/`) **and** **Layer 2** (the stack-specific conventions and commands). Layer 3 (business) is added by the team as the project evolves, never here.
 
 Replace `<stack>` with the stack's name (e.g. `python-fastapi`, `java-spring`).
 
@@ -27,7 +27,7 @@ skills/sdd-<stack>/
 
 ---
 
-## Step 2 — Copy the 27 masters from `core/` (verbatim)
+## Step 2 — Copy the 30 masters from `core/` (verbatim)
 
 Layer 1 must be **byte-identical** to `core/` — this is what `scripts/audit.sh` (section 6) verifies. We copy, we never rewrite by hand.
 
@@ -41,7 +41,7 @@ cp core/rules/20-git-conventions.md "$S/rules/"
 cp core/rules/50-security.md        "$S/rules/"
 ```
 
-This installs: the **15 SDD commands**, the **5 agents** (including `test-generator`, which we will adapt in step 4), the **5 templates** and the **3 universal rules**.
+This installs: the **17 SDD commands**, the **5 agents** (including `test-generator`, which we will adapt in step 4), the **5 templates** and the **4 universal rules**.
 
 > Never modify these files in the skill. The source is `core/`; any divergence is detected by the audit.
 
@@ -93,7 +93,7 @@ Optional but recommended: auxiliary commands (e.g. `<stack>-entity`, `<stack>-te
 
 ## Step 6 — Write `SKILL.md`
 
-At the skill's root. It describes when the skill activates (detected stack) and what it deploys. Take inspiration from an existing `SKILL.md` (`skills/sdd-php-symfony/SKILL.md`, etc.). It lists the deployment: 15 commands + 5 agents + rules + templates.
+At the skill's root. It describes when the skill activates (detected stack) and what it deploys. Take inspiration from an existing `SKILL.md` (`skills/sdd-php-symfony/SKILL.md`, etc.). It lists the deployment: 17 commands + 5 agents + rules + templates.
 
 ---
 
@@ -113,16 +113,16 @@ bash scripts/audit.sh
 
 Must display `✅ AUDIT OK`. The audit checks in particular:
 - the skill's structure (`SKILL.md` + `reference/{agents,commands,rules,templates}`);
-- completeness (15 commands + 5 agents);
+- completeness (17 commands + 5 agents);
 - the wiring in the installers;
-- the hash equality of the 27 masters with `core/`.
+- the hash equality of the 30 masters with `core/`.
 
 ---
 
 ## Forbidden divergences
 
 - ❌ Do not rename the universal SDD commands (`/sdd-start`, etc.).
-- ❌ Do not modify the Layer 1 masters in the skill (`00-sdd-framework.md`, `20-git-conventions.md`, `50-security.md`, `sdd-*.md`, `retro-spec.md`, templates) — the source is `core/`.
+- ❌ Do not modify the Layer 1 masters in the skill (`00-sdd-framework.md`, `05-constitution.md`, `20-git-conventions.md`, `50-security.md`, `sdd-*.md`, `retro-spec.md`, templates) — the source is `core/`.
 - ❌ Do not mix methodology and technology (no tool name in `00-sdd-framework.md`).
 - ❌ Do not create business skills here (Layer 3, not Layer 2).
 - ❌ Do not change the task naming convention (`T001, T002…`).
@@ -131,4 +131,4 @@ Must display `✅ AUDIT OK`. The audit checks in particular:
 
 ## Customization (stays in Layer 2)
 
-A skill can be adjusted for a project type: quality gate levels, specific security rules, additional scaffolding commands. These adjustments remain in **Layer 2**; Layer 1 (the 27 masters) stays untouched.
+A skill can be adjusted for a project type: quality gate levels, specific security rules, additional scaffolding commands. These adjustments remain in **Layer 2**; Layer 1 (the 30 masters) stays untouched.

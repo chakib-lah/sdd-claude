@@ -88,7 +88,7 @@ Update `.claude/sdd/<feature>/tasks.md`:
 - [~] T00X [Category] ... ← in_progress marker
 ```
 
-(Or another marker consistent with the project's convention.)
+(`[ ]` pending · `[~]` in progress · `[x]` done — the only valid markers, see `.claude/rules/00-sdd-framework.md`.)
 
 ### 6. Implement the code
 

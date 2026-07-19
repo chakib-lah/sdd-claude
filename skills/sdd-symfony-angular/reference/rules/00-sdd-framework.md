@@ -71,6 +71,8 @@ No exceptions, except for critical Production hotfixes (see `### Production Hotf
                   [Push + Merge Request]
 ```
 
+Within Phase 1, two complementary commands support the spec before approval: `/sdd-clarify` (dedicated ambiguity-resolution pass) and `/sdd-spec-check` (scored quality gate).
+
 ---
 
 ## The status lifecycle
@@ -139,6 +141,22 @@ Examples:
 
 The `TICKET-ID` must match **exactly** the ticket in the ticketing tool used by the project.
 
+### Active-feature detection
+
+Every SDD command identifies the active feature **from the current Git branch**. When that heuristic is ambiguous — detached HEAD, a branch matching no feature folder, several matching folders, or a Git worktree on another feature — the command must **not guess**: it lists the folders in `.claude/sdd/` whose artifacts are not yet `implemented` and asks the user to pick one.
+
+---
+
+## The project constitution
+
+Alongside the per-feature artifacts, a project may maintain a **constitution** (`.claude/rules/05-constitution.md`): the durable engineering principles that outlive any single feature, numbered `P1…PN` and **ratified by the team** (`status: ratified` — a human act, like every approval in SDD).
+
+When a ratified constitution exists:
+- `/sdd-spec-check` verifies the spec violates no principle (scored criterion)
+- `/sdd-review` treats a violation in the diff as a **blocking finding**
+
+Without a ratified constitution, these checks are skipped. The skeleton is deployed with every skill; filling it in is optional but recommended for any team of more than one.
+
 ---
 
 ## Anatomy of a spec
@@ -194,6 +212,16 @@ A valid `tasks.md` contains:
   - **Commit SHA**: *(filled in after /sdd-implement)*
 ```
 
+### Task state markers
+
+| Marker | State | Set by |
+|---|---|---|
+| `- [ ]` | pending | `/sdd-tasks` at creation |
+| `- [~]` | in progress | `/sdd-implement` when starting the task |
+| `- [x]` | done (SHA filled in) | `/sdd-implement` after the commit |
+
+These three markers are the **only** valid ones. A task left `- [~]` counts as **not done** for `/sdd-verify` and `/sdd-status`.
+
 ### Criteria for an atomic task
 
 - Achievable in 30 min to 2 h max
@@ -241,6 +269,19 @@ For urgent Production fixes, the SDD discipline may be lightened:
 - `tasks.md` may fit in 1-2 lines
 - **But** a test reproducing the bug is mandatory before the fix
 - **And** the spec must still be completed after the hotfix (status `implemented`)
+
+---
+
+## Rolling back a feature
+
+When a shipped feature (or one of its tasks) must be withdrawn, do not fix backward by hand: the one-task-one-commit discipline makes rollback mechanical.
+
+```
+/sdd-revert <FEATURE-ID>          # whole feature
+/sdd-revert <FEATURE-ID> T003     # single task
+```
+
+The command builds a `git revert` plan from the commit SHAs recorded in `tasks.md`, executes it on a dedicated branch after explicit confirmation, re-runs the tests, and annotates the SDD artifacts (never deletes them). See `/sdd-revert` for the full rules.
 
 ---
 

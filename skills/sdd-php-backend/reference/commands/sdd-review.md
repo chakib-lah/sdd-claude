@@ -11,7 +11,7 @@ This command is complementary to `/sdd-verify`: Verify checks that the machinery
 ## Blocking prerequisites
 
 - An active SDD feature must exist
-- `/sdd-verify` must have been run successfully beforehand (recommended)
+- `/sdd-verify` must have **passed** beforehand: look for a `Verify gate` entry with `Result: READY` in `notes.md` whose `HEAD` matches the current commit. If it is missing or stale (commits made since), **refuse** and ask to run `/sdd-verify` first. The user may explicitly override ("review anyway") — record that override in `notes.md`.
 - `spec.md` must have `status: approved`
 - `tasks.md` must have all its tasks `done`
 
@@ -75,7 +75,11 @@ Verify that the items listed under "Out of scope" in `spec.md` are **not** imple
 
 If the spec contains non-regression ACs (typical for bugfixes), explicitly verify their coverage by tests.
 
-### 8. Produce the AC-by-AC report
+### 8. Check the constitution
+
+If `.claude/rules/05-constitution.md` exists with `status: ratified`, verify that the diff violates none of its principles. A violation of a ratified principle is a **blocking finding** (cite the `PN` and the offending files). Without a ratified constitution, skip with the mention "no constitution".
+
+### 9. Produce the AC-by-AC report
 
 ```
 ═══════════════════════════════════════════════════════════
@@ -103,6 +107,8 @@ AC-3: ...
 ═══════════════════════════════════════════════════════════
   Out of scope respected: ✅
 ═══════════════════════════════════════════════════════════
+  Constitution: ✅ respected (or ❌ violates P2 / — no constitution)
+═══════════════════════════════════════════════════════════
   Non-regressions:
   - AC-3 (first save): ✅ covered by testFirstSave
 ═══════════════════════════════════════════════════════════
@@ -111,7 +117,7 @@ AC-3: ...
 ═══════════════════════════════════════════════════════════
 ```
 
-### 9. Announce the next step
+### 10. Announce the next step
 
 **If all ACs are covered and there is no scope creep**:
 

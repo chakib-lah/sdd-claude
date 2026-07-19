@@ -98,6 +98,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/agents/test-generator.md
 .claude/agents/code-reviewer.md
 .claude/rules/00-sdd-framework.md
+.claude/rules/05-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/10-code-conventions.md
 .claude/rules/20-git-conventions.md
 .claude/rules/30-tests-strategy.md
@@ -112,6 +113,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/sdd/_archive/.gitkeep
 .claude/commands/sdd-start.md
 .claude/commands/sdd-spec.md
+.claude/commands/sdd-clarify.md
 .claude/commands/sdd-spec-check.md
 .claude/commands/sdd-plan.md
 .claude/commands/sdd-tasks.md
@@ -124,6 +126,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/commands/sdd-hotfix.md
 .claude/commands/sdd-upgrade.md
 .claude/commands/sdd-changelog.md
+.claude/commands/sdd-revert.md
 .claude/commands/retro-spec.md
 .claude/commands/symfony-entity.md
 .claude/commands/symfony-service.md

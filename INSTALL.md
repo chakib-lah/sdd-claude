@@ -12,7 +12,7 @@
 sdd-claude/
 ├── core/                   ← Universal reference (Layer 1)
 │   ├── agents/             ← 5 SDD agents (spec-writer, plan-architect...)
-│   ├── commands/           ← 15 universal SDD commands
+│   ├── commands/           ← 17 universal SDD commands
 │   ├── rules/              ← Methodology + Git
 │   ├── templates/          ← spec/plan/tasks/notes
 │   └── ci-templates/       ← GitLab CI snippets
@@ -40,7 +40,7 @@ sdd-claude/
 │   └── audit.sh            ← consistency guardrail
 ├── install.sh             ← Linux / macOS / WSL2 installer
 ├── install.ps1            ← Windows installer
-├── VERSION                ← 1.0.0
+├── VERSION                ← 1.1.0
 └── CHANGELOG.md
 ```
 
@@ -138,7 +138,7 @@ Generate the SDD framework for this project.
 ```
 
 Claude detects the stack, activates the right skill, and deploys in one pass:
-- 15 SDD commands into `.claude/commands/`
+- 17 SDD commands into `.claude/commands/`
 - Stack rules into `.claude/rules/`
 - **5 SDD agents into `.claude/agents/`** ← included automatically
 - Templates into `.claude/sdd/_template/`
@@ -168,11 +168,11 @@ cp ~/tools/sdd-claude/global-agents/*.md ~/.claude/agents/
 
 ## Difference with previous packages (former sdd-toolkit V1/V2)
 
-| | V1 | V2 | sdd-claude 1.0 |
+| | V1 | V2 | sdd-claude 1.1 |
 |---|---|---|---|
 | ZIPs to install | 1 | 2 (toolkit + agents) | **1** |
 | Agents included in the skill | ❌ | ❌ | **✅** |
-| Universal commands | 9 | 14 | **15** |
+| Universal commands | 9 | 14 | **17** |
 | Available skills | 3 | 4 | **4** |
 | Global agents | ❌ | Separate | **Included** |
 
@@ -195,4 +195,4 @@ cd ~/tools/sdd-claude
 bash scripts/audit.sh
 ```
 
-The script checks: absence of ghost references (rules, and `settings.json` which is no longer deployed), correct agent delegations, 15 commands per skill, docs consistency. Output is `✅ AUDIT OK` or the list of problems.
+The script checks: absence of ghost references (rules, and `settings.json` which is no longer deployed), correct agent delegations, 17 commands per skill, docs consistency. Output is `✅ AUDIT OK` or the list of problems.

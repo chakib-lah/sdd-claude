@@ -46,6 +46,7 @@ Based on the ticket, identify the area of code most likely involved. Read the re
 
 **Load the available rules**:
 - `.claude/rules/00-sdd-framework.md` (methodology)
+- `.claude/rules/05-constitution.md` if ratified (durable project principles — the spec must not violate them)
 - `.claude/rules/10-code-conventions.md` if present (technical conventions)
 - `.claude/rules/30-tests-strategy.md` if present (test strategy)
 - Project-specific business rules as applicable
@@ -135,9 +136,10 @@ Open questions: N
 
 Next step:
 1. Read the spec in full
-2. Resolve the structural open questions
-3. Edit the frontmatter to set status to "approved"
-4. Run /sdd-plan
+2. Resolve the remaining ambiguities: /sdd-clarify (recommended if open questions remain)
+3. Score the spec: /sdd-spec-check
+4. Edit the frontmatter to set status to "approved"
+5. Run /sdd-plan
 ```
 
 ## Stop rules

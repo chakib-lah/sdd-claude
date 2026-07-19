@@ -155,7 +155,21 @@ SDD artifacts:
 ═══════════════════════════════════════════════════════════
 ```
 
-### 11. Announce the next step
+### 11. Record the gate result in `notes.md`
+
+Append to `.claude/sdd/<feature>/notes.md` (this is an SDD artifact, not source code — the read-only rule applies to the project's code):
+
+```markdown
+## Verify gate — <date> <time>
+
+- Result: READY (or BLOCKED)
+- HEAD: <commit sha>
+- Summary: <one line per red point, or "all green">
+```
+
+`/sdd-review` uses this entry as proof that the technical gate ran.
+
+### 12. Announce the next step
 
 **If everything is green**:
 

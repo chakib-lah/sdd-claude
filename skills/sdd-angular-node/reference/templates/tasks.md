@@ -11,6 +11,7 @@ author: <name>
 
 - One task = 30 min to 2 h max
 - One task = a single commit
+- Markers: `[ ]` pending · `[~]` in progress · `[x]` done — no other marker is valid
 - `[P]` = parallelizable (no dependency with the other `[P]` tasks)
 - `Blocked by` = this task cannot start before the blocking one is `done`
 - The commit SHA is filled in automatically by `/sdd-implement`

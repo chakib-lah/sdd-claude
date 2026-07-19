@@ -7,16 +7,16 @@
 
 ## Role of `core/`
 
-`core/` contains the **27 "masters"**: the Layer 1 (methodology) files, identical for all stacks. Each skill embeds a **byte-identical copy** of these 27 masters in its `reference/` directory. The consistency of these copies is verified by hash in `scripts/audit.sh` (section 6).
+`core/` contains the **30 "masters"**: the Layer 1 (methodology) files, identical for all stacks. Each skill embeds a **byte-identical copy** of these 30 masters in its `reference/` directory. The consistency of these copies is verified by hash in `scripts/audit.sh` (section 6).
 
-The 27 masters:
+The 30 masters:
 
 | Category | Count | Files |
 |---|---|---|
-| Commands | **15** | the 15 universal SDD commands (see table below) |
+| Commands | **17** | the 17 universal SDD commands (see table below) |
 | Agents | **4** | `spec-writer`, `plan-architect`, `task-decomposer`, `code-reviewer` |
 | Templates | **5** | `spec.md`, `plan.md`, `tasks.md`, `notes.md`, `sdd-readme.md` |
-| Rules | **3** | `00-sdd-framework.md`, `20-git-conventions.md`, `50-security.md` |
+| Rules | **4** | `00-sdd-framework.md`, `05-constitution.md`, `20-git-conventions.md`, `50-security.md` |
 
 > **Exception: `agents/test-generator.md` is NOT a master.** It is **adapted per skill** (each stack cites only its own test commands). It is therefore excluded from the hash equality check. `core/agents/` nevertheless contains a generic source version of `test-generator.md` as a starting point.
 
@@ -50,7 +50,7 @@ Review  →  Functional gate: acceptance criteria coverage
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ LAYER 1 — METHODOLOGY (the 27 masters, source here)        │
+│ LAYER 1 — METHODOLOGY (the 30 masters, source here)        │
 │ Universal, identical across all projects                   │
 └────────────────────────────────────────────────────────────┘
                             ▼ plugged in per stack
@@ -64,7 +64,7 @@ Review  →  Functional gate: acceptance criteria coverage
 └────────────────────────────────────────────────────────────┘
 ```
 
-A **skill** (`skills/sdd-<stack>/`) is the packaging that brings together Layer 1 (the 27 copied masters) **and** Layer 2 (the stack-specific conventions and commands). It is the unit installed on a project. Layer 3 is added manually by the team as the project evolves.
+A **skill** (`skills/sdd-<stack>/`) is the packaging that brings together Layer 1 (the 30 copied masters) **and** Layer 2 (the stack-specific conventions and commands). It is the unit installed on a project. Layer 3 is added manually by the team as the project evolves.
 
 ---
 
@@ -78,7 +78,7 @@ core/
 │   ├── 00-sdd-framework.md    ← The methodology in detail
 │   ├── 20-git-conventions.md  ← Universal Git conventions
 │   └── 50-security.md         ← Secure-coding baseline + security gate
-├── commands/                  ← 15 universal SDD commands (masters)
+├── commands/                  ← 17 universal SDD commands (masters)
 │   └── …
 ├── agents/                    ← 5 SDD agents (4 masters + test-generator adapted/skill)
 │   ├── spec-writer.md
@@ -99,12 +99,13 @@ core/
 
 ---
 
-## The 15 universal commands
+## The 17 universal commands
 
 | Command | Phase | Role |
 |---|---|---|
 | `/sdd-start` | Init | Creates the branch + the feature directory |
 | `/sdd-spec` | 1 — Specify | Interview → generates `spec.md` |
+| `/sdd-clarify` | 1 — Specify | Dedicated ambiguity-resolution pass on the spec |
 | `/sdd-spec-check` | 1 — Specify | Spec quality checklist before validation |
 | `/sdd-plan` | 2 — Plan | Generates `plan.md` from an approved spec |
 | `/sdd-tasks` | 3 — Tasks | Breaks down into atomic tasks `T001…TN` |
@@ -117,9 +118,10 @@ core/
 | `/sdd-hotfix` | Emergency | Lightened workflow for a Production fix |
 | `/sdd-upgrade` | Maintenance | Updates Layer 1 without touching Layers 2/3 |
 | `/sdd-changelog` | Release | Generates the CHANGELOG from archived specs |
+| `/sdd-revert` | Rollback | Un-ships a feature/task via the tracked commit SHAs |
 | `/retro-spec` | Brownfield | Rebuilds a spec from existing code |
 
-**These 15 names and their roles are stable**: do not rename them in a skill's Layer 2, otherwise team portability across projects is broken.
+**These 17 names and their roles are stable**: do not rename them in a skill's Layer 2, otherwise team portability across projects is broken.
 
 ---
 
@@ -135,7 +137,7 @@ core/
 
 ### Creating a new stack skill
 
-Follow the step-by-step skeleton: **`examples/skill-template.md`**. In short: create `skills/sdd-<stack>/reference/{agents,commands,rules,templates}/`, copy the 27 masters from `core/`, write Layer 2 (conventions + scaffolding commands), adapt `test-generator.md`, write the `SKILL.md`, wire the skill into `install.sh` / `install.ps1` / `skills/README.md`, then validate with `bash scripts/audit.sh`.
+Follow the step-by-step skeleton: **`examples/skill-template.md`**. In short: create `skills/sdd-<stack>/reference/{agents,commands,rules,templates}/`, copy the 30 masters from `core/`, write Layer 2 (conventions + scaffolding commands), adapt `test-generator.md`, write the `SKILL.md`, wire the skill into `install.sh` / `install.ps1` / `skills/README.md`, then validate with `bash scripts/audit.sh`.
 
 ---
 

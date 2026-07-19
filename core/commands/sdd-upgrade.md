@@ -23,11 +23,12 @@ description: SDD maintenance — updates the common core (Layer 1) without touch
 
 #### 1.1 — Universal commands
 
-Check the presence of each of the 15 universal commands (compare against the toolkit's current `core/commands/` set):
+Check the presence of each of the 17 universal commands (compare against the toolkit's current `core/commands/` set):
 
 ```
 sdd-start        : [✅ present / ❌ missing / ⚠️ divergent behavior]
 sdd-spec         : [...]
+sdd-clarify      : [...]
 sdd-spec-check   : [...]
 sdd-plan         : [...]
 sdd-tasks        : [...]
@@ -40,6 +41,7 @@ sdd-status       : [...]
 sdd-hotfix       : [...]
 sdd-upgrade      : [...]
 sdd-changelog    : [...]
+sdd-revert       : [...]
 retro-spec       : [...]
 ```
 
@@ -47,6 +49,7 @@ retro-spec       : [...]
 
 ```
 00-sdd-framework.md   : [✅ present / ❌ missing / ⚠️ old version]
+05-constitution.md    : [✅ / ❌ / ⚠️ — never overwrite a filled-in constitution]
 20-git-conventions.md : [✅ / ❌ / ⚠️]
 50-security.md        : [✅ / ❌ / ⚠️]
 ```
@@ -129,5 +132,6 @@ Layer 3 (project skills): unchanged ✅
 ## Stop rules
 
 - ❌ **Never touch** Layer 2 or Layer 3 files — even if outdated
-- ❌ **Never rename** the 15 existing universal commands
+- ❌ **Never rename** the 17 existing universal commands
+- ❌ **Never overwrite** a project's filled-in `05-constitution.md` — only deploy the skeleton where none exists
 - ✅ **Always wait** for explicit confirmation before writing anything

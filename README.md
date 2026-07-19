@@ -15,7 +15,7 @@ The framework stacks three layers: the methodology is universal, the technology 
 ```
 ┌────────────────────────────────────────────────────────────────┐
 │  Layer 1 — Methodology (universal, identical everywhere)         │
-│  15 SDD commands · 5 SDD agents · templates · process rules      │
+│  17 SDD commands · 5 SDD agents · templates · process rules      │
 └────────────────────────────────────────────────────────────────┘
                           ↓ plugged in per stack
 ┌────────────────────────────────────────────────────────────────┐
@@ -56,13 +56,13 @@ package.json contains @angular/core ?
 | `sdd-symfony-angular` | Symfony + Angular | Full-stack application |
 | `sdd-angular-node` | Angular + Node.js/Express | Full-stack application (Node) |
 
-Each skill ships the **15 universal commands** + the **5 SDD agents** + its **stack rules** + its own **scaffolding commands** (e.g. `symfony-entity`, `angular-component`, `node-endpoint`). Details in `skills/README.md`.
+Each skill ships the **17 universal commands** + the **5 SDD agents** + its **stack rules** + its own **scaffolding commands** (e.g. `symfony-entity`, `angular-component`, `node-endpoint`). Details in `skills/README.md`.
 
 ---
 
 ## Ticket → MR workflow
 
-This is the heart of the framework: a sequence of 15 commands across 4 phases, **paced by manual stop points (✋)**. At each ✋, a human — not the AI — moves the document to `status: approved`. As long as the spec is not `approved`, no production code is written. As long as the plan is not `approved`, no tasks are broken down. **These manual validations are the core of the method.**
+This is the heart of the framework: a sequence of 17 commands across 4 phases, **paced by manual stop points (✋)**. At each ✋, a human — not the AI — moves the document to `status: approved`. As long as the spec is not `approved`, no production code is written. As long as the plan is not `approved`, no tasks are broken down. **These manual validations are the core of the method.**
 
 ```
 /sdd-start <PROJ-xxx>-<desc>   → creates the Git branch + the feature folder
@@ -97,12 +97,13 @@ This is the heart of the framework: a sequence of 15 commands across 4 phases, *
 
 The **3 ✋ MANUAL GATES** (spec → plan → tasks) guarantee that we never build on unvalidated foundations. The **2 🚦 automatic GATES** (`/sdd-verify`, `/sdd-review`) guarantee that we never propose an MR with red tests or an uncovered acceptance criterion.
 
-### The 15 commands at a glance
+### The 17 commands at a glance
 
 | Command | Phase | Role |
 |---|---|---|
 | `/sdd-start` | Init | Creates the branch + the feature folder |
 | `/sdd-spec` | 1 | Interview → `spec.md` via `@spec-writer` |
+| `/sdd-clarify` | 1 | Dedicated ambiguity-resolution pass on the spec |
 | `/sdd-spec-check` | 1 | Quality checklist before validation |
 | `/sdd-plan` | 2 | `spec.md` approved → `plan.md` via `@plan-architect` |
 | `/sdd-tasks` | 3 | `plan.md` approved → `tasks.md` via `@task-decomposer` |
@@ -115,6 +116,7 @@ The **3 ✋ MANUAL GATES** (spec → plan → tasks) guarantee that we never bui
 | `/sdd-hotfix` | Emergency | Lightweight workflow for a Production fix |
 | `/sdd-upgrade` | Maintenance | Updates Layer 1 without touching Layers 2/3 |
 | `/sdd-changelog` | Release | CHANGELOG from archived specs |
+| `/sdd-revert` | Rollback | Un-ships a feature/task via the tracked commit SHAs |
 | `/retro-spec` | Brownfield | Rebuilds a spec from existing code |
 
 > The `PROJ-xxx` identifiers and the `User` / `Order` / `Certificate` names are only neutral examples: replace them with your own tickets and entities.
@@ -175,7 +177,7 @@ Run it after **any change** to the toolkit (adding a command/agent/rule, editing
 bash scripts/audit.sh
 ```
 
-In a single pass it checks: the **structure** of the skills, **completeness** (15 commands + 5 agents per skill, 8 global agents), the absence of **ghost references**, the consistency of **agent delegations**, the **docs**, and the **absence of divergent duplication** (files shared across skills must stay byte-identical). Output is `✅ AUDIT OK` or the list of detected problems.
+In a single pass it checks: the **structure** of the skills, **completeness** (17 commands + 5 agents per skill, 8 global agents), the absence of **ghost references**, the consistency of **agent delegations**, the **docs**, and the **absence of divergent duplication** (files shared across skills must stay byte-identical). Output is `✅ AUDIT OK` or the list of detected problems.
 
 ---
 
@@ -196,4 +198,4 @@ The toolkit is not limited to the 4 shipped skills: you can add a skill for a ne
 | `core/extension-guide.md` | Creating a new stack skill |
 | `core/ci-templates/` | CI snippets |
 
-Version 1.0.0 — July 2026.
+Version 1.1.0 — July 2026.

@@ -8,7 +8,7 @@
 
 The toolkit stacks **3 layers**:
 
-- **Layer 1 — Universal methodology**: the 15 SDD commands, the 5 SDD agents, the templates and the 3 process rules. Identical everywhere, never adapted.
+- **Layer 1 — Universal methodology**: the 17 SDD commands, the 5 SDD agents, the templates and the 4 process rules. Identical everywhere, never adapted.
 - **Layer 2 — Technology**: code rules, test strategy, quality gates and scaffolding commands specific to the stack.
 - **Layer 3 — Project**: business skills, house conventions, project-specific code templates (added by the team).
 
@@ -30,8 +30,8 @@ skills/sdd-<stack>/
     │   ├── task-decomposer.md        ← MASTER
     │   ├── code-reviewer.md          ← MASTER
     │   └── test-generator.md         ← ONLY agent adapted to the stack
-    ├── commands/                     ← 15 SDD commands + scaffolding commands
-    │   ├── sdd-start.md … retro-spec.md   ← 15 MASTERS (copied verbatim from core)
+    ├── commands/                     ← 17 SDD commands + scaffolding commands
+    │   ├── sdd-start.md … retro-spec.md   ← 17 MASTERS (copied verbatim from core)
     │   └── <stack>-entity.md, <stack>-test.md, …   ← stack-specific (Layer 2)
     ├── rules/
     │   ├── 00-sdd-framework.md       ← MASTER (methodology, copied from core)
@@ -53,19 +53,19 @@ skills/sdd-<stack>/
 
 This is the most important rule in this guide. Team portability relies on Layer 1 being **rigorously identical** in all skills. A dev who masters one project must find exactly the same commands, agents and templates on another one, byte for byte.
 
-### (a) The 27 masters from `core/` are copied verbatim
+### (a) The 30 masters from `core/` are copied verbatim
 
-When creating a skill, we **copy** — without ever adapting them — the **27 master files** from `core/` to `skills/sdd-<stack>/reference/`:
+When creating a skill, we **copy** — without ever adapting them — the **30 master files** from `core/` to `skills/sdd-<stack>/reference/`:
 
 | Origin (`core/`) | Count | Destination (`reference/`) |
 |---|---|---|
-| `core/commands/*.md` (the 15 SDD commands) | 15 | `commands/` |
+| `core/commands/*.md` (the 17 SDD commands) | 17 | `commands/` |
 | `core/agents/*.md` **except `test-generator.md`** | 4 | `agents/` |
 | `core/templates/*.md` | 5 | `templates/` |
-| `core/rules/*.md` (`00-sdd-framework`, `20-git-conventions`, `50-security`) | 3 | `rules/` |
-| **Total** | **27** | |
+| `core/rules/*.md` (`00-sdd-framework`, `05-constitution`, `20-git-conventions`, `50-security`) | 4 | `rules/` |
+| **Total** | **30** | |
 
-These 27 files are not to be touched: no renaming, no rephrasing, no "local improvement". Any evolution happens in `core/` and is then **re-propagated** to all skills (see *Synchronization with the core*).
+These 30 files are not to be touched: no renaming, no rephrasing, no "local improvement". Any evolution happens in `core/` and is then **re-propagated** to all skills (see *Synchronization with the core*).
 
 ### (b) Only `test-generator` is adapted to the stack
 
@@ -90,10 +90,10 @@ bash scripts/audit.sh
 The audit checks in a single pass:
 
 1. **Structure** — `SKILL.md` present, `reference/{agents,commands,rules,templates}/` non-empty, no `settings.json` (option A: no hooks), skill wired into the installers.
-2. **Completeness** — the 15 core commands + the 5 SDD agents present in the skill, the 8 global agents present.
+2. **Completeness** — the 17 core commands + the 5 SDD agents present in the skill, the 8 global agents present.
 3. **Ghost references** — every cited rule / command (`.claude/rules/X.md`, `.claude/commands/X.md`) actually exists.
 4. **Delegations** — `plan-architect` does cite `/sdd-plan`; `test-generator` cites only `*-test` commands actually present in the skill.
-5. **Docs** — correct command count (15), skill documented in `skills/README.md`.
+5. **Docs** — correct command count (17), skill documented in `skills/README.md`.
 6. **Anti-drift (hash equality)** — every `core/` master is **byte-identical** (md5) in the 4 skills, **`test-generator` excepted**; and the groups shared between skills of the same family remain identical (`angular-*` commands/rules between `sdd-symfony-angular` and `sdd-angular-node`; `symfony-*` commands/rules between `sdd-php-symfony` and `sdd-symfony-angular`).
 
 The output must remain `✅ AUDIT OK`. Any drift of a master triggers a `✗ … differs from core/ (drift)`.
@@ -104,12 +104,12 @@ The output must remain `✅ AUDIT OK`. Any drift of a master triggers a `✗ …
 
 ### ❌ Prohibitions
 
-**Never rename or redefine the 15 universal SDD commands**:
+**Never rename or redefine the 17 universal SDD commands**:
 `/sdd-start`, `/sdd-spec`, `/sdd-spec-check`, `/sdd-plan`, `/sdd-tasks`, `/sdd-implement`, `/sdd-verify`, `/sdd-review`, `/sdd-mr`, `/sdd-archive`, `/sdd-status`, `/sdd-hotfix`, `/sdd-upgrade`, `/sdd-changelog`, `/retro-spec`.
 
 These commands belong to Layer 1. Modifying them breaks team portability across projects.
 
-**Never alter a master** (see *Consistency with the core*): the 27 masters are copied verbatim. The only allowed adaptation on the agents side is `test-generator`.
+**Never alter a master** (see *Consistency with the core*): the 30 masters are copied verbatim. The only allowed adaptation on the agents side is `test-generator`.
 
 **Never pollute the methodology with tech**:
 - No mention of "PHPUnit", "Jest", "JUnit" in `00-sdd-framework.md`.
@@ -160,7 +160,7 @@ A stack skill's `SKILL.md` must:
 1. Declare the scope (when to use it / when not to use it) and the detection triggers (e.g. `composer.json` contains `symfony/framework-bundle`).
 2. Describe the deployment from `reference/` to `.claude/`.
 3. Detect brownfield / greenfield mode and adapt to it.
-4. Check the presence of the 27 masters (otherwise, refuse and point back to the core).
+4. Check the presence of the 30 masters (otherwise, refuse and point back to the core).
 
 Typical skeleton of the installation flow:
 
@@ -172,7 +172,7 @@ Typical skeleton of the installation flow:
 ## Phase 0 — Common core verification
 Check the presence of the Layer 1 masters:
 - .claude/rules/00-sdd-framework.md, 20-git-conventions.md, 50-security.md
-- the 15 commands .claude/commands/sdd-*.md (+ retro-spec.md)
+- the 17 commands .claude/commands/sdd-*.md (+ retro-spec.md)
 - the templates .claude/sdd/_template/*.md
 If any is missing: refuse and install Layer 1 first.
 
@@ -196,8 +196,8 @@ Next step: add the project's business skills in .claude/skills/ (Layer 3).
 
 Before publishing a skill, check:
 
-- [ ] The **27 masters** from `core/` are copied verbatim into `reference/` (verified by `audit.sh §6`)
-- [ ] The **15 universal SDD commands** are neither renamed nor redefined
+- [ ] The **30 masters** from `core/` are copied verbatim into `reference/` (verified by `audit.sh §6`)
+- [ ] The **17 universal SDD commands** are neither renamed nor redefined
 - [ ] Only `test-generator` is adapted to the stack; the 4 other SDD agents remain masters
 - [ ] The granularity of the auxiliary commands is consistent with the team's other skills
 - [ ] The Layer 2 rules are technical only (no business, no process)
@@ -221,7 +221,7 @@ Focused questions:
 
 ### Generation (Phase 3) — Layer 2 only
 
-The 27 masters are already copied from `core/`. Only the stack-specific files are generated:
+The 30 masters are already copied from `core/`. Only the stack-specific files are generated:
 
 ```
 reference/rules/
@@ -267,7 +267,7 @@ reference/agents/
 2. `sdd-python-django` — Python / Django projects
 3. `sdd-go` — Go services
 
-For each: copy the 27 masters, write Layer 2 (rules + scaffolding + `test-generator`), wire the installers and `skills/README.md`, then validate with `audit.sh`.
+For each: copy the 30 masters, write Layer 2 (rules + scaffolding + `test-generator`), wire the installers and `skills/README.md`, then validate with `audit.sh`.
 
 ---
 

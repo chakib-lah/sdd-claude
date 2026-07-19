@@ -4,7 +4,7 @@
 #
 # Checks that the framework is installable, consistent, complete and duplication-free:
 #   1. Structure       — skills tree + global-agents + installers
-#   2. Completeness    — 15 core commands + 5 SDD agents per skill, 8 global agents
+#   2. Completeness    — 17 core commands + 5 SDD agents per skill, 8 global agents
 #   3. Ghost refs      — every referenced rule/command actually exists
 #   4. Delegations     — test-generator / plan-architect consistent
 #   5. Docs            — correct command count, skills documented
@@ -19,7 +19,7 @@ hashf(){ md5sum < "$1" | cut -d' ' -f1; }
 
 # ---- Reference lists (the package's sources of truth) ----
 SKILLS="sdd-php-backend sdd-php-symfony sdd-symfony-angular sdd-angular-node"
-CORE_CMDS="sdd-start sdd-spec sdd-spec-check sdd-plan sdd-tasks sdd-implement sdd-verify sdd-review sdd-mr sdd-archive sdd-status sdd-hotfix sdd-upgrade sdd-changelog retro-spec"
+CORE_CMDS="sdd-start sdd-spec sdd-clarify sdd-spec-check sdd-plan sdd-tasks sdd-implement sdd-verify sdd-review sdd-mr sdd-archive sdd-status sdd-hotfix sdd-upgrade sdd-changelog sdd-revert retro-spec"
 SDD_AGENTS="spec-writer plan-architect task-decomposer test-generator code-reviewer"
 GLOBAL_AGENTS="debugger git-assistant security-reviewer refactoring-advisor symfony-expert angular-expert doctrine-migration-expert phpstan-fixer"
 
@@ -55,7 +55,7 @@ done
 [ $err -eq $before ] && ok "tree of the 4 skills + global-agents + installers conforms"
 
 # =====================================================================
-say "== 2. Completeness (15 core commands + 5 SDD agents / skill, 8 global agents) =="
+say "== 2. Completeness (17 core commands + 5 SDD agents / skill, 8 global agents) =="
 before=$err
 for c in $CORE_CMDS; do [ -f "core/commands/$c.md" ] || fail "core: missing command: $c"; done
 for a in $SDD_AGENTS; do [ -f "core/agents/$a.md" ]   || fail "core: missing SDD agent: $a"; done
@@ -64,7 +64,7 @@ for s in $SKILLS; do
   for a in $SDD_AGENTS; do [ -f "skills/$s/reference/agents/$a.md" ]   || fail "$s: missing SDD agent: $a"; done
 done
 for a in $GLOBAL_AGENTS; do [ -f "global-agents/$a.md" ] || fail "missing global agent: $a"; done
-[ $err -eq $before ] && ok "15 core commands + 5 SDD agents present everywhere, 8 global agents present"
+[ $err -eq $before ] && ok "17 core commands + 5 SDD agents present everywhere, 8 global agents present"
 
 # =====================================================================
 say "== 3. Ghost references (cited rules / commands actually exist) =="
@@ -110,13 +110,13 @@ done
 # =====================================================================
 say "== 5. Docs (command count, skills documented, install paths) =="
 before=$err
-# wrong count: the canonical number is 15
-c=$(grep -rlE '\b(9|14) (command|commande)' README.md INSTALL.md skills/README.md skills/*/SKILL.md 2>/dev/null | wc -l)
-[ "$c" -eq 0 ] || fail "docs: wrong command count (9/14) in $c file(s)"
+# wrong count: the canonical number is 17
+c=$(grep -rlE '\b(9|12|14|15) (command|commande)' README.md INSTALL.md skills/README.md skills/*/SKILL.md 2>/dev/null | wc -l)
+[ "$c" -eq 0 ] || fail "docs: wrong command count (9/12/14/15) in $c file(s)"
 # wrong count inside command/agent/rule BODIES too (not just top-level docs)
 while IFS= read -r hit; do
   fail "wrong command count in body: $hit"
-done < <(grep -rnE '\b(9|12|14) (universal )?(command|commande)' core skills --include='*.md' 2>/dev/null)
+done < <(grep -rnE '\b(9|12|14|15) (universal )?(command|commande)' core skills --include='*.md' 2>/dev/null)
 # stale version narrative: commands must stay version-agnostic
 while IFS= read -r hit; do
   fail "stale version narrative: $hit"
@@ -125,7 +125,7 @@ done < <(grep -rnE 'new command v[0-9]' core skills --include='*.md' 2>/dev/null
 for s in $SKILLS; do
   grep -q "$s" skills/README.md 2>/dev/null || fail "skills/README.md does not mention $s"
 done
-[ $err -eq $before ] && ok "command count correct (15) and 4 skills documented"
+[ $err -eq $before ] && ok "command count correct (17) and 4 skills documented"
 
 # =====================================================================
 say "== 6. Content equality of shared files (anti-drift) =="
@@ -174,7 +174,7 @@ check_shared "angular" "sdd-symfony-angular sdd-angular-node" \
 check_shared "symfony" "sdd-php-symfony sdd-symfony-angular" \
   commands/symfony-entity.md commands/symfony-service.md commands/symfony-controller.md commands/symfony-test.md \
   rules/doctrine-conventions.md
-[ $err -eq $before ] && ok "27 core masters + angular/symfony groups identical (hash)"
+[ $err -eq $before ] && ok "30 core masters + angular/symfony groups identical (hash)"
 
 # =====================================================================
 echo ""
