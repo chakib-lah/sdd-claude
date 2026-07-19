@@ -23,23 +23,24 @@ description: SDD maintenance — updates the common core (Layer 1) without touch
 
 #### 1.1 — Universal commands
 
-Check the presence of each of the 12 universal commands:
+Check the presence of each of the 15 universal commands (compare against the toolkit's current `core/commands/` set):
 
 ```
 sdd-start        : [✅ present / ❌ missing / ⚠️ divergent behavior]
 sdd-spec         : [...]
+sdd-spec-check   : [...]
 sdd-plan         : [...]
 sdd-tasks        : [...]
 sdd-implement    : [...]
 sdd-verify       : [...]
 sdd-review       : [...]
+sdd-mr           : [...]
+sdd-archive      : [...]
 sdd-status       : [...]
+sdd-hotfix       : [...]
+sdd-upgrade      : [...]
+sdd-changelog    : [...]
 retro-spec       : [...]
-sdd-archive      : [✅ / ❌ missing — new command v1.1]
-sdd-mr           : [✅ / ❌ missing — new command v1.1]
-sdd-spec-check   : [✅ / ❌ missing — new command v1.1]
-sdd-hotfix       : [✅ / ❌ missing — new command v1.1]
-sdd-changelog    : [✅ / ❌ missing — new command v1.1]
 ```
 
 #### 1.2 — Methodology rules
@@ -47,6 +48,7 @@ sdd-changelog    : [✅ / ❌ missing — new command v1.1]
 ```
 00-sdd-framework.md   : [✅ present / ❌ missing / ⚠️ old version]
 20-git-conventions.md : [✅ / ❌ / ⚠️]
+50-security.md        : [✅ / ❌ / ⚠️]
 ```
 
 #### 1.3 — Templates
@@ -72,24 +74,20 @@ List the files that MUST NOT be touched:
 
 ### 3. Produce the upgrade plan
 
-Display in the chat:
+Display in the chat (example — the actual lists come from the audit in step 1):
 
 ```
 SDD upgrade plan (Layer 1 only)
 ─────────────────────────────────────────
 TO ADD:
-  + .claude/commands/sdd-archive.md
-  + .claude/commands/sdd-mr.md
-  + .claude/commands/sdd-spec-check.md
-  + .claude/commands/sdd-hotfix.md
-  + .claude/commands/sdd-changelog.md
+  + .claude/commands/<missing-command>.md
+  + ...
 
 TO UPDATE:
-  ~ .claude/commands/sdd-implement.md  ([P] task strategy)
-  ~ .claude/commands/sdd-review.md     (fix+re-review cycle)
-  ~ .claude/rules/00-sdd-framework.md  (context recovery section)
-  ~ .claude/sdd/_template/notes.md     (structured template)
-  ~ .claude/sdd/_template/tasks.md     (blocked-by field)
+  ~ .claude/commands/<divergent-command>.md  (reason)
+  ~ .claude/rules/<outdated-rule>.md         (reason)
+  ~ .claude/sdd/_template/<template>.md      (reason)
+  ~ ...
 
 NOT TO TOUCH (Layers 2 and 3 preserved):
   ✓ .claude/rules/10-code-conventions.md
@@ -113,7 +111,7 @@ After confirmation:
 ### 5. Commit
 
 ```
-chore(sdd): upgrade SDD core v1.0.0 → v1.1.0
+chore(sdd): upgrade SDD core to toolkit v<X.Y.Z>
 ```
 
 ### 6. Announce in the chat
@@ -121,8 +119,8 @@ chore(sdd): upgrade SDD core v1.0.0 → v1.1.0
 ```
 ✅ SDD Core updated.
 
-Added:   sdd-archive, sdd-mr, sdd-spec-check, sdd-hotfix, sdd-changelog
-Updated: sdd-implement, sdd-review, 00-sdd-framework, notes.md, tasks.md
+Added:   <list of added commands/rules/templates>
+Updated: <list of updated files>
 
 Layer 2 (stack conventions): unchanged ✅
 Layer 3 (project skills): unchanged ✅
@@ -131,5 +129,5 @@ Layer 3 (project skills): unchanged ✅
 ## Stop rules
 
 - ❌ **Never touch** Layer 2 or Layer 3 files — even if outdated
-- ❌ **Never rename** the 9 existing universal commands
+- ❌ **Never rename** the 15 existing universal commands
 - ✅ **Always wait** for explicit confirmation before writing anything

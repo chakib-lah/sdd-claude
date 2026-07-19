@@ -166,13 +166,13 @@ cp ~/tools/sdd-claude/global-agents/*.md ~/.claude/agents/
 
 ---
 
-## Difference with V1/V2
+## Difference with previous packages (former sdd-toolkit V1/V2)
 
-| | V1 | V2 | V3 |
+| | V1 | V2 | sdd-claude 1.0 |
 |---|---|---|---|
 | ZIPs to install | 1 | 2 (toolkit + agents) | **1** |
 | Agents included in the skill | ❌ | ❌ | **✅** |
-| Universal commands | 9 | 14 | **14** |
+| Universal commands | 9 | 14 | **15** |
 | Available skills | 3 | 4 | **4** |
 | Global agents | ❌ | Separate | **Included** |
 

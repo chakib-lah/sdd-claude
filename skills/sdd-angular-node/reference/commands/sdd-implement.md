@@ -77,9 +77,8 @@ Before writing any code, load:
 - `.claude/rules/20-git-conventions.md` (universal Git conventions)
 - `.claude/rules/30-tests-strategy.md` if present (test strategy)
 - `.claude/rules/40-quality-gates.md` if present (quality gates)
-- `` if present (team templates)
 - Relevant skills in `.claude/skills/` depending on the nature of the task
-- Templates in `.claude/templates/` if applicable
+- Templates in `.claude/sdd/_template/` if applicable
 
 ### 5. Mark the task `in_progress`
 
