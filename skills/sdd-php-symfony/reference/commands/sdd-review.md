@@ -33,7 +33,7 @@ Read:
 Parse the "Acceptance criteria" section of `spec.md` and list each AC with an identifier:
 
 ```
-AC-1: When [situation], the system [action] and [result]
+AC-1: When [situation], the system [action] and [expected result]
 AC-2: ...
 AC-3: ...
 ```
@@ -82,7 +82,7 @@ If the spec contains non-regression ACs (typical for bugfixes), explicitly verif
   Gate Review — <FEATURE-ID>-<description>
 ═══════════════════════════════════════════════════════════
 
-AC-1: When [situation], the system [action] and [result]
+AC-1: When [situation], the system [action] and [expected result]
   Code           : ✅ Implemented in src/.../FileA.php:42-58
   Tests          : ✅ Covered by tests/.../FileATest.php::testSituation
   Tasks          : T002, T005

@@ -13,7 +13,7 @@ Produce `spec.md` files that are clear, testable and unambiguous. A spec you pro
 ## Non-negotiable rules
 
 ### Acceptance criteria
-- MANDATORY format: `When [situation], the system [action] and [observable result]`
+- MANDATORY format: `When [situation], the system [action] and [expected result]`
 - Every AC is **binary**: passes or does not pass — never "should be better"
 - No vague terms: never "fast", "user-friendly", "robust" without a measurable threshold
 - Every AC must be able to give rise to an automated test

@@ -74,6 +74,11 @@ for t in sdd-methodology.md 50-team-templates.md; do
   c=$(grep -rl "$t" core skills 2>/dev/null | wc -l)
   [ "$c" -eq 0 ] || fail "remaining ghost reference: $t ($c files)"
 done
+# 3a-bis. blanked references: list items with EMPTY inline code (e.g. "- `` if present")
+#         — residue of a deleted file whose path was blanked instead of the line removed
+while IFS= read -r hit; do
+  fail "blanked (empty-backtick) reference: $hit"
+done < <(grep -rnE '^[[:space:]]*-[[:space:]]*``([^`]|$)' core skills --include='*.md' 2>/dev/null)
 # 3b. every cited rule `.claude/rules/X.md` exists in core/rules OR in a skill
 #     (global existence: avoids false positives on cross-stack examples,
 #      e.g. sdd-upgrade.md which lists Layer 2 rules for illustration)
@@ -108,6 +113,14 @@ before=$err
 # wrong count: the canonical number is 15
 c=$(grep -rlE '\b(9|14) (command|commande)' README.md INSTALL.md skills/README.md skills/*/SKILL.md 2>/dev/null | wc -l)
 [ "$c" -eq 0 ] || fail "docs: wrong command count (9/14) in $c file(s)"
+# wrong count inside command/agent/rule BODIES too (not just top-level docs)
+while IFS= read -r hit; do
+  fail "wrong command count in body: $hit"
+done < <(grep -rnE '\b(9|12|14) (universal )?(command|commande)' core skills --include='*.md' 2>/dev/null)
+# stale version narrative: commands must stay version-agnostic
+while IFS= read -r hit; do
+  fail "stale version narrative: $hit"
+done < <(grep -rnE 'new command v[0-9]' core skills --include='*.md' 2>/dev/null)
 # every skill must be documented in the decision tree
 for s in $SKILLS; do
   grep -q "$s" skills/README.md 2>/dev/null || fail "skills/README.md does not mention $s"
@@ -146,6 +159,15 @@ check_shared(){
     done
   done
 }
+# 6c. Command↔agent duplicated logic: the canonical AC format must be identical
+#     wherever it is stated (commands, agents, templates), or the copies drift silently.
+AC_FORMAT='the system \[action\] and \[expected result\]'
+for f in core/templates/spec.md core/agents/spec-writer.md core/commands/sdd-spec.md core/commands/sdd-review.md; do
+  grep -q "$AC_FORMAT" "$f" 2>/dev/null || fail "AC format drift: canonical string missing in $f"
+done
+c=$(grep -rc "the system \[action\] and \[[a-z ]*result\]" core --include='*.md' 2>/dev/null | awk -F: '$2>0{n+=$2}END{print n+0}')
+canon=$(grep -rc "$AC_FORMAT" core --include='*.md' 2>/dev/null | awk -F: '$2>0{n+=$2}END{print n+0}')
+[ "$c" -eq "$canon" ] || fail "AC format drift: $((c-canon)) non-canonical variant(s) of the AC format in core/"
 check_shared "angular" "sdd-symfony-angular sdd-angular-node" \
   commands/angular-component.md commands/angular-service.md commands/angular-test.md \
   rules/angular-conventions.md
