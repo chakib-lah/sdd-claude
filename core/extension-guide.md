@@ -35,6 +35,7 @@ skills/sdd-<stack>/
     │   └── <stack>-entity.md, <stack>-test.md, …   ← stack-specific (Layer 2)
     ├── rules/
     │   ├── 00-sdd-framework.md       ← MASTER (methodology, copied from core)
+    │   ├── 01-constitution.md        ← MASTER (project-principles skeleton, copied from core)
     │   ├── 02-git-conventions.md     ← MASTER (Git, copied from core)
     │   ├── 03-security.md            ← MASTER (security baseline, copied from core)
     │   ├── 10-code-conventions.md    ← stack-specific (Layer 2)
@@ -75,7 +76,7 @@ These 30 files are not to be touched: no renaming, no rephrasing, no "local impr
 
 Everything else — and **only** the rest — is stack-specific:
 
-- The Layer 2 rules: `10-code-conventions.md`, `11-tests-strategy.md`, `12-quality-gates.md`, plus possible stack extras (`doctrine-conventions.md`, `angular-conventions.md`, `node-conventions.md`, `api-contracts.md`, `migration-guard.md`, `legacy-rules.md`, `shared-types.md`, …).
+- The Layer 2 rules: `10-code-conventions.md`, `11-tests-strategy.md`, `12-quality-gates.md`, plus possible stack extras (`doctrine-conventions.md`, `angular-conventions.md`, `node-conventions.md`, `api-contracts.md`, `migration-guard.md`, `legacy-rules.md`, `shared-types.md`, …). Numbering convention: **the first digit is the layer** — `0x` = Layer 1 methodology (never renumber), `1x` = Layer 2 stack rules; extras stay unnumbered.
 - The `<stack>-*` **scaffolding commands** (e.g. `symfony-entity`, `angular-component`, `node-endpoint`).
 - The `test-generator` agent (point b).
 

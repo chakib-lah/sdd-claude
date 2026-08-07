@@ -1,10 +1,10 @@
 ---
-description: SDD maintenance — updates the common core (Layer 1) without touching Layer 2 or the project skills (Layer 3)
+description: SDD maintenance — updates the common core (Layer 1) without touching the content of Layer 2 or the project skills (Layer 3)
 ---
 
 # /sdd-upgrade
 
-**Maintenance command**: update the SDD common core (Layer 1 — methodology) in an existing project, without touching the code conventions (Layer 2) or the domain skills (Layer 3).
+**Maintenance command**: update the SDD common core (Layer 1 — methodology) in an existing project, without touching the **content** of the code conventions (Layer 2) or the domain skills (Layer 3) — the only Layer 2 touch allowed is the step 0b file rename.
 
 ## When to use it
 
@@ -172,9 +172,10 @@ Do you confirm this upgrade?
 ### 4. Apply the upgrade
 
 After confirmation:
+- Apply the renames from step 0b (pure rename, content untouched)
 - Add the new commands
-- Update the identified files
-- Fully preserve the Layer 2 and Layer 3 files
+- Update the identified files (commands, rules, templates, **SDD agents**)
+- Fully preserve the **content** of Layer 2 and Layer 3 files (step 0b renames excepted)
 
 ### 5. Commit
 
@@ -187,17 +188,18 @@ chore(sdd): upgrade SDD core to toolkit v<X.Y.Z>
 ```
 ✅ SDD Core updated.
 
-Added:   <list of added commands/rules/templates>
+Renamed: <old name → new name list, per the step 0b map — or (none)>
+Added:   <list of added commands/rules/templates/agents>
 Updated: <list of updated files>
 
-Layer 2 (stack conventions): unchanged ✅
+Layer 2 (stack conventions): content unchanged ✅ (N file(s) renamed)
 Layer 3 (project skills): unchanged ✅
 ```
 
 ## Stop rules
 
 - ❌ **Never audit against this file's embedded checklists alone** — the reference directory resolved in step 0 is the only source of truth; if it cannot be located, stop and ask the user rather than concluding "nothing to upgrade"
-- ❌ **Never touch** Layer 2 or Layer 3 files — even if outdated
+- ❌ **Never touch the content** of Layer 2 or Layer 3 files — even if outdated. The only exception is the step 0b rename (filename only, content untouched)
 - ❌ **Never rename** the 17 existing universal commands
 - ❌ **Never touch** the developer's own agents (`.claude/agents/` files absent from the reference)
 - ❌ **Never overwrite** a project's filled-in `01-constitution.md` — only deploy the skeleton where none exists

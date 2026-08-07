@@ -36,9 +36,7 @@ S=skills/sdd-<stack>/reference
 cp core/commands/*.md   "$S/commands/"
 cp core/agents/*.md     "$S/agents/"
 cp core/templates/*.md  "$S/templates/"
-cp core/rules/00-sdd-framework.md   "$S/rules/"
-cp core/rules/02-git-conventions.md "$S/rules/"
-cp core/rules/03-security.md        "$S/rules/"
+cp core/rules/*.md      "$S/rules/"
 ```
 
 This installs: the **17 SDD commands**, the **5 agents** (including `test-generator`, which we will adapt in step 4), the **5 templates** and the **4 universal rules**.

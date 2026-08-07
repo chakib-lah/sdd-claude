@@ -74,8 +74,9 @@ A **skill** (`skills/sdd-<stack>/`) is the packaging that brings together Layer 
 core/
 ├── README.md                  ← This file
 ├── extension-guide.md         ← Notes on creating a new stack
-├── rules/                     ← 3 universal rules (masters)
+├── rules/                     ← 4 universal rules (masters)
 │   ├── 00-sdd-framework.md    ← The methodology in detail
+│   ├── 01-constitution.md     ← Durable project principles (skeleton)
 │   ├── 02-git-conventions.md  ← Universal Git conventions
 │   └── 03-security.md         ← Secure-coding baseline + security gate
 ├── commands/                  ← 17 universal SDD commands (masters)

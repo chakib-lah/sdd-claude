@@ -13,7 +13,17 @@ New-Item -ItemType Directory -Force -Path $AgentsDst | Out-Null
 foreach ($s in $Skills) {
   $src = Join-Path $ToolkitDir "skills\$s"
   $dst = Join-Path $SkillsDst $s
-  if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
+  if (Test-Path $dst) {
+    # A junction (left by upgrade-global.ps1) must be unlinked, NOT recursed:
+    # on Windows PowerShell 5.1, Remove-Item -Recurse follows the junction and
+    # would delete the toolkit's own skills/ content.
+    $item = Get-Item $dst -Force
+    if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+      [System.IO.Directory]::Delete($dst, $false)
+    } else {
+      Remove-Item -Recurse -Force $dst
+    }
+  }
   Copy-Item -Recurse $src $dst
   Write-Host "  skill copied: $s"
 }

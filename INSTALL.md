@@ -13,7 +13,7 @@ sdd-claude/
 ├── core/                   ← Universal reference (Layer 1)
 │   ├── agents/             ← 5 SDD agents (spec-writer, plan-architect...)
 │   ├── commands/           ← 17 universal SDD commands
-│   ├── rules/              ← Methodology + Git
+│   ├── rules/              ← Methodology + constitution + Git + security
 │   ├── templates/          ← spec/plan/tasks/notes
 │   └── ci-templates/       ← GitLab CI snippets
 ├── skills/                 ← 4 installable skills (Layer 2)
@@ -174,7 +174,7 @@ Projects are updated separately: run `/sdd-upgrade` inside each project.
 
 ## Difference with previous packages (former sdd-toolkit V1/V2)
 
-| | V1 | V2 | sdd-claude 1.1 |
+| | V1 | V2 | sdd-claude |
 |---|---|---|---|
 | ZIPs to install | 1 | 2 (toolkit + agents) | **1** |
 | Agents included in the skill | ❌ | ❌ | **✅** |

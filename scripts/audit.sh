@@ -48,6 +48,9 @@ for s in $SKILLS; do
   grep -q "$s" install.sh  2>/dev/null || fail "install.sh does not reference skill $s"
   grep -q "$s" install.ps1 2>/dev/null || fail "install.ps1 does not reference skill $s"
 done
+# global updaters present (they auto-discover skills, no per-skill wiring needed)
+[ -x upgrade-global.sh ]  || fail "upgrade-global.sh missing or not executable"
+[ -f upgrade-global.ps1 ] || fail "upgrade-global.ps1 missing"
 for d in skills/*/; do
   s=$(basename "$d")
   echo "$SKILLS" | grep -qw "$s" || fail "skill not declared in the reference list/installer: $s"
@@ -77,7 +80,7 @@ done
 # 3a-ter. rules renamed in v1.3.0: old names may appear ONLY in sdd-upgrade.md
 #         (its migration map documents them); anywhere else is drift
 for t in 05-constitution.md 20-git-conventions.md 50-security.md 30-tests-strategy.md 40-quality-gates.md; do
-  c=$(grep -rl "$t" core skills 2>/dev/null | grep -v "sdd-upgrade.md" | wc -l)
+  c=$(grep -rlF -- "$t" core skills 2>/dev/null | grep -v '/sdd-upgrade\.md$' | wc -l)
   [ "$c" -eq 0 ] || fail "renamed rule still cited under its old name: $t ($c files)"
 done
 # 3a-bis. blanked references: list items with EMPTY inline code (e.g. "- `` if present")
