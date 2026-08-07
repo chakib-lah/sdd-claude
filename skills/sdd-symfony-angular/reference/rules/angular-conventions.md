@@ -461,7 +461,7 @@ export const appConfig: ApplicationConfig = {
 
 ## Tests
 
-See `30-tests-strategy.md` for details. In short:
+See `11-tests-strategy.md` for details. In short:
 - Jest preferred over Karma
 - TestBed for components
 - HttpTestingController for HTTP services

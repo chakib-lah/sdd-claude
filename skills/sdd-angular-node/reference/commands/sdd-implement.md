@@ -76,9 +76,9 @@ Before writing any code, load:
 
 - `.claude/rules/00-sdd-framework.md` (methodology)
 - `.claude/rules/10-code-conventions.md` if present (stack code conventions)
-- `.claude/rules/20-git-conventions.md` (universal Git conventions)
-- `.claude/rules/30-tests-strategy.md` if present (test strategy)
-- `.claude/rules/40-quality-gates.md` if present (quality gates)
+- `.claude/rules/02-git-conventions.md` (universal Git conventions)
+- `.claude/rules/11-tests-strategy.md` if present (test strategy)
+- `.claude/rules/12-quality-gates.md` if present (quality gates)
 - Relevant skills in `.claude/skills/` depending on the nature of the task
 - Templates in `.claude/sdd/_template/` if applicable
 
@@ -104,7 +104,7 @@ If a structural surprise appears (ambiguous spec, missing dependency, flaky test
 
 ### 7. Run the tests
 
-Run the test suites listed in the task. The exact commands depend on the project (read `.claude/rules/30-tests-strategy.md`).
+Run the test suites listed in the task. The exact commands depend on the project (read `.claude/rules/11-tests-strategy.md`).
 
 **If a test fails**:
 - **NEVER** disable the test to unblock
@@ -114,7 +114,7 @@ Run the test suites listed in the task. The exact commands depend on the project
 
 ### 8. Run the quality gates
 
-Run the quality tools defined in `.claude/rules/40-quality-gates.md`. If one fails, fix it before continuing.
+Run the quality tools defined in `.claude/rules/12-quality-gates.md`. If one fails, fix it before continuing.
 
 **If a tool offers automatic fixes** (linter --fix, formatter, etc.), apply them in the **same commit** unless they are very large (in which case, a separate commit).
 
@@ -128,7 +128,7 @@ Before committing, display the diff and validate it mentally:
 
 ### 10. Commit (local)
 
-This commit is a **local, per-task commit**: it will be squashed into the phase commit at step 11b when the phase completes. Stage any pending SDD-artifact bookkeeping (from the previous task's step 11) together with the task's changes. Strictly follow `.claude/rules/20-git-conventions.md` for:
+This commit is a **local, per-task commit**: it will be squashed into the phase commit at step 11b when the phase completes. Stage any pending SDD-artifact bookkeeping (from the previous task's step 11) together with the task's changes. Strictly follow `.claude/rules/02-git-conventions.md` for:
 - The message format (subject line only, short)
 - Including the ticket in the scope
 

@@ -34,11 +34,11 @@ git status --porcelain
 git branch --show-current
 ```
 
-If the current branch is not the integration branch (default: `develop`, otherwise as defined in `.claude/rules/20-git-conventions.md`), offer to switch.
+If the current branch is not the integration branch (default: `develop`, otherwise as defined in `.claude/rules/02-git-conventions.md`), offer to switch.
 
 ### 2. Create the feature branch
 
-Read the branch convention in `.claude/rules/20-git-conventions.md` (format `<type>/<TICKET>-<description>`). Ask the user for the `<type>`:
+Read the branch convention in `.claude/rules/02-git-conventions.md` (format `<type>/<TICKET>-<description>`). Ask the user for the `<type>`:
 
 - `feature`: new business functionality
 - `fix`: bug fix

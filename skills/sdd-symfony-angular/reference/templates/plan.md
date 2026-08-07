@@ -66,7 +66,7 @@ For each acceptance criterion of the spec, indicate:
 - On which file or component
 - Which edge cases to cover
 
-Reference .claude/rules/30-tests-strategy.md if present.
+Reference .claude/rules/11-tests-strategy.md if present.
 -->
 
 | AC | Test type | Test file | Covered cases |

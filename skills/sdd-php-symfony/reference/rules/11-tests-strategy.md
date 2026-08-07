@@ -245,7 +245,7 @@ php bin/console doctrine:schema:create --env=test
 php bin/console doctrine:fixtures:load --env=test --no-interaction
 ```
 
-Recommended Makefile targets (to be added to `.claude/rules/40-quality-gates.md` too):
+Recommended Makefile targets (to be added to `.claude/rules/12-quality-gates.md` too):
 
 ```makefile
 test:

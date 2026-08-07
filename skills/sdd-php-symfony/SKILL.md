@@ -98,11 +98,11 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/agents/test-generator.md
 .claude/agents/code-reviewer.md
 .claude/rules/00-sdd-framework.md
-.claude/rules/05-constitution.md          (skeleton — never overwrite an existing one)
+.claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/10-code-conventions.md
-.claude/rules/20-git-conventions.md
-.claude/rules/30-tests-strategy.md
-.claude/rules/40-quality-gates.md
+.claude/rules/02-git-conventions.md
+.claude/rules/11-tests-strategy.md
+.claude/rules/12-quality-gates.md
 .claude/rules/doctrine-conventions.md
 .claude/rules/migration-guard.md          (brownfield only)
 .claude/sdd/_template/spec.md
@@ -141,8 +141,8 @@ Copy from `reference/` to project's `.claude/`, in this order:
 
 After copying, fill in:
 - `.claude/rules/10-code-conventions.md`: PHP version, Symfony version, architecture detected
-- `.claude/rules/30-tests-strategy.md`: PHPUnit version, test categories present
-- `.claude/rules/40-quality-gates.md`: target PHPStan level, CS-fixer config, Rector
+- `.claude/rules/11-tests-strategy.md`: PHPUnit version, test categories present
+- `.claude/rules/12-quality-gates.md`: target PHPStan level, CS-fixer config, Rector
 - `.claude/rules/doctrine-conventions.md`: Doctrine version, ORM patterns
 
 ### Phase 5 — Announce completion

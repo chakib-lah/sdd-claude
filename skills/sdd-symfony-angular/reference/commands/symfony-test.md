@@ -10,7 +10,7 @@ description: Scaffold PHPUnit tests (unit, integration, functional) from a SDD s
 
 - Active SDD feature with `tasks.md` `status: approved`
 - The class under test must already exist
-- Conventions available: `.claude/rules/30-tests-strategy.md`
+- Conventions available: `.claude/rules/11-tests-strategy.md`
 
 ## Steps
 
@@ -29,7 +29,7 @@ Automatic suggestion based on the class:
 
 ### 2. Load the conventions
 
-Read `.claude/rules/30-tests-strategy.md` to comply with:
+Read `.claude/rules/11-tests-strategy.md` to comply with:
 - Directory structure (`tests/Unit/`, `tests/Integration/`, `tests/Functional/`)
 - File naming (`<ClassName>Test.php`)
 - AAA pattern (Arrange / Act / Assert)

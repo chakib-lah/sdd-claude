@@ -49,7 +49,7 @@ parameters:
 composer require --dev friendsofphp/php-cs-fixer
 ```
 
-`.php-cs-fixer.dist.php` (see `sdd-php-symfony/40-quality-gates.md` for details).
+`.php-cs-fixer.dist.php` (see `sdd-php-symfony/12-quality-gates.md` for details).
 
 ### Rector
 

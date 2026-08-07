@@ -113,7 +113,7 @@ If the feature affects the frontend:
 
 <!--
 Mandatory when the feature touches authentication, personal data, money,
-file handling, or any external input. See `rules/50-security.md`.
+file handling, or any external input. See `rules/03-security.md`.
 - Data sensitivity: what data is touched (public / internal / personal / secret)?
 - Authentication / authorization impact: new endpoints, new roles, object-level checks (IDOR)?
 - External inputs: what is validated, where, against which allow-list?

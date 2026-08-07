@@ -111,11 +111,11 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/agents/test-generator.md
 .claude/agents/code-reviewer.md
 .claude/rules/00-sdd-framework.md
-.claude/rules/05-constitution.md          (skeleton — never overwrite an existing one)
+.claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/10-code-conventions.md
-.claude/rules/20-git-conventions.md
-.claude/rules/30-tests-strategy.md
-.claude/rules/40-quality-gates.md
+.claude/rules/02-git-conventions.md
+.claude/rules/11-tests-strategy.md
+.claude/rules/12-quality-gates.md
 .claude/rules/doctrine-conventions.md
 .claude/rules/angular-conventions.md
 .claude/rules/api-contracts.md

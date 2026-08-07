@@ -74,6 +74,12 @@ for t in sdd-methodology.md 50-team-templates.md; do
   c=$(grep -rl "$t" core skills 2>/dev/null | wc -l)
   [ "$c" -eq 0 ] || fail "remaining ghost reference: $t ($c files)"
 done
+# 3a-ter. rules renamed in v1.3.0: old names may appear ONLY in sdd-upgrade.md
+#         (its migration map documents them); anywhere else is drift
+for t in 05-constitution.md 20-git-conventions.md 50-security.md 30-tests-strategy.md 40-quality-gates.md; do
+  c=$(grep -rl "$t" core skills 2>/dev/null | grep -v "sdd-upgrade.md" | wc -l)
+  [ "$c" -eq 0 ] || fail "renamed rule still cited under its old name: $t ($c files)"
+done
 # 3a-bis. blanked references: list items with EMPTY inline code (e.g. "- `` if present")
 #         — residue of a deleted file whose path was blanked instead of the line removed
 while IFS= read -r hit; do
@@ -143,8 +149,8 @@ for cf in core/commands/*.md core/agents/*.md core/templates/*.md core/rules/*.m
   done
 done
 # 6b. Shared files OUTSIDE core that must be identical across the relevant skills.
-#     Legitimate exclusions (per-stack divergence): 10-code-conventions, 30-tests-strategy,
-#     40-quality-gates, api-contracts, migration-guard.
+#     Legitimate exclusions (per-stack divergence): 10-code-conventions, 11-tests-strategy,
+#     12-quality-gates, api-contracts, migration-guard.
 check_shared(){
   local label="$1"; local skills="$2"; shift 2
   local rel ref refhash s f h

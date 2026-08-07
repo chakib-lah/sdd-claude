@@ -125,7 +125,7 @@ The **3 ✋ MANUAL GATES** (spec → plan → tasks) guarantee that we never bui
 
 ## Security by default
 
-Security is built into the method, not bolted on (see `core/rules/50-security.md`, deployed with every skill):
+Security is built into the method, not bolted on (see `core/rules/03-security.md`, deployed with every skill):
 
 - **Spec phase** — every spec has a **Security considerations** section (data sensitivity, authorization impact, abuse cases); security acceptance criteria are tagged `[SEC]`.
 - **Implementation** — baseline rules always apply: server-side input validation, parameterized queries, contextual output encoding, no secrets in code, explicit access control on every endpoint.
@@ -136,7 +136,7 @@ Security is built into the method, not bolted on (see `core/rules/50-security.md
 
 ## Installation
 
-Installation is a single command (symlink of the skills + copy of the global agents), on Linux/macOS/WSL2 or Windows.
+Installation is a single command (symlink of the skills + copy of the global agents), on Linux/macOS/WSL2 or Windows. To update later: `git pull` + `./upgrade-global.sh` for the global `~/.claude`, and `/sdd-upgrade` inside each project.
 
 ➡️ **See [`INSTALL.md`](INSTALL.md)** for the detailed procedure, verification and updates.
 
@@ -198,4 +198,4 @@ The toolkit is not limited to the 4 shipped skills: you can add a skill for a ne
 | `core/extension-guide.md` | Creating a new stack skill |
 | `core/ci-templates/` | CI snippets |
 
-Version 1.2.0 — August 2026.
+Version 1.3.0 — August 2026.

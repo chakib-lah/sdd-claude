@@ -10,7 +10,7 @@ description: Scaffold Angular tests (component, service, pipe) from a SDD spec
 
 - Active SDD feature with `tasks.md` `status: approved`
 - The class to test must already exist
-- Available conventions: `.claude/rules/30-tests-strategy.md`
+- Available conventions: `.claude/rules/11-tests-strategy.md`
 
 ## Steps
 
@@ -27,7 +27,7 @@ Automatic detection:
 
 ### 2. Load the conventions
 
-Read `.claude/rules/30-tests-strategy.md`:
+Read `.claude/rules/11-tests-strategy.md`:
 - Jest (recommended) or Karma+Jasmine
 - TestBed for components
 - HttpTestingController for HTTP services

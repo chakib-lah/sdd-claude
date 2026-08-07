@@ -37,8 +37,8 @@ cp core/commands/*.md   "$S/commands/"
 cp core/agents/*.md     "$S/agents/"
 cp core/templates/*.md  "$S/templates/"
 cp core/rules/00-sdd-framework.md   "$S/rules/"
-cp core/rules/20-git-conventions.md "$S/rules/"
-cp core/rules/50-security.md        "$S/rules/"
+cp core/rules/02-git-conventions.md "$S/rules/"
+cp core/rules/03-security.md        "$S/rules/"
 ```
 
 This installs: the **17 SDD commands**, the **5 agents** (including `test-generator`, which we will adapt in step 4), the **5 templates** and the **4 universal rules**.
@@ -57,12 +57,12 @@ Create the 3 stack rules in `reference/rules/`. They are **read by `/sdd-impleme
 - Stack-specific best practices, with ✅ / ❌ examples
 - **Must NOT contain**: methodology rules (Layer 1), Git rules (Layer 1), business rules (Layer 3)
 
-### `rules/30-tests-strategy.md`
+### `rules/11-tests-strategy.md`
 - Test types (unit, integration, E2E) and tools
 - **Exact execution commands** (read by `/sdd-implement` and `/sdd-verify`)
 - Test naming conventions, fixtures/mocks strategy, target coverage
 
-### `rules/40-quality-gates.md`
+### `rules/12-quality-gates.md`
 - Quality tools (linter, formatter, static analysis) and **exact commands**
 - Required levels, possible pre-commit hooks, policy on warnings
 
@@ -122,7 +122,7 @@ Must display `✅ AUDIT OK`. The audit checks in particular:
 ## Forbidden divergences
 
 - ❌ Do not rename the universal SDD commands (`/sdd-start`, etc.).
-- ❌ Do not modify the Layer 1 masters in the skill (`00-sdd-framework.md`, `05-constitution.md`, `20-git-conventions.md`, `50-security.md`, `sdd-*.md`, `retro-spec.md`, templates) — the source is `core/`.
+- ❌ Do not modify the Layer 1 masters in the skill (`00-sdd-framework.md`, `01-constitution.md`, `02-git-conventions.md`, `03-security.md`, `sdd-*.md`, `retro-spec.md`, templates) — the source is `core/`.
 - ❌ Do not mix methodology and technology (no tool name in `00-sdd-framework.md`).
 - ❌ Do not create business skills here (Layer 3, not Layer 2).
 - ❌ Do not change the task naming convention (`T001, T002…`).

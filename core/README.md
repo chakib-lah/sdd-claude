@@ -16,7 +16,7 @@ The 30 masters:
 | Commands | **17** | the 17 universal SDD commands (see table below) |
 | Agents | **4** | `spec-writer`, `plan-architect`, `task-decomposer`, `code-reviewer` |
 | Templates | **5** | `spec.md`, `plan.md`, `tasks.md`, `notes.md`, `sdd-readme.md` |
-| Rules | **4** | `00-sdd-framework.md`, `05-constitution.md`, `20-git-conventions.md`, `50-security.md` |
+| Rules | **4** | `00-sdd-framework.md`, `01-constitution.md`, `02-git-conventions.md`, `03-security.md` |
 
 > **Exception: `agents/test-generator.md` is NOT a master.** It is **adapted per skill** (each stack cites only its own test commands). It is therefore excluded from the hash equality check. `core/agents/` nevertheless contains a generic source version of `test-generator.md` as a starting point.
 
@@ -76,8 +76,8 @@ core/
 ├── extension-guide.md         ← Notes on creating a new stack
 ├── rules/                     ← 3 universal rules (masters)
 │   ├── 00-sdd-framework.md    ← The methodology in detail
-│   ├── 20-git-conventions.md  ← Universal Git conventions
-│   └── 50-security.md         ← Secure-coding baseline + security gate
+│   ├── 02-git-conventions.md  ← Universal Git conventions
+│   └── 03-security.md         ← Secure-coding baseline + security gate
 ├── commands/                  ← 17 universal SDD commands (masters)
 │   └── …
 ├── agents/                    ← 5 SDD agents (4 masters + test-generator adapted/skill)
@@ -151,9 +151,9 @@ No technology name (PHP, Angular, Doctrine…) appears in the masters. Anything 
 
 The universal commands **do not know** the project's tools (`make`, `npm`, `gradle`…). They read this information from the Layer 2 rules under `.claude/rules/`:
 
-- `.claude/rules/30-tests-strategy.md` → test commands to run
-- `.claude/rules/40-quality-gates.md` → quality gates to run
-- `.claude/rules/20-git-conventions.md` → commit format
+- `.claude/rules/11-tests-strategy.md` → test commands to run
+- `.claude/rules/12-quality-gates.md` → quality gates to run
+- `.claude/rules/02-git-conventions.md` → commit format
 
 ### Agent auto-delegation
 

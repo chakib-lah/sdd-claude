@@ -77,7 +77,7 @@ For each AC in the spec, indicate:
 - On which file/component
 - The edge cases to cover
 
-Reference `.claude/rules/30-tests-strategy.md` if present, to follow the project's test strategy.
+Reference `.claude/rules/11-tests-strategy.md` if present, to follow the project's test strategy.
 
 #### Points of vigilance
 

@@ -77,7 +77,7 @@ If the spec contains non-regression ACs (typical for bugfixes), explicitly verif
 
 ### 8. Check the constitution
 
-If `.claude/rules/05-constitution.md` exists with `status: ratified`, verify that the diff violates none of its principles. A violation of a ratified principle is a **blocking finding** (cite the `PN` and the offending files). Without a ratified constitution, skip with the mention "no constitution".
+If `.claude/rules/01-constitution.md` exists with `status: ratified`, verify that the diff violates none of its principles. A violation of a ratified principle is a **blocking finding** (cite the `PN` and the offending files). Without a ratified constitution, skip with the mention "no constitution".
 
 ### 9. Produce the AC-by-AC report
 

@@ -26,7 +26,7 @@ Example:
 
 ### 1. Create the hotfix branch
 
-Read `.claude/rules/20-git-conventions.md` for the convention. For a hotfix, the branch starts from the production branch (often `main` or `master`, never `develop`):
+Read `.claude/rules/02-git-conventions.md` for the convention. For a hotfix, the branch starts from the production branch (often `main` or `master`, never `develop`):
 
 ```bash
 git checkout main    # or master depending on the project

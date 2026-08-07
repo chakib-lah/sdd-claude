@@ -35,11 +35,11 @@ skills/sdd-<stack>/
     │   └── <stack>-entity.md, <stack>-test.md, …   ← stack-specific (Layer 2)
     ├── rules/
     │   ├── 00-sdd-framework.md       ← MASTER (methodology, copied from core)
-    │   ├── 20-git-conventions.md     ← MASTER (Git, copied from core)
-    │   ├── 50-security.md            ← MASTER (security baseline, copied from core)
+    │   ├── 02-git-conventions.md     ← MASTER (Git, copied from core)
+    │   ├── 03-security.md            ← MASTER (security baseline, copied from core)
     │   ├── 10-code-conventions.md    ← stack-specific (Layer 2)
-    │   ├── 30-tests-strategy.md      ← stack-specific (Layer 2)
-    │   ├── 40-quality-gates.md       ← stack-specific (Layer 2)
+    │   ├── 11-tests-strategy.md      ← stack-specific (Layer 2)
+    │   ├── 12-quality-gates.md       ← stack-specific (Layer 2)
     │   └── <stack extras>.md         ← e.g. doctrine-conventions, angular-conventions, migration-guard…
     └── templates/                    ← 5 process templates
         └── spec.md, plan.md, tasks.md, notes.md, sdd-readme.md   ← MASTERS (copied from core)
@@ -62,7 +62,7 @@ When creating a skill, we **copy** — without ever adapting them — the **30 m
 | `core/commands/*.md` (the 17 SDD commands) | 17 | `commands/` |
 | `core/agents/*.md` **except `test-generator.md`** | 4 | `agents/` |
 | `core/templates/*.md` | 5 | `templates/` |
-| `core/rules/*.md` (`00-sdd-framework`, `05-constitution`, `20-git-conventions`, `50-security`) | 4 | `rules/` |
+| `core/rules/*.md` (`00-sdd-framework`, `01-constitution`, `02-git-conventions`, `03-security`) | 4 | `rules/` |
 | **Total** | **30** | |
 
 These 30 files are not to be touched: no renaming, no rephrasing, no "local improvement". Any evolution happens in `core/` and is then **re-propagated** to all skills (see *Synchronization with the core*).
@@ -75,7 +75,7 @@ These 30 files are not to be touched: no renaming, no rephrasing, no "local impr
 
 Everything else — and **only** the rest — is stack-specific:
 
-- The Layer 2 rules: `10-code-conventions.md`, `30-tests-strategy.md`, `40-quality-gates.md`, plus possible stack extras (`doctrine-conventions.md`, `angular-conventions.md`, `node-conventions.md`, `api-contracts.md`, `migration-guard.md`, `legacy-rules.md`, `shared-types.md`, …).
+- The Layer 2 rules: `10-code-conventions.md`, `11-tests-strategy.md`, `12-quality-gates.md`, plus possible stack extras (`doctrine-conventions.md`, `angular-conventions.md`, `node-conventions.md`, `api-contracts.md`, `migration-guard.md`, `legacy-rules.md`, `shared-types.md`, …).
 - The `<stack>-*` **scaffolding commands** (e.g. `symfony-entity`, `angular-component`, `node-endpoint`).
 - The `test-generator` agent (point b).
 
@@ -122,8 +122,8 @@ These commands belong to Layer 1. Modifying them breaks team portability across 
 ### ✅ Permissions
 
 - Freely define the stack's code rules (`10-code-conventions.md`).
-- Define the test strategy and execution commands (`30-tests-strategy.md`).
-- Define the quality gates (`40-quality-gates.md`) and the stack extras.
+- Define the test strategy and execution commands (`11-tests-strategy.md`).
+- Define the quality gates (`12-quality-gates.md`) and the stack extras.
 - Add auxiliary scaffolding commands (`<stack>-entity`, `<stack>-component`, etc.).
 - Adapt `test-generator` to the stack.
 - Add stack-specific code templates in `templates/`.
@@ -171,7 +171,7 @@ Typical skeleton of the installation flow:
 
 ## Phase 0 — Common core verification
 Check the presence of the Layer 1 masters:
-- .claude/rules/00-sdd-framework.md, 20-git-conventions.md, 50-security.md
+- .claude/rules/00-sdd-framework.md, 02-git-conventions.md, 03-security.md
 - the 17 commands .claude/commands/sdd-*.md (+ retro-spec.md)
 - the templates .claude/sdd/_template/*.md
 If any is missing: refuse and install Layer 1 first.
@@ -226,8 +226,8 @@ The 30 masters are already copied from `core/`. Only the stack-specific files ar
 ```
 reference/rules/
   10-code-conventions.md       ← PHP 8.x strict_types, PSR-12, Symfony conventions
-  30-tests-strategy.md         ← PHPUnit, WebTestCase, fixtures, conventions
-  40-quality-gates.md          ← PHPStan level X, CS-fixer, Rector, make quality
+  11-tests-strategy.md         ← PHPUnit, WebTestCase, fixtures, conventions
+  12-quality-gates.md          ← PHPStan level X, CS-fixer, Rector, make quality
   doctrine-conventions.md      ← stack extra
   migration-guard.md           ← brownfield extra
 

@@ -20,7 +20,7 @@ Read in this order:
 1. `.claude/sdd/<feature>/spec.md` — the ACs to cover
 2. `.claude/sdd/<feature>/tasks.md` — the implemented tasks
 3. `.claude/rules/10-code-conventions.md` — code standards
-4. `.claude/rules/30-tests-strategy.md` — test strategy
+4. `.claude/rules/11-tests-strategy.md` — test strategy
 
 ### Step 2 — Analyze the diff
 

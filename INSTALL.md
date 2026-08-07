@@ -40,7 +40,9 @@ sdd-claude/
 │   └── audit.sh            ← consistency guardrail
 ├── install.sh             ← Linux / macOS / WSL2 installer
 ├── install.ps1            ← Windows installer
-├── VERSION                ← 1.2.0
+├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
+├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
+├── VERSION                ← 1.3.0
 └── CHANGELOG.md
 ```
 
@@ -160,9 +162,13 @@ cd ~/tools/sdd-claude
 git pull
 # The 4 skills are automatically up to date
 
-# Update the global agents
-cp ~/tools/sdd-claude/global-agents/*.md ~/.claude/agents/
+# Update the global ~/.claude (skill symlinks + global agents)
+./upgrade-global.sh          # Windows: .\upgrade-global.ps1
 ```
+
+`upgrade-global.sh` repairs/adds skill symlinks (new skills included), updates **stale but unmodified** global agents, and **never silently overwrites** a customized or translated agent copy — it reports them and asks (`--force` / `--keep-custom` to skip the prompt). Your own agents in `~/.claude/agents/` are never touched.
+
+Projects are updated separately: run `/sdd-upgrade` inside each project.
 
 ---
 
@@ -178,10 +184,9 @@ cp ~/tools/sdd-claude/global-agents/*.md ~/.claude/agents/
 
 ```bash
 git pull
-# The symlinks follow automatically, nothing else to do.
-
-# On Windows (copy, not symlink): re-run the installer after the pull
-# .\install.ps1
+./upgrade-global.sh
+# The skill symlinks follow the pull automatically; the script also
+# refreshes the global agents (Windows: .\upgrade-global.ps1).
 ```
 
 ---

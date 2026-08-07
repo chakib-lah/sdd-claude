@@ -10,7 +10,7 @@ description: Scaffold a PHPUnit test from a SDD spec, following project conventi
 
 - An active SDD feature
 - The class to test must already exist (otherwise use `/php-class` first)
-- Test conventions available in `.claude/rules/30-tests-strategy.md`
+- Test conventions available in `.claude/rules/11-tests-strategy.md`
 
 ## Steps
 
@@ -22,7 +22,7 @@ Ask:
 
 ### 2. Load the test conventions
 
-Read `.claude/rules/30-tests-strategy.md` to comply with:
+Read `.claude/rules/11-tests-strategy.md` to comply with:
 - Directory structure (`tests/Unit/`, `tests/Integration/`)
 - File naming (`<ClassName>Test.php`)
 - AAA pattern (Arrange / Act / Assert)

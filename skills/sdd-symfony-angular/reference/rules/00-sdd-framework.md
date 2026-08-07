@@ -149,7 +149,7 @@ Every SDD command identifies the active feature **from the current Git branch**.
 
 ## The project constitution
 
-Alongside the per-feature artifacts, a project may maintain a **constitution** (`.claude/rules/05-constitution.md`): the durable engineering principles that outlive any single feature, numbered `P1…PN` and **ratified by the team** (`status: ratified` — a human act, like every approval in SDD).
+Alongside the per-feature artifacts, a project may maintain a **constitution** (`.claude/rules/01-constitution.md`): the durable engineering principles that outlive any single feature, numbered `P1…PN` and **ratified by the team** (`status: ratified` — a human act, like every approval in SDD).
 
 When a ratified constitution exists:
 - `/sdd-spec-check` verifies the spec violates no principle (scored criterion)
