@@ -103,8 +103,8 @@ Compare each file found in `reference/templates/` with the project's copy:
 ```
 _template/spec.md     : [✅ / ❌ / ⚠️]
 _template/plan.md     : [✅ / ❌ / ⚠️]
-_template/tasks.md    : [✅ / ❌ / ⚠️ — blocked-by field missing?]
-_template/notes.md    : [✅ structured / ⚠️ empty template (old version)]
+_template/tasks.md    : [✅ / ❌ / ⚠️ — phase structure (### Phase N) missing?]
+_template/notes.md    : [✅ structured / ⚠️ "Squash exceptions" section missing (old version)]
 sdd/README.md         : [✅ / ❌ / ⚠️ — from reference/templates/sdd-readme.md]
 ```
 
