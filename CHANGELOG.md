@@ -1,5 +1,15 @@
 # Changelog — SDD Claude
 
+## [1.2.0] — 2026-08-07
+
+### Changed
+
+- **One commit per implementation phase** — tasks are grouped under phase headings; `/sdd-implement` keeps one local commit per task and squashes each phase into a single commit before push; verification, revert, review and MR flows adapted. Hotfixes keep their red-test commit visible.
+- **Commit messages are subject-line only** — no body, no generated signature.
+- **Minimal MR body** — context and changes only; the details stay in the SDD artifacts.
+
+---
+
 ## [1.1.0] — 2026-07-19
 
 Consistency, security hardening, and three new Layer 1 capabilities.

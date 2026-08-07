@@ -40,7 +40,7 @@ sdd-claude/
 │   └── audit.sh            ← consistency guardrail
 ├── install.sh             ← Linux / macOS / WSL2 installer
 ├── install.ps1            ← Windows installer
-├── VERSION                ← 1.1.0
+├── VERSION                ← 1.2.0
 └── CHANGELOG.md
 ```
 
