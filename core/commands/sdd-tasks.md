@@ -30,7 +30,7 @@ For each step in the plan's implementation order, identify one or more atomic ta
 - ✅ Achievable in 30 minutes to 2 hours maximum
 - ✅ A single concept or main file touched
 - ✅ Testable independently of the other tasks
-- ✅ Results in a single commit
+- ✅ Results in a single local commit
 - ✅ Has a testable "done" criterion
 
 If a task exceeds the planned 2 hours, break it down further.
@@ -49,6 +49,19 @@ Choose the clearest convention for the project and apply it uniformly.
 
 Mark with `[P]` the tasks that can be implemented in parallel (no dependency between them). This makes planning easier if several developers work on the feature.
 
+### 5b. Group tasks into implementation phases
+
+Implementation phases (not to be confused with the 4 SDD phases) group tasks into revertable milestones: each phase is squashed into **one commit** on the branch by `/sdd-implement`.
+
+- Small feature (≲ 5 tasks, or a single concern) → **exactly one phase**
+- Larger feature → group by coherent milestone (e.g. DB migration / backend / frontend, or migration / implementation / cleanup), typically 3–8 tasks per phase
+- **Invariant**: each phase must leave the codebase consistent (all tests green, no half-wired code), because it becomes one revertable commit
+- An AC should be fully covered within a single phase whenever possible
+- A `[P]` group must never straddle a phase boundary
+- `Blocked by` may cross phases only forward (a task in phase N+1 blocked by a task in phase N, never the reverse)
+
+Task numbering stays global and continuous (T001…TN across all phases).
+
 ### 6. Write `tasks.md`
 
 Fill in the template `.claude/sdd/_template/tasks.md` with:
@@ -58,19 +71,26 @@ Fill in the template `.claude/sdd/_template/tasks.md` with:
 
 #### Overview
 - Total number of tasks
+- Number of implementation phases
 - Overall duration estimate
 - Any dependencies on other features
 
 #### Task list
 
-Strict format:
+Strict format — tasks grouped under their implementation phase:
 
 ```markdown
+### Phase 1: <Milestone name>
+
+- **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
+- **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+
 - [ ] T001 [Category] Short, active description of the task
   - **Done when**: testable and observable completion criterion
   - **Files**: list of the main files touched
   - **Tests**: test suite(s) to run after this task
   - **ACs covered**: AC-1, AC-3 (reference to the spec's acceptance criteria)
+  - **Blocked by**: *(none)* or T00X
   - **Commit SHA**: *(filled in after /sdd-implement)*
 
 - [ ] T002 [P] [Category] ...
@@ -84,6 +104,7 @@ Confirm that **every acceptance criterion in the spec is covered by at least one
 
 Before saving, display in the chat:
 - Total number of tasks
+- Number of implementation phases (1 phase = 1 final commit on the branch)
 - Parallelizable tasks
 - Cumulative estimate (if relevant)
 - AC coverage check
@@ -101,6 +122,7 @@ Write `.claude/sdd/<feature>/tasks.md`.
 
 Current status: draft
 Total tasks: N
+Implementation phases: N (1 phase = 1 final commit)
 Parallelizable tasks: N
 ACs covered: N/N
 
@@ -123,7 +145,7 @@ Next step:
 
 ## Full task format (with the `blocked-by` field)
 
-Every task in `tasks.md` must follow this format:
+Every task in `tasks.md` lives under a `### Phase N: <name>` heading (see step 5b) and must follow this format:
 
 ```markdown
 - [ ] T001 [Category] Short description of the task
@@ -141,16 +163,26 @@ Every task in `tasks.md` must follow this format:
 - If the task depends on another one: write `T00X` (number of the blocking task)
 - `/sdd-implement` will check this field and refuse to execute a task whose blocker is not `done`
 
-### Example tasks.md with dependencies and parallelism
+### Example tasks.md with phases, dependencies and parallelism
 
 ```markdown
+### Phase 1: Shared contracts
+
+- **Goal**: shared types compiled, ready to be consumed by both sides
+- **Phase commit SHA**: def5678
+
 - [x] T001 [Shared] Define the shared TypeScript types
   - **Done when**: interfaces compile without errors
   - **Files**: src/types/user.types.ts
   - **Tests**: tsc --noEmit
   - **ACs covered**: AC-1
   - **Blocked by**: *(none)*
-  - **Commit SHA**: abc1234
+  - **Commit SHA**: def5678 *(squashed)*
+
+### Phase 2: Backend and frontend implementation
+
+- **Goal**: user list feature working end to end
+- **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
 
 - [ ] T002 [Backend] Create the UserService service [P]
   - **Done when**: unit tests green
@@ -169,4 +201,4 @@ Every task in `tasks.md` must follow this format:
   - **Commit SHA**:
 ```
 
-T002 and T003 are parallel (marked `[P]`) and both blocked by T001.
+T002 and T003 are parallel (marked `[P]`), both blocked by T001, and both in the same phase (a `[P]` group never straddles two phases). Phase 1 is complete: its task commit was squashed into the phase commit `def5678`, which replaced T001's local SHA.

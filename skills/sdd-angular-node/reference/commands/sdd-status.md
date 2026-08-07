@@ -21,13 +21,13 @@ List:
 Read the frontmatter of:
 - `spec.md` → status (draft / in-review / approved / implemented)
 - `plan.md` → status
-- `tasks.md` → status + ratio of done tasks / total
+- `tasks.md` → status + ratio of done tasks / total + ratio of squashed implementation phases (`Phase commit SHA` filled) / total phases
 
-### 3. Identify each feature's current phase
+### 3. Identify each feature's current SDD phase
 
-Determine the feature's current phase based on the statuses:
+Determine the feature's current SDD phase (Specify/Plan/Tasks/Implement — not the implementation phases of `tasks.md`) based on the statuses:
 
-| spec.md | plan.md | tasks.md | Tasks done | Current phase |
+| spec.md | plan.md | tasks.md | Tasks done | Current SDD phase |
 |---|---|---|---|---|
 | draft | - | - | - | Phase 1 — Specify |
 | approved | draft | - | - | Phase 2 — Plan |
@@ -63,15 +63,15 @@ The active feature = the one whose branch matches the current Git branch. Mark i
   └────────────────────────────────────────────────────────────┘
 
 ▶ <FEATURE-A>-<description>
-  Phase     : Phase 4 — Implement (in progress)
+  SDD phase : Phase 4 — Implement (in progress)
   Spec      : approved ✅
   Plan      : approved ✅
-  Tasks     : approved | 3/7 done
+  Tasks     : approved | 3/7 done | impl. phases: 1/3 squashed
   Branch    : feature/<FEATURE-A>-<description>
   Created   : 2026-05-20
 
   <FEATURE-B>-<description>
-  Phase     : Phase 2 — Plan
+  SDD phase : Phase 2 — Plan
   Spec      : approved ✅
   Plan      : draft ⏳
   Tasks     : —

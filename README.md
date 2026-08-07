@@ -85,7 +85,7 @@ This is the heart of the framework: a sequence of 17 commands across 4 phases, *
    ✋ MANUAL GATE — a human moves tasks.md to status: approved
 
 ──────────────── Phase 4 · Implementation ───────────────
-/sdd-implement                 → loop: one task = one commit (T001, then T002…)
+/sdd-implement                 → loop: one task = one local commit; one phase = one branch commit (squash)
 /sdd-verify                    → 🚦 TECHNICAL GATE: tests + quality gates + security gate green
 /sdd-review                    → 🚦 FUNCTIONAL GATE: every acceptance criterion covered
 
@@ -107,7 +107,7 @@ The **3 ✋ MANUAL GATES** (spec → plan → tasks) guarantee that we never bui
 | `/sdd-spec-check` | 1 | Quality checklist before validation |
 | `/sdd-plan` | 2 | `spec.md` approved → `plan.md` via `@plan-architect` |
 | `/sdd-tasks` | 3 | `plan.md` approved → `tasks.md` via `@task-decomposer` |
-| `/sdd-implement` | 4 | One task → one commit (+ `[P]` subagents) |
+| `/sdd-implement` | 4 | One task → one local commit; one phase → one branch commit (+ `[P]` subagents) |
 | `/sdd-verify` | Gate | Tests + quality gates + security gate (technical) |
 | `/sdd-review` | Gate | Acceptance criteria coverage via `@code-reviewer` |
 | `/sdd-mr` | Closure | Generated Merge Request body |
@@ -116,7 +116,7 @@ The **3 ✋ MANUAL GATES** (spec → plan → tasks) guarantee that we never bui
 | `/sdd-hotfix` | Emergency | Lightweight workflow for a Production fix |
 | `/sdd-upgrade` | Maintenance | Updates Layer 1 without touching Layers 2/3 |
 | `/sdd-changelog` | Release | CHANGELOG from archived specs |
-| `/sdd-revert` | Rollback | Un-ships a feature/task via the tracked commit SHAs |
+| `/sdd-revert` | Rollback | Un-ships a feature/phase via the tracked phase commit SHAs |
 | `/retro-spec` | Brownfield | Rebuilds a spec from existing code |
 
 > The `PROJ-xxx` identifiers and the `User` / `Order` / `Certificate` names are only neutral examples: replace them with your own tickets and entities.

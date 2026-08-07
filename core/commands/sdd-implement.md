@@ -1,10 +1,10 @@
 ---
-description: SDD phase 4 — implements ONE task (code + tests + commit), one per invocation
+description: SDD phase 4 — implements ONE task (code + tests + local commit), one per invocation; squashes the phase into one commit when its last task completes
 ---
 
 # /sdd-implement
 
-**SDD Phase 4**: execute **a single** task from `tasks.md` end-to-end (code → tests → commit).
+**SDD Phase 4**: execute **a single** task from `tasks.md` end-to-end (code → tests → local commit). When the task completes its **implementation phase**, squash the phase's commits into one.
 
 ## Blocking prerequisites
 
@@ -13,11 +13,13 @@ description: SDD phase 4 — implements ONE task (code + tests + commit), one pe
 
   > tasks.md is not in `status: approved`. Review and validate the task breakdown before re-running `/sdd-implement`.
 
-- The Git tree must be clean at startup (no uncommitted changes)
+- The Git tree must be clean at startup — **except** pending SDD-artifact bookkeeping under `.claude/sdd/<feature>/` (the `tasks.md` updates written after the previous commit), which rides in this task's commit
 
 ## Golden rule
 
 > **One single task per invocation.** Never chain tasks automatically.
+
+Each task still produces one **local** commit; the branch history shown to reviewers is **one commit per implementation phase**, produced by the phase squash (step 11b) when the phase's last task completes.
 
 ## Steps
 
@@ -124,12 +126,11 @@ Before committing, display the diff and validate it mentally:
 - No forgotten console.log / dump / var_dump?
 - No accidental modification of files outside the scope?
 
-### 10. Commit
+### 10. Commit (local)
 
-Strictly follow `.claude/rules/20-git-conventions.md` for:
-- The message format
+This commit is a **local, per-task commit**: it will be squashed into the phase commit at step 11b when the phase completes. Stage any pending SDD-artifact bookkeeping (from the previous task's step 11) together with the task's changes. Strictly follow `.claude/rules/20-git-conventions.md` for:
+- The message format (subject line only, short)
 - Including the ticket in the scope
-- The `Co-Authored-By` signature if requested
 
 **Never use `--no-verify`**: if a pre-commit hook blocks, diagnose and fix.
 
@@ -140,12 +141,31 @@ Capture the SHA of the resulting commit.
 - Check the task off: `- [x] T00X ...`
 - Fill in the `**Commit SHA**` field with the captured SHA
 
+### 11b. Phase squash (only when the phase is complete)
+
+If, after step 11, **all the tasks of the current task's implementation phase are `- [x]`**, squash the phase's local commits into a single commit. A `tasks.md` without `### Phase` headings counts as **one implicit phase** covering all tasks (squash when the last task completes). **Exception: hotfixes** (`type: hotfix` frontmatter or `hotfix/` branch) are never squashed — the red-test commit must stay visible before the fix commit.
+
+1. **Push guard**: if the branch has an upstream, verify that none of the phase's task commits has already been pushed (e.g. `git merge-base --is-ancestor <first-task-sha-of-phase> @{upstream}` must fail). If any was pushed → **skip the squash**, set `**Phase commit SHA**: *(not squashed — commits pushed mid-phase, see notes.md)*` and log the incident in `notes.md`. `/sdd-revert` will fall back to the per-task SHAs for that phase.
+2. **Propose the squash** to the user with the planned phase commit message, and wait for explicit confirmation (same human-validation discipline as between tasks).
+3. Execute (never `git rebase -i`, unavailable here):
+
+   ```bash
+   BASE=$(git rev-parse <first-task-sha-of-phase>^)
+   git reset --soft "$BASE"
+   git commit   # single phase commit
+   ```
+
+4. Message: `<type>(<TICKET-ID>): <phase summary in imperative lowercase>` — subject line only; the squashed tasks stay traceable in `tasks.md`.
+5. Capture the phase SHA → fill in `**Phase commit SHA**`, and **replace every per-task `Commit SHA` of the phase** with the phase SHA suffixed `*(squashed)*` (the local SHAs become unreachable after the squash).
+
+Note: as for per-task commits, the `tasks.md` bookkeeping edit recording the phase SHA rides in the next commit — or, for the feature's final phase, in a tiny trailing `chore(<TICKET-ID>): update SDD artifacts` commit so the tree is clean for `/sdd-verify`.
+
 ### 12. Announce in the chat
 
 ```
 ✅ T00X complete.
 
-Commit: <SHA> <message>
+Commit (local): <SHA> <message>
 Tests: ✅ all green
 Quality gates: ✅ OK
 
@@ -154,11 +174,19 @@ Next task: T00Y [Category] - <description>
 Type `/sdd-implement` to continue.
 ```
 
+If the task completed its phase, add:
+
+```
+✅ Phase N squashed → <phase-SHA> <phase commit message>
+```
+
 If there are no tasks left:
 
 ```
 ✅ T00X complete. That was the last task.
+✅ Phase N squashed → <phase-SHA>
 
+Branch history: one commit per implementation phase.
 Next step: /sdd-verify for the technical gate.
 ```
 
@@ -173,6 +201,10 @@ Next step: /sdd-verify for the technical gate.
 ❌ **Never widen the scope** without asking. If an unforeseen change is needed, stop and ask.
 
 ❌ **Do not mark a task `done`** if a single test is red or a quality gate fails.
+
+❌ **Never push mid-phase.** Push only after the completed phases have been squashed (step 11b).
+
+❌ **Never skip the phase squash silently.** The only sanctioned exception is the push guard of step 11b, and it must be documented in `notes.md`.
 
 ❌ **Do not modify `spec.md`, `plan.md` or `tasks.md` beyond progress tracking.** The content of these artifacts is frozen once approved. If a structural change is needed, go back through the earlier phases.
 
@@ -210,9 +242,12 @@ Read ONLY:
 - The source files involved in T00X
 
 Implement T00X according to the rules in sdd-implement.md.
-One task, one commit. Do not touch the other tasks.
+One task, one local commit. Do not touch the other tasks.
+Never squash: the phase squash is performed by the main agent only.
 ```
 
-**Merge conflict handling**: if subagents modify common files, the main agent resolves the conflicts before the final commit.
+When the `[P]` group completes its implementation phase, the **main agent** performs steps 11 and 11b once, for the whole group.
+
+**Merge conflict handling**: if subagents modify common files, the main agent resolves the conflicts before the last task commit of the group.
 
 **Golden rule**: `[P]` tasks must NEVER modify the same files. If they do, remove the `[P]` marker from `tasks.md` and execute them sequentially.

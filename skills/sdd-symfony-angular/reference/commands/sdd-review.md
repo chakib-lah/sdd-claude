@@ -167,9 +167,14 @@ Decision to make:
 
 ### Generate the corrective tasks
 
-For each uncovered AC, add a corrective task at the end of `tasks.md` (without modifying the existing T001+ tasks):
+For each uncovered AC, add a corrective task at the end of `tasks.md` (without modifying the existing T001+ tasks), inside a **new implementation phase** `### Phase N+1: Review fixes` — squashed into one commit like any other phase:
 
 ```markdown
+### Phase N+1: Review fixes
+
+- **Goal**: cover the ACs flagged by /sdd-review
+- **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+
 - [ ] TC001 [Fix] Cover AC-N: <short description of the missing behavior>
   - **Done when**: the test validating AC-N is green
   - **Files**: [files to modify or add]

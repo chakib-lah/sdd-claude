@@ -54,13 +54,9 @@ Format: **Conventional Commits with the ticket as scope**.
 
 ```
 <type>(<TICKET-ID>): <imperative lowercase description without trailing period>
-
-[optional body — why and how]
-
-[optional footer — breaking changes, additional refs]
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
+
+The message is the **subject line only** — no body, no footer, no signature.
 
 ### Commit types
 
@@ -81,11 +77,9 @@ Possible additions:
 - **No trailing period**
 - **No technical jargon without business context**: "add index on certificate" rather than "modify schema"
 
-**Body (optional)**:
-- Separated from the subject by a blank line
-- Lines ≤ 72 characters
-- Explains **the why**, not the what (the diff already shows the what)
-- Markdown allowed for lists
+**No body**:
+- The message is the subject line only — keep it short
+- The why lives in the SDD artifacts (spec.md, plan.md) and the MR description, not in the commit
 
 ### Valid examples
 
@@ -95,20 +89,10 @@ fix(PROJ-101): fix header field initialization
 
 ```
 feat(PROJ-110): add csv export endpoint
-
-Answers the business request for bulk export.
-The format follows the Squash TM standard for later re-import.
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 ```
 refactor(PROJ-103): extract business validation into a dedicated service
-
-Prepares the decoupling of the validation chain planned in PROJ-150.
-No behavior change expected.
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 ### Invalid examples
@@ -121,19 +105,19 @@ fix(PROJ-101): fixing of the bug              ❌ "fixing of" instead of "fix" (
 feat(PROJ-101): add a new service that allows managing csv exports of business data   ❌ subject > 72 chars
 ```
 
-## Co-Authored-By
+## Commit discipline: one local commit per task, one pushed commit per phase
 
-For commits where Claude (or another AI agent) contributed significantly, add the signature:
+During development, each `T00X` task in `tasks.md` must result in **exactly one local commit**. If the implementation generated several micro-commits, squash them into the task's commit.
 
+When the last task of an implementation phase completes, `/sdd-implement` **squashes the phase's task commits into a single commit** — mandatory before the phase's first push. The pushed history contains **one commit per phase**, plus at most one final `chore(<TICKET-ID>): update SDD artifacts` commit (bookkeeping only, no code). A single-phase feature is therefore reviewed as a single code commit. The recipe (interactive rebase is not available to agents):
+
+```bash
+BASE=$(git rev-parse <first-task-sha-of-phase>^)
+git reset --soft "$BASE"
+git commit   # single phase commit
 ```
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
 
-This signature is **recommended** for transparency about AI usage, but not mandatory. Adapt according to the project's or team's policy.
-
-## One-commit-per-task discipline
-
-Each `T00X` task in `tasks.md` must result in **exactly one commit**. If the implementation generated several micro-commits, **squash before push**.
+The phase commit message follows the standard format — `<type>(<TICKET-ID>): <phase summary in imperative lowercase>` — subject line only; the squashed tasks stay traceable in `tasks.md`.
 
 If a task turns out to be more complex than expected and requires several commits, it is usually a sign that it should have been re-split. Document in `notes.md` for future adjustment of the task breakdown.
 
@@ -145,7 +129,9 @@ If a task turns out to be more complex than expected and requires several commit
 
 ❌ **Never commit directly on the integration branch**. Everything goes through a feature branch and an MR.
 
-❌ **Never mix several tasks in one commit**. One commit = one intention.
+❌ **Never mix several tasks in one local commit** during development. One local commit = one task. The phase squash is the only sanctioned regrouping.
+
+❌ **Never push mid-phase**. Push only after the completed phases have been squashed. If it happened anyway, skip the squash for that phase and document it in `notes.md`.
 
 ❌ **Never commit secrets** (API keys, passwords, tokens). If it happened: `git reset`, add to `.gitignore`, and revoke the secret.
 
@@ -157,7 +143,7 @@ If a task turns out to be more complex than expected and requires several commit
 3. git checkout -b <type>/<TICKET-ID>-<description>
 4. [SDD loop]
    /sdd-start → /sdd-spec → /sdd-plan → /sdd-tasks
-   /sdd-implement (loop, one commit per task)
+   /sdd-implement (loop: one local commit per task, squash to one commit per phase)
 5. /sdd-verify
 6. /sdd-review
 7. git push -u origin <type>/<TICKET-ID>-<description>
@@ -181,19 +167,25 @@ For urgent Production fixes:
 7. Cherry-pick onto the integration branch (develop) after merge
 ```
 
+Hotfix branches are **exempt from the phase squash**: the red-test commit (T001) must stay visible before the fix commit (T002) in the history.
+
 ## Special cases
 
 ### Several "fixup" commits during development
 
-Acceptable during local development. **Before push, squash** to honor "one commit per task".
+Acceptable during local development. **Before push, squash** to honor "one commit per phase", using the `reset --soft` recipe:
 
 ```bash
-git rebase -i HEAD~5
+BASE=$(git rev-parse <first-commit-to-squash>^)
+git reset --soft "$BASE"
+git commit
 ```
 
 ### Modifying a commit already pushed on a feature branch
 
 Allowed via `git push --force-with-lease`. Prefer this form over `--force` to avoid overwriting another developer's work.
+
+This does **not** apply to the phase squash: once a phase's task commits are pushed, do not rewrite them — skip the squash for that phase and document it in `notes.md` (see "Never push mid-phase").
 
 ### Rebase vs Merge on the integration branch
 

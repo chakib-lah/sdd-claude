@@ -30,6 +30,15 @@ feature: <kebab-case-name>
 
 ---
 
+## Squash exceptions
+
+<!-- Phases NOT squashed (commits pushed mid-phase).
+     Format: Phase N — reason + list of the per-task SHAs kept.
+     /sdd-verify checks this section when a phase is marked
+     "not squashed — commits pushed mid-phase" -->
+
+---
+
 ## Session of <date>
 
 ### What was done

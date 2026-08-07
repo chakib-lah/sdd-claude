@@ -108,7 +108,7 @@ test('should redirect to dashboard after valid login', async ({ page }) => {
 ```
 ✅ Tests generated
 
-Covered ACs: N/N
+ACs covered: N/N
   AC-1 → test_<name> ✅
   AC-2 → test_<name> ✅
   AC-3 → test_<name> ✅

@@ -140,7 +140,7 @@ One command per business layer (scaffold entity + service + controller + tests i
 
 ### Option B — Fine granularity
 
-One command per artifact type. **This is the option chosen in all the toolkit's current skills**, because it composes better with the `/sdd-implement` loop (one task → one artifact → one commit):
+One command per artifact type. **This is the option chosen in all the toolkit's current skills**, because it composes better with the `/sdd-implement` loop (one task → one artifact → one local commit):
 
 | Skill | Actual scaffolding commands |
 |---|---|

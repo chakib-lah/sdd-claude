@@ -1,24 +1,24 @@
 ---
-description: SDD rollback — un-ships a feature (or a single task) using the commit SHAs tracked in tasks.md
+description: SDD rollback — un-ships a feature (or one of its implementation phases) using the commit SHAs tracked in tasks.md
 ---
 
 # /sdd-revert
 
-**Rollback command**: cleanly undo an SDD feature — or a single task of it — by exploiting the traceability the method already guarantees: one task ↔ one commit, with the SHA recorded in `tasks.md`.
+**Rollback command**: cleanly undo an SDD feature — or a single implementation phase of it — by exploiting the traceability the method already guarantees: one phase ↔ one commit, with the phase SHA recorded in `tasks.md`.
 
-`/sdd-hotfix` is for fixing forward; `/sdd-revert` is for backing out. Typical uses: a merged feature must be withdrawn from the release, or a specific task introduced a regression that cannot be fixed forward in time.
+`/sdd-hotfix` is for fixing forward; `/sdd-revert` is for backing out. Typical uses: a merged feature must be withdrawn from the release, or a specific phase introduced a regression that cannot be fixed forward in time.
 
 ## Usage
 
 ```
-/sdd-revert <FEATURE-ID>              # revert the whole feature
-/sdd-revert <FEATURE-ID> T003         # revert a single task
+/sdd-revert <FEATURE-ID>              # revert the whole feature (all phases)
+/sdd-revert <FEATURE-ID> "Phase 2"    # revert a single implementation phase
 ```
 
 ## Blocking prerequisites
 
 - The feature folder exists in `.claude/sdd/` (or `.claude/sdd/_archive/` for a merged feature)
-- `tasks.md` has the `Commit SHA` field filled in for the targeted task(s) — without SHAs, refuse and explain that traceability is missing
+- `tasks.md` has the `Phase commit SHA` field filled in for the targeted phase(s) — without SHAs, refuse and explain that traceability is missing. Exception: for a phase marked `*(not squashed — commits pushed mid-phase, see notes.md)*` and for hotfixes (exempt from the squash), fall back to that phase's per-task `Commit SHA` fields. A `tasks.md` without `### Phase` headings counts as one implicit phase: its unit of revert is the **deduplicated** set of per-task SHAs (after a squash all tasks share the phase SHA → one single revert); an unsquashed phase reverts each distinct per-task SHA, newest first
 - The Git tree is clean
 - You are on a **dedicated revert branch** (e.g. `revert/<FEATURE-ID>`), never directly on the integration branch — create it if needed
 
@@ -26,7 +26,7 @@ description: SDD rollback — un-ships a feature (or a single task) using the co
 
 ### 1. Locate the feature and load `tasks.md`
 
-Look in `.claude/sdd/<feature>/` first, then `.claude/sdd/_archive/<feature>/`. Collect the tasks and their commit SHAs.
+Look in `.claude/sdd/<feature>/` first, then `.claude/sdd/_archive/<feature>/`. Collect the implementation phases and their `Phase commit SHA` (falling back to per-task SHAs for a documented unsquashed phase). The trailing `chore(<TICKET-ID>): update SDD artifacts` commit, if any, touches only SDD artifacts and is **not** part of the revert plan.
 
 ### 2. Verify the SHAs
 
@@ -34,7 +34,7 @@ For each targeted SHA, verify it exists in the history (`git cat-file -t <sha>`)
 
 ### 3. Build the revert plan
 
-Order the reverts **most recent commit first** (reverse chronological order) to minimize conflicts. Display:
+Order the reverts **most recent commit first** (reverse chronological order, newest phase first) to minimize conflicts. Display:
 
 ```
 Revert plan — <FEATURE-ID>
@@ -42,11 +42,11 @@ Revert plan — <FEATURE-ID>
 Branch: revert/<FEATURE-ID> (from <integration-branch>)
 
 Will revert (newest first):
-  1. git revert <sha-T005>   — T005 <description>
-  2. git revert <sha-T003>   — T003 <description>
-  3. git revert <sha-T001>   — T001 <description>
+  1. git revert <sha-phase-3>   — Phase 3 <name> (T006-T008)
+  2. git revert <sha-phase-2>   — Phase 2 <name> (T003-T005)
+  3. git revert <sha-phase-1>   — Phase 1 <name> (T001-T002)
 
-Not touched: <tasks kept, if partial revert>
+Not touched: <phases kept, if partial revert>
 
 Do you confirm this revert?
 ```
@@ -63,7 +63,7 @@ A revert can break the code that remains (later features may depend on the rever
 
 ### 6. Update the SDD artifacts
 
-- In `tasks.md`: annotate each reverted task — keep `[x]` and the original SHA, and append `**Reverted by**: <revert-sha>`
+- In `tasks.md`: annotate each reverted phase — keep the `Phase commit SHA` and the tasks' `[x]` markers, and append `**Reverted by**: <revert-sha>` to the phase's metadata block
 - In `spec.md`: do **not** change the `status` (never rewrite history silently) — add a `> ⚠️ Reverted on <date> by <revert-branch>` banner right under the frontmatter, and let the team decide the status afterwards
 - In `notes.md`: log the revert (date, reason, reverted SHAs, revert SHAs, test results)
 
@@ -72,7 +72,7 @@ A revert can break the code that remains (later features may depend on the rever
 ```
 ✅ Revert prepared on branch revert/<FEATURE-ID>
 
-Reverted: T001, T003, T005 (3 commits)
+Reverted: Phase 1, Phase 2, Phase 3 (3 commits — tasks T001-T008)
 Tests: ✅ green / ❌ N failures (list)
 
 Next step:

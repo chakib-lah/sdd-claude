@@ -272,11 +272,11 @@ Major upgrades:
 
 ## Anti-patterns
 
-- ❌ Big rewrite of an entire service in a single commit
+- ❌ Big rewrite of an entire service in a single task or phase
 - ❌ Modification without prior tests
 - ❌ DB migration without `down()`
 - ❌ Removing a column and the code that used it in the same deployment
 - ❌ Public signature change without `@deprecated`
 - ❌ Method removal without an exhaustive search for usages
-- ❌ Refactor mixed with feature work in the same commit
+- ❌ Refactor mixed with feature work in the same phase (the phase squash would merge them into one commit)
 - ❌ "We'll see in production if it breaks" — no, we test beforehand

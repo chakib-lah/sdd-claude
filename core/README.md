@@ -30,7 +30,7 @@ The 30 masters:
 Phase 1 — Specify   →  spec.md (acceptance criteria, design)
 Phase 2 — Plan      →  plan.md (order, files, risks)
 Phase 3 — Tasks     →  breakdown into atomic T001, T002...
-Phase 4 — Implement →  one task, one commit, green tests
+Phase 4 — Implement →  one task, one local commit, green tests; one phase, one branch commit
 ```
 
 ### The 2 verification gates
@@ -109,7 +109,7 @@ core/
 | `/sdd-spec-check` | 1 — Specify | Spec quality checklist before validation |
 | `/sdd-plan` | 2 — Plan | Generates `plan.md` from an approved spec |
 | `/sdd-tasks` | 3 — Tasks | Breaks down into atomic tasks `T001…TN` |
-| `/sdd-implement` | 4 — Implement | Executes ONE task (code + tests + commit) |
+| `/sdd-implement` | 4 — Implement | Executes ONE task (code + tests + local commit); squashes each phase into one commit |
 | `/sdd-verify` | Technical gate | Checks tests, quality, completeness |
 | `/sdd-review` | Functional gate | Checks acceptance criteria coverage |
 | `/sdd-mr` | Closure | Prepares the Merge Request body |
@@ -118,7 +118,7 @@ core/
 | `/sdd-hotfix` | Emergency | Lightened workflow for a Production fix |
 | `/sdd-upgrade` | Maintenance | Updates Layer 1 without touching Layers 2/3 |
 | `/sdd-changelog` | Release | Generates the CHANGELOG from archived specs |
-| `/sdd-revert` | Rollback | Un-ships a feature/task via the tracked commit SHAs |
+| `/sdd-revert` | Rollback | Un-ships a feature/phase via the tracked phase commit SHAs |
 | `/retro-spec` | Brownfield | Rebuilds a spec from existing code |
 
 **These 17 names and their roles are stable**: do not rename them in a skill's Layer 2, otherwise team portability across projects is broken.

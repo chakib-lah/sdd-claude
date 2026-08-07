@@ -21,11 +21,9 @@ Format required by the SDD toolkit:
 
 ```
 <type>(<TICKET-ID>): imperative lowercase description without trailing period
-
-[optional body: why / how, max 72 chars per line]
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
+
+Subject line only — no body, no signature. Keep it short.
 
 Valid types: `feat` `fix` `refactor` `test` `chore` `docs` `hotfix`
 
@@ -44,6 +42,18 @@ When you analyze a conflict:
 2. Identify what each developer was trying to accomplish
 3. Propose a merge that preserves both intents
 4. Always explain the choice
+
+## Phase squash (SDD)
+
+The SDD flow produces one local commit per task, then squashes each implementation phase into **one commit** before push. Interactive rebase is for humans; the agent-safe recipe is:
+
+```bash
+BASE=$(git rev-parse <first-task-sha-of-phase>^)
+git reset --soft "$BASE"
+git commit   # message: <type>(<TICKET-ID>): <phase summary> — subject line only
+```
+
+Never squash commits already pushed to the upstream, and never re-squash a phase `/sdd-verify` has already verified (new phases created after the gate are squashed normally, then `/sdd-verify` is re-run).
 
 ## Interactive rebase
 
@@ -93,10 +103,4 @@ git reset --hard HEAD
 ✅ Commit message
 
 feat(PROJ-101): add search results display on the list view
-
-Adds the `search_label` field to the Item entity and exposes the
-information via the GET /api/items/{id} endpoint. Includes serialization
-in the item:detail group.
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```

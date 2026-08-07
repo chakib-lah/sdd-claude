@@ -202,15 +202,22 @@ A valid plan contains:
 A valid `tasks.md` contains:
 
 1. **Frontmatter**: feature, status, created, author
-2. **Task list** in the strict format:
+2. **Task list**, grouped into **implementation phases** (not to be confused with the 4 SDD phases Specify/Plan/Tasks/Implement), in the strict format:
 
 ```markdown
+### Phase 1: <Milestone name>
+
+- **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
+- **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+
 - [ ] T001 [Category] Short description of the task
   - **Done when**: testable completion criterion
   - **Files**: list of files touched
   - **Tests**: test suite to run afterwards
-  - **Commit SHA**: *(filled in after /sdd-implement)*
+  - **Commit SHA**: *(local commit — replaced by the phase SHA after squash)*
 ```
+
+Task numbering is **global and continuous** (T001…TN across all phases). A small feature has **exactly one phase**; a larger feature is split into coherent milestones. A `tasks.md` without `### Phase` headings is treated as **one implicit phase** covering all tasks. Exception: **hotfixes are exempt from the phase squash** (the red-test commit must stay visible before the fix commit).
 
 ### Task state markers
 
@@ -227,7 +234,7 @@ These three markers are the **only** valid ones. A task left `- [~]` counts as *
 - Achievable in 30 min to 2 h max
 - A single concept or main file touched
 - Independently testable
-- Results in a single commit
+- Results in a single local commit
 
 If a task is expected to exceed 2 h → **re-split** before approving `tasks.md`.
 
@@ -246,13 +253,15 @@ This is the golden rule. Never chain tasks automatically. Between each task, a h
 - The test results
 - The commit's conformity
 
-### One commit per task
+### One local commit per task, one branch commit per phase
 
-Each task produces **exactly one commit**. If the implementation generates several sub-modifications, they go into the same commit (squash before push if necessary).
+During development, each task produces **exactly one local commit** (this preserves traceability and human validation between tasks). If the implementation generates several sub-modifications, they go into the same local commit.
 
-### The commit SHA is tracked in `tasks.md`
+When the **last task of an implementation phase** completes, `/sdd-implement` **squashes the phase's task commits into a single commit** — always before the phase's first push. The history presented to reviewers therefore contains **one commit per phase** (plus at most one final `chore(<TICKET-ID>): update SDD artifacts` bookkeeping commit): a small feature (one phase) is reviewed as a single code commit.
 
-After `/sdd-implement`, the task is checked off and the commit SHA is added. This enables perfect traceability: one AC ↔ one task ↔ one commit.
+### The commit SHAs are tracked in `tasks.md`
+
+After `/sdd-implement`, the task is checked off and its local commit SHA is added. At phase squash, the per-task SHAs of the phase are **replaced by the phase commit SHA** (the local SHAs become unreachable after the squash) and the `**Phase commit SHA**` field is filled in. This keeps the traceability chain: one AC ↔ one task ↔ one phase commit.
 
 ### Pre-commit hooks are mandatory
 
@@ -269,16 +278,17 @@ For urgent Production fixes, the SDD discipline may be lightened:
 - `tasks.md` may fit in 1-2 lines
 - **But** a test reproducing the bug is mandatory before the fix
 - **And** the spec must still be completed after the hotfix (status `implemented`)
+- Hotfix commits are **not squashed**: the red-test commit stays visible before the fix commit
 
 ---
 
 ## Rolling back a feature
 
-When a shipped feature (or one of its tasks) must be withdrawn, do not fix backward by hand: the one-task-one-commit discipline makes rollback mechanical.
+When a shipped feature (or one of its implementation phases) must be withdrawn, do not fix backward by hand: the one-phase-one-commit discipline makes rollback mechanical.
 
 ```
-/sdd-revert <FEATURE-ID>          # whole feature
-/sdd-revert <FEATURE-ID> T003     # single task
+/sdd-revert <FEATURE-ID>              # whole feature (all phases, newest first)
+/sdd-revert <FEATURE-ID> "Phase 2"    # single implementation phase
 ```
 
 The command builds a `git revert` plan from the commit SHAs recorded in `tasks.md`, executes it on a dedicated branch after explicit confirmation, re-runs the tests, and annotates the SDD artifacts (never deletes them). See `/sdd-revert` for the full rules.

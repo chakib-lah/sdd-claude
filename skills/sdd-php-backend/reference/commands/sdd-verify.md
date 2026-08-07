@@ -23,15 +23,20 @@ Read `.claude/sdd/<feature>/tasks.md` and verify that **all** tasks are `done` (
 
 For each `done` task, verify that the `**Commit SHA**` field is filled in.
 
-**If a task is not `done` or has no SHA**:
+For each implementation phase whose tasks are all `done`, verify that the `**Phase commit SHA**` field is filled in (i.e. the phase was squashed by `/sdd-implement` step 11b). Accepted exceptions: a phase marked `*(not squashed — commits pushed mid-phase, see notes.md)*` **with** the incident documented in `notes.md`, and **hotfix features** (`type: hotfix` frontmatter or `hotfix/` branch), which are exempt from the squash — for them, only check the per-task `Commit SHA` fields. A `tasks.md` without `### Phase` headings counts as one implicit phase.
+
+**If a task is not `done`, has no SHA, or a completed phase is not squashed**:
 
 ```
-❌ Incomplete tasks:
+❌ Incomplete tasks or phases:
    - T00X: status pending
    - T00Y: status done but SHA missing
+   - Phase N: complete but not squashed (Phase commit SHA empty)
 
-Action: finish the tasks via /sdd-implement before re-running /sdd-verify.
+Action: finish the tasks via /sdd-implement (which performs the phase squash) before re-running /sdd-verify.
 ```
+
+Once `/sdd-verify` has recorded its verdict, **never re-squash a phase it has already verified**: the review gate compares HEAD against the verified commit, and rewriting verified history would invalidate it. New phases created after the gate (e.g. `Phase N+1: Review fixes` from `/sdd-review`) are squashed normally by `/sdd-implement` — then `/sdd-verify` must be re-run.
 
 ### 3. Check that the Git tree is clean
 

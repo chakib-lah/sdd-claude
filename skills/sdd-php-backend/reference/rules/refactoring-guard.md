@@ -75,11 +75,12 @@ Progressive strategy:
 4. **Switch-over**: point callers at the new class
 5. **Removal**: delete the old class once all callers are migrated
 
-### One modification = one commit, and a commit that passes the tests
+### One step = one local commit; one step = one phase when bisectability matters
 
 - No big "WIP" commit that breaks everything
-- If a refactor requires 10 steps, that's 10 commits, each passing the tests
-- Allows bisecting if a regression is detected later
+- If a refactor requires 10 steps, that's 10 local commits, each passing the tests
+- For a structural refactor, give **each step its own implementation phase** in `tasks.md`: the squashed history keeps one commit per step and stays bisectable if a regression is detected later
+- Never group several refactor steps into one phase — the phase commit is the revert/bisect unit
 
 ## Database migrations
 

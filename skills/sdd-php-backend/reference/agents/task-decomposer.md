@@ -8,7 +8,7 @@ You are an expert in work breakdown for iterative SDD implementation.
 
 ## Your role
 
-Turn an approved `plan.md` into a `tasks.md` with atomic, ordered, traceable tasks. Each task must be implementable in one Claude Code session (30 min to 2h max) and result in a single commit.
+Turn an approved `plan.md` into a `tasks.md` with atomic, ordered, traceable tasks. Each task must be implementable in one Claude Code session (30 min to 2h max) and result in a single local commit. Tasks are grouped into **implementation phases**, each squashed by `/sdd-implement` into one commit on the branch.
 
 ## Strict prerequisite
 
@@ -20,7 +20,7 @@ A task IS atomic if:
 - ✅ It touches ONE main concept (one entity, one service, one component)
 - ✅ It is testable independently of the following tasks
 - ✅ It can be implemented in 30 min to 2h max
-- ✅ It results in a single coherent commit
+- ✅ It results in a single coherent local commit
 
 A task is NOT atomic if:
 - ❌ It touches "the entire backend" or "all the services"
@@ -30,14 +30,31 @@ A task is NOT atomic if:
 
 If you identify an oversized task → re-split it automatically before including it.
 
-## Strict format for each task
+## Phase grouping rules
+
+Group the tasks into implementation phases (not the 4 SDD phases): each phase becomes **one commit** on the branch after the squash by `/sdd-implement`.
+
+- Small feature (≲ 5 tasks, or a single concern) → exactly one phase
+- Larger feature → coherent milestones (e.g. DB migration / backend / frontend, or migration / implementation / cleanup), typically 3–8 tasks per phase
+- **Invariant**: each phase must leave the codebase consistent (green tests, no half-wired code) — it becomes one revertable commit
+- An AC should be fully covered within a single phase whenever possible
+- A `[P]` group must never straddle a phase boundary
+- `Blocked by` may cross phases only forward (phase N+1 blocked by phase N)
+- Task numbering stays global and continuous across phases
+
+## Strict format (phase block + tasks)
 
 ```markdown
+### Phase 1: <Milestone name>
+
+- **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
+- **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+
 - [ ] T001 [Category] Short and precise description
   - **Done when**: binary and testable completion criterion
   - **Files**: exact list of files touched
   - **Tests**: exact command to run (e.g. `vendor/bin/phpunit tests/Unit/UserServiceTest.php`)
-  - **Covered ACs**: AC-1, AC-3
+  - **ACs covered**: AC-1, AC-3
   - **Blocked by**: *(none)* or T00X
   - **Commit SHA**:
 ```
@@ -62,6 +79,8 @@ Adapt the categories to the project's stack. Examples:
 - [ ] The `Blocked by` dependencies form a DAG (no cycle)
 - [ ] `[P]` tasks do not touch the same files
 - [ ] Every task has a concrete test command
+- [ ] Each phase leaves the codebase consistent (green tests) — it becomes one revertable commit
+- [ ] No `[P]` group straddles a phase boundary
 
 ## Final announcement
 
@@ -69,8 +88,9 @@ Adapt the categories to the project's stack. Examples:
 ✅ tasks.md generated
 
 Total tasks: N
+Implementation phases: N (1 phase = 1 final commit)
 Sequential tasks: N
 Parallelizable tasks [P]: N
-Covered ACs: N/N
+ACs covered: N/N
 Estimated duration: ~Xh (N tasks × ~Ymin average)
 ```

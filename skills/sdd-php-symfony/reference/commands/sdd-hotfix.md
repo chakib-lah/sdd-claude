@@ -99,6 +99,7 @@ type: hotfix
   - **Files**: [to be identified]
   - **Tests**: [suite to run]
   - **ACs covered**: AC-2
+  - **Commit SHA**:
 
 - [ ] T002 [Fix] Fix the bug (test T001 must turn green)
   - **Done when**: T001 green + no regression
@@ -106,6 +107,7 @@ type: hotfix
   - **Tests**: [full suites]
   - **ACs covered**: AC-1, AC-2, AC-3
   - **Blocked by**: T001
+  - **Commit SHA**:
 ```
 
 ### 5. Announce in the chat
@@ -131,6 +133,7 @@ After the hotfix: complete spec.md if needed and set it to status: implemented.
 
 - ❌ **Never bypass** with `git commit --no-verify`
 - ✅ **A test reproducing the bug is mandatory** before the fix (T001 before T002)
+- ❌ **No phase squash on a hotfix**: the red-test commit (T001) must stay visible before the fix commit (T002) — the revert unit is the per-task SHAs
 - ✅ **MR to main** (prod branch) + **backport to develop** (so the fix is not lost)
 - ✅ **Complete spec.md** after the hotfix if the context was incomplete
 - ❌ **Do not take advantage of the hotfix** to refactor or improve — minimal scope
