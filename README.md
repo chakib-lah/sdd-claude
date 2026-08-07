@@ -136,9 +136,19 @@ Security is built into the method, not bolted on (see `core/rules/03-security.md
 
 ## Installation
 
-Installation is a single command (symlink of the skills + copy of the global agents), on Linux/macOS/WSL2 or Windows. To update later: `git pull` + `./upgrade-global.sh` for the global `~/.claude`, and `/sdd-upgrade` inside each project.
+Installation is a single command (symlink of the skills + copy of the global agents), on Linux/macOS/WSL2 or Windows.
 
 ➡️ **See [`INSTALL.md`](INSTALL.md)** for the detailed procedure, verification and updates.
+
+### Updating
+
+```bash
+cd ~/tools/sdd-claude && git pull   # skill symlinks follow automatically
+./upgrade-global.sh                 # global ~/.claude: symlinks + global agents
+                                    # (Windows: .\upgrade-global.ps1)
+```
+
+The script adds/repairs the skill symlinks, updates stale global agents, and never silently overwrites an agent you customized. Then, inside each project: `/sdd-upgrade` (updates Layer 1, preserves your customizations).
 
 ---
 
@@ -194,6 +204,7 @@ The toolkit is not limited to the 4 shipped skills: you can add a skill for a ne
 | File | Contents |
 |---|---|
 | `INSTALL.md` | Detailed installation guide |
+| `upgrade-global.sh` / `.ps1` | Updates the global `~/.claude` (skills + agents) after a `git pull` |
 | `skills/README.md` | Skills decision tree |
 | `core/extension-guide.md` | Creating a new stack skill |
 | `core/ci-templates/` | CI snippets |

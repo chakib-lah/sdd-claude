@@ -1,5 +1,18 @@
 # Changelog — SDD Claude
 
+## [1.3.0] — 2026-08-07
+
+### Added
+
+- `/sdd-upgrade` audits the SDD agents; developer-owned agents are never touched.
+- `upgrade-global.sh` / `upgrade-global.ps1` — update the global `~/.claude` after a toolkit update: repair skill symlinks, refresh global agent copies, never overwrite customized copies silently.
+
+### Changed
+
+- **Rules renumbered — first digit = layer** (0x = Layer 1 methodology, 1x = Layer 2 stack); `/sdd-upgrade` gains a structural migration that renames a project's files, content untouched.
+
+---
+
 ## [1.2.0] — 2026-08-07
 
 ### Changed
