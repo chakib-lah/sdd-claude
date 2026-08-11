@@ -103,6 +103,11 @@ author: <name>
 draft → in-review → approved → implemented
 ```
 
+**Exception — retrospective specs.** A spec carrying `retrospective: true` (produced by
+`/retro-spec`) escapes this lifecycle: it documents code that already exists, so it is created
+directly with `status: implemented`, is never "in progress", and can be archived immediately.
+`/sdd-plan`, `/sdd-tasks` and `/sdd-implement` do not apply to it.
+
 ### The transition to `approved` is manual
 
 This is intentional. Moving to `approved` is the act by which a human takes responsibility for the artifact's content. No agent may do it automatically.
@@ -125,7 +130,8 @@ This is intentional. Moving to `approved` is the act by which a human takes resp
     ├── spec.md
     ├── plan.md
     ├── tasks.md
-    └── notes.md                               ← free-form logbook
+    ├── notes.md                               ← free-form logbook
+    └── exports/                               ← AMOA deliverables (retrospective specs only, optional)
 ```
 
 ### Feature directory naming convention
@@ -300,10 +306,11 @@ The command builds a `git revert` plan from the commit SHAs recorded in `tasks.m
 To document legacy code without implementing anything:
 
 ```
-/retro-spec <path/to/code>
+/retro-spec <FEATURE-ID>-<description> [<target>]            # analysis
+/retro-spec <FEATURE-ID>-<description> --export jira|word|all  # exports only, on an existing retro spec
 ```
 
-This command produces a retrospective spec with `status: implemented` directly. Useful for catching up on documentation debt before a refactor.
+The target may be a module directory (recommended granularity — business readers think in modules), a screen/component, a URL/route or a single file. The command produces a retrospective spec with `status: implemented` directly, and can optionally derive business-facing deliverables (Jira story, SPEC document) into the feature's `exports/` folder. Useful for catching up on documentation debt before a refactor.
 
 ---
 

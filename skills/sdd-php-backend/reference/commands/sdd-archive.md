@@ -35,6 +35,8 @@ Read `.claude/sdd/<feature>/spec.md` and verify `status: implemented`.
 
 ### 3. Check that the MR is merged (optional but recommended)
 
+**Exception**: if `spec.md` carries `retrospective: true`, skip this check entirely — a retrospective spec is documentation produced without any branch or MR, and is archivable as soon as the team wants it out of the active list. In the step 4 announcement, report plan.md and tasks.md as "not applicable (retrospective)" instead of task counts.
+
 ```bash
 git log origin/<integration-branch> --oneline | grep <FEATURE-ID>
 ```

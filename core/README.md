@@ -120,7 +120,7 @@ core/
 | `/sdd-upgrade` | Maintenance | Updates Layer 1 without touching Layers 2/3 |
 | `/sdd-changelog` | Release | Generates the CHANGELOG from archived specs |
 | `/sdd-revert` | Rollback | Un-ships a feature/phase via the tracked phase commit SHAs |
-| `/retro-spec` | Brownfield | Rebuilds a spec from existing code |
+| `/retro-spec` | Brownfield | Rebuilds a spec from existing code; optional AMOA exports (Jira story, SPEC document) |
 
 **These 17 names and their roles are stable**: do not rename them in a skill's Layer 2, otherwise team portability across projects is broken.
 

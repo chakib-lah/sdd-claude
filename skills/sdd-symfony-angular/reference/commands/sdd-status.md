@@ -36,6 +36,9 @@ Determine the feature's current SDD phase (Specify/Plan/Tasks/Implement — not 
 | approved | approved | approved | X/N (in progress) | Phase 4 — Implement (in progress) |
 | approved | approved | approved | N/N | Gate Verify / Review |
 | implemented | - | - | N/N | Merged, ready to archive |
+| implemented (`retrospective: true`) | n/a | n/a | n/a | Retrospective — documentation only, archivable |
+
+A feature whose `spec.md` carries `retrospective: true` is displayed as "retrospective (implemented)": plan/tasks are "not applicable" stubs, so no task or phase ratio is computed for it.
 
 ### 4. Identify the associated Git branch
 
