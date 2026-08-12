@@ -81,7 +81,7 @@ sdd-<stack>/
 └── reference/
     ├── commands/         ← All commands (universal + auxiliary)
     ├── rules/            ← All rules (core + stack-specific)
-    └── templates/        ← Templates (spec.md, plan.md, tasks.md, notes.md)
+    └── templates/        ← Templates (spec, plan, tasks, notes, sdd-readme + exports AMOA jira-story, spec-doc)
 ```
 
 Files in `reference/` are copied into the project's `.claude/` during installation.

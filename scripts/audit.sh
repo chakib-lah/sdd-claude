@@ -38,6 +38,17 @@ for s in $SKILLS; do
   # option A — no hooks: settings.json must neither exist nor be referenced
   [ -f "skills/$s/reference/settings.json" ] && fail "$s: settings.json present (option A — no hooks)"
   grep -q "settings.json" "skills/$s/SKILL.md" 2>/dev/null && fail "$s: SKILL.md references settings.json (ghost)"
+  # every deployable template must be listed in SKILL.md (sdd-readme.md deploys as sdd/README.md)
+  for f in "skills/$s/reference/templates/"*.md; do
+    [ -e "$f" ] || continue
+    t=$(basename "$f")
+    [ "$t" = "sdd-readme.md" ] && continue
+    grep -qF "_template/$t" "skills/$s/SKILL.md" 2>/dev/null || fail "$s: SKILL.md does not deploy _template/$t"
+  done
+  # reverse: every _template/<f> cited in SKILL.md must exist in reference/templates/ (ghost)
+  for t in $(grep -hoE '_template/[a-z0-9-]+\.md' "skills/$s/SKILL.md" 2>/dev/null | sed 's|_template/||' | sort -u); do
+    [ -f "skills/$s/reference/templates/$t" ] || fail "$s: SKILL.md deploys ghost template _template/$t"
+  done
 done
 [ -d global-agents ] || fail "global-agents/ missing"
 for d in core/commands core/agents core/rules core/templates; do
@@ -134,6 +145,11 @@ done < <(grep -rnE 'new command v[0-9]' core skills --include='*.md' 2>/dev/null
 for s in $SKILLS; do
   grep -q "$s" skills/README.md 2>/dev/null || fail "skills/README.md does not mention $s"
 done
+# version coherence: docs must cite the current VERSION
+v=$(cat VERSION 2>/dev/null)
+for f in README.md INSTALL.md; do
+  grep -qF "$v" "$f" 2>/dev/null || fail "docs: $f does not cite current version $v (stale)"
+done
 [ $err -eq $before ] && ok "command count correct (17) and 4 skills documented"
 
 # =====================================================================
@@ -141,9 +157,11 @@ say "== 6. Content equality of shared files (anti-drift) =="
 before=$err
 # 6a. The core/ masters must be byte-identical in the 4 skills.
 #     Legitimate exclusion: test-generator.md (adapted per stack).
+mcount=0
 for cf in core/commands/*.md core/agents/*.md core/templates/*.md core/rules/*.md; do
   rel=${cf#core/}                       # e.g. commands/sdd-spec.md
   [ "$rel" = "agents/test-generator.md" ] && continue
+  mcount=$((mcount+1))
   base=$(hashf "$cf")
   for s in $SKILLS; do
     sf="skills/$s/reference/$rel"
@@ -183,7 +201,7 @@ check_shared "angular" "sdd-symfony-angular sdd-angular-node" \
 check_shared "symfony" "sdd-php-symfony sdd-symfony-angular" \
   commands/symfony-entity.md commands/symfony-service.md commands/symfony-controller.md commands/symfony-test.md \
   rules/doctrine-conventions.md
-[ $err -eq $before ] && ok "32 core masters + angular/symfony groups identical (hash)"
+[ $err -eq $before ] && ok "$mcount core masters + angular/symfony groups identical (hash)"
 
 # =====================================================================
 echo ""

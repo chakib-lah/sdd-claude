@@ -123,7 +123,9 @@ This is intentional. Moving to `approved` is the act by which a human takes resp
 │   ├── spec.md
 │   ├── plan.md
 │   ├── tasks.md
-│   └── notes.md
+│   ├── notes.md
+│   ├── jira-story-fr.md / jira-story-en.md    ← retro-spec export trames (per language)
+│   └── spec-doc-fr.md / spec-doc-en.md        ← retro-spec export trames (per language)
 ├── _archive/                                  ← merged features
 │   └── <FEATURE-XXX>-<description>/
 └── <FEATURE-XXX>-<description>/               ← features in progress
@@ -306,8 +308,8 @@ The command builds a `git revert` plan from the commit SHAs recorded in `tasks.m
 To document legacy code without implementing anything:
 
 ```
-/retro-spec <FEATURE-ID>-<description> [<target>]            # analysis
-/retro-spec <FEATURE-ID>-<description> --export jira|word|all  # exports only, on an existing retro spec
+/retro-spec <FEATURE-ID>-<description> [<target>] [--format <trame>]            # analysis
+/retro-spec <FEATURE-ID>-<description> --export jira|word|all [--format <trame>]  # exports only, on an existing retro spec
 ```
 
 The target may be a module directory (recommended granularity — business readers think in modules), a screen/component, a URL/route or a single file. The command produces a retrospective spec with `status: implemented` directly, and can optionally derive business-facing deliverables (Jira story, SPEC document) into the feature's `exports/` folder. Useful for catching up on documentation debt before a refactor.

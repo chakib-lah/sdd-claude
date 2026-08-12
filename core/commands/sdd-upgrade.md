@@ -98,15 +98,17 @@ Compare each Layer 1 rule found in `reference/rules/` (see scope in step 0) with
 
 #### 1.3 — Templates
 
-Compare each file found in `reference/templates/` with the project's copy:
+Compare each file found in `reference/templates/` with the project's copy. A template present in the project's `_template/` but absent from the reference (e.g. a `spec-doc-<lang>.md` trame saved by `/retro-spec` for a language with no shipped variant) is a **project-own trame — never touch it**:
 
 ```
 _template/spec.md     : [✅ / ❌ / ⚠️]
 _template/plan.md     : [✅ / ❌ / ⚠️]
 _template/tasks.md    : [✅ / ❌ / ⚠️ — phase structure (### Phase N) missing?]
 _template/notes.md    : [✅ structured / ⚠️ "Squash exceptions" section missing (old version)]
-_template/jira-story.md : [✅ / ❌ missing (added with retro-spec AMOA exports)]
-_template/spec-doc.md   : [✅ / ❌ missing (added with retro-spec AMOA exports)]
+_template/jira-story-fr.md : [✅ / ❌ missing (added with retro-spec AMOA exports) / ⚠️ divergent — likely a legitimate project override (custom trame): never overwrite without explicit request]
+_template/jira-story-en.md : [✅ / ❌ missing (added with retro-spec AMOA exports) / ⚠️ divergent — likely a legitimate project override (custom trame): never overwrite without explicit request]
+_template/spec-doc-fr.md   : [✅ / ❌ missing (added with retro-spec AMOA exports) / ⚠️ divergent — likely a legitimate project override (custom trame): never overwrite without explicit request]
+_template/spec-doc-en.md   : [✅ / ❌ missing (added with retro-spec AMOA exports) / ⚠️ divergent — likely a legitimate project override (custom trame): never overwrite without explicit request]
 sdd/README.md         : [✅ / ❌ / ⚠️ — from reference/templates/sdd-readme.md]
 ```
 

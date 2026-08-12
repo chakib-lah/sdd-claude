@@ -14,7 +14,7 @@ sdd-claude/
 │   ├── agents/             ← 5 SDD agents (spec-writer, plan-architect...)
 │   ├── commands/           ← 17 universal SDD commands
 │   ├── rules/              ← Methodology + constitution + Git + security
-│   ├── templates/          ← spec/plan/tasks/notes
+│   ├── templates/          ← spec/plan/tasks/notes + AMOA exports (jira-story, spec-doc)
 │   └── ci-templates/       ← GitLab CI snippets
 ├── skills/                 ← 4 installable skills (Layer 2)
 │   ├── sdd-php-backend/
@@ -42,7 +42,7 @@ sdd-claude/
 ├── install.ps1            ← Windows installer
 ├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
 ├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
-├── VERSION                ← 1.3.0
+├── VERSION                ← 1.4.0
 └── CHANGELOG.md
 ```
 

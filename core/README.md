@@ -7,15 +7,15 @@
 
 ## Role of `core/`
 
-`core/` contains the **32 "masters"**: the Layer 1 (methodology) files, identical for all stacks. Each skill embeds a **byte-identical copy** of these 32 masters in its `reference/` directory. The consistency of these copies is verified by hash in `scripts/audit.sh` (section 6).
+`core/` contains the **34 "masters"**: the Layer 1 (methodology) files, identical for all stacks. Each skill embeds a **byte-identical copy** of these 34 masters in its `reference/` directory. The consistency of these copies is verified by hash in `scripts/audit.sh` (section 6).
 
-The 32 masters:
+The 34 masters:
 
 | Category | Count | Files |
 |---|---|---|
 | Commands | **17** | the 17 universal SDD commands (see table below) |
 | Agents | **4** | `spec-writer`, `plan-architect`, `task-decomposer`, `code-reviewer` |
-| Templates | **7** | `spec.md`, `plan.md`, `tasks.md`, `notes.md`, `sdd-readme.md`, `jira-story.md`, `spec-doc.md` |
+| Templates | **9** | `spec.md`, `plan.md`, `tasks.md`, `notes.md`, `sdd-readme.md`, `jira-story-fr.md`, `jira-story-en.md`, `spec-doc-fr.md`, `spec-doc-en.md` |
 | Rules | **4** | `00-sdd-framework.md`, `01-constitution.md`, `02-git-conventions.md`, `03-security.md` |
 
 > **Exception: `agents/test-generator.md` is NOT a master.** It is **adapted per skill** (each stack cites only its own test commands). It is therefore excluded from the hash equality check. `core/agents/` nevertheless contains a generic source version of `test-generator.md` as a starting point.
@@ -50,7 +50,7 @@ Review  →  Functional gate: acceptance criteria coverage
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ LAYER 1 — METHODOLOGY (the 32 masters, source here)        │
+│ LAYER 1 — METHODOLOGY (the 34 masters, source here)        │
 │ Universal, identical across all projects                   │
 └────────────────────────────────────────────────────────────┘
                             ▼ plugged in per stack
@@ -64,7 +64,7 @@ Review  →  Functional gate: acceptance criteria coverage
 └────────────────────────────────────────────────────────────┘
 ```
 
-A **skill** (`skills/sdd-<stack>/`) is the packaging that brings together Layer 1 (the 32 copied masters) **and** Layer 2 (the stack-specific conventions and commands). It is the unit installed on a project. Layer 3 is added manually by the team as the project evolves.
+A **skill** (`skills/sdd-<stack>/`) is the packaging that brings together Layer 1 (the 34 copied masters) **and** Layer 2 (the stack-specific conventions and commands). It is the unit installed on a project. Layer 3 is added manually by the team as the project evolves.
 
 ---
 
@@ -87,14 +87,14 @@ core/
 │   ├── task-decomposer.md
 │   ├── code-reviewer.md
 │   └── test-generator.md      ← generic source, then adapted per skill
-├── templates/                 ← 7 artifact templates (masters)
+├── templates/                 ← 9 artifact templates (masters)
 │   ├── spec.md
 │   ├── plan.md
 │   ├── tasks.md
 │   ├── notes.md
 │   ├── sdd-readme.md
-│   ├── jira-story.md          ← retro-spec AMOA export (Jira story)
-│   └── spec-doc.md            ← retro-spec AMOA export (SPEC document)
+│   ├── jira-story-{fr,en}.md  ← retro-spec AMOA export (Jira story)
+│   └── spec-doc-{fr,en}.md    ← retro-spec AMOA export (SPEC document)
 ├── ci-templates/              ← reusable CI snippets
 └── examples/
     └── skill-template.md      ← Step-by-step guide to create a new stack skill
@@ -140,7 +140,7 @@ core/
 
 ### Creating a new stack skill
 
-Follow the step-by-step skeleton: **`examples/skill-template.md`**. In short: create `skills/sdd-<stack>/reference/{agents,commands,rules,templates}/`, copy the 32 masters from `core/`, write Layer 2 (conventions + scaffolding commands), adapt `test-generator.md`, write the `SKILL.md`, wire the skill into `install.sh` / `install.ps1` / `skills/README.md`, then validate with `bash scripts/audit.sh`.
+Follow the step-by-step skeleton: **`examples/skill-template.md`**. In short: create `skills/sdd-<stack>/reference/{agents,commands,rules,templates}/`, copy the 34 masters from `core/`, write Layer 2 (conventions + scaffolding commands), adapt `test-generator.md`, write the `SKILL.md`, wire the skill into `install.sh` / `install.ps1` / `skills/README.md`, then validate with `bash scripts/audit.sh`.
 
 ---
 

@@ -209,4 +209,4 @@ The toolkit is not limited to the 4 shipped skills: you can add a skill for a ne
 | `core/extension-guide.md` | Creating a new stack skill |
 | `core/ci-templates/` | CI snippets |
 
-Version 1.3.0 — August 2026.
+Version 1.4.0 — August 2026.

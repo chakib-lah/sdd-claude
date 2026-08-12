@@ -2,12 +2,13 @@
 
 <!--
 Used by /retro-spec step 8 to derive exports/spec-doc.md from a retrospective spec.md.
-Write the document in the project's working language. Business content only: no technical
-debt section — uncertainties go to chapter 5. Every "Source :" reference is a file path
-WITHOUT line numbers (the export is derived from spec.md without re-reading the code).
-The header revision comes from the spec frontmatter (analyzed_branch / analyzed_commit),
-NOT from the current HEAD. If the user provides their own document format, base the export
-on it instead and save it as the project's override of this template.
+The export follows this skeleton: strip the HTML comments, replace the <placeholders>.
+FR variant — an EN variant (spec-doc-en.md) exists: /retro-spec picks the one matching
+the project's working language, and translates from the -en variant for any other
+language. Filling rules (business-only content, "Source :" file paths without line
+numbers, revision from analyzed_branch/analyzed_commit — never the current HEAD, which is only a
+flagged fallback when those fields are missing) live in /retro-spec step 8. If the user provides their own document format, /retro-spec bases the
+export on it and OFFERS (asks first) to save it as the project's override of this file.
 -->
 
 | | |

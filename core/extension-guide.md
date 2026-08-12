@@ -42,8 +42,9 @@ skills/sdd-<stack>/
     │   ├── 11-tests-strategy.md      ← stack-specific (Layer 2)
     │   ├── 12-quality-gates.md       ← stack-specific (Layer 2)
     │   └── <stack extras>.md         ← e.g. doctrine-conventions, angular-conventions, migration-guard…
-    └── templates/                    ← 5 process templates
-        └── spec.md, plan.md, tasks.md, notes.md, sdd-readme.md   ← MASTERS (copied from core)
+    └── templates/                    ← 9 process templates
+        └── spec.md, plan.md, tasks.md, notes.md, sdd-readme.md,
+            jira-story-{fr,en}.md, spec-doc-{fr,en}.md   ← MASTERS (copied from core)
 ```
 
 > **"MASTER"** = Layer 1 file whose source of truth is `core/`. It is **copied byte for byte**, never rewritten. See the next section.
@@ -54,19 +55,19 @@ skills/sdd-<stack>/
 
 This is the most important rule in this guide. Team portability relies on Layer 1 being **rigorously identical** in all skills. A dev who masters one project must find exactly the same commands, agents and templates on another one, byte for byte.
 
-### (a) The 32 masters from `core/` are copied verbatim
+### (a) The 34 masters from `core/` are copied verbatim
 
-When creating a skill, we **copy** — without ever adapting them — the **32 master files** from `core/` to `skills/sdd-<stack>/reference/`:
+When creating a skill, we **copy** — without ever adapting them — the **34 master files** from `core/` to `skills/sdd-<stack>/reference/`:
 
 | Origin (`core/`) | Count | Destination (`reference/`) |
 |---|---|---|
 | `core/commands/*.md` (the 17 SDD commands) | 17 | `commands/` |
 | `core/agents/*.md` **except `test-generator.md`** | 4 | `agents/` |
-| `core/templates/*.md` | 7 | `templates/` |
+| `core/templates/*.md` | 9 | `templates/` |
 | `core/rules/*.md` (`00-sdd-framework`, `01-constitution`, `02-git-conventions`, `03-security`) | 4 | `rules/` |
-| **Total** | **32** | |
+| **Total** | **34** | |
 
-These 32 files are not to be touched: no renaming, no rephrasing, no "local improvement". Any evolution happens in `core/` and is then **re-propagated** to all skills (see *Synchronization with the core*).
+These 34 files are not to be touched: no renaming, no rephrasing, no "local improvement". Any evolution happens in `core/` and is then **re-propagated** to all skills (see *Synchronization with the core*).
 
 ### (b) Only `test-generator` is adapted to the stack
 
@@ -110,7 +111,7 @@ The output must remain `✅ AUDIT OK`. Any drift of a master triggers a `✗ …
 
 These commands belong to Layer 1. Modifying them breaks team portability across projects.
 
-**Never alter a master** (see *Consistency with the core*): the 32 masters are copied verbatim. The only allowed adaptation on the agents side is `test-generator`.
+**Never alter a master** (see *Consistency with the core*): the 34 masters are copied verbatim. The only allowed adaptation on the agents side is `test-generator`.
 
 **Never pollute the methodology with tech**:
 - No mention of "PHPUnit", "Jest", "JUnit" in `00-sdd-framework.md`.
@@ -161,7 +162,7 @@ A stack skill's `SKILL.md` must:
 1. Declare the scope (when to use it / when not to use it) and the detection triggers (e.g. `composer.json` contains `symfony/framework-bundle`).
 2. Describe the deployment from `reference/` to `.claude/`.
 3. Detect brownfield / greenfield mode and adapt to it.
-4. Check the presence of the 32 masters (otherwise, refuse and point back to the core).
+4. Check the presence of the 34 masters (otherwise, refuse and point back to the core).
 
 Typical skeleton of the installation flow:
 
@@ -197,7 +198,7 @@ Next step: add the project's business skills in .claude/skills/ (Layer 3).
 
 Before publishing a skill, check:
 
-- [ ] The **32 masters** from `core/` are copied verbatim into `reference/` (verified by `audit.sh §6`)
+- [ ] The **34 masters** from `core/` are copied verbatim into `reference/` (verified by `audit.sh §6`)
 - [ ] The **17 universal SDD commands** are neither renamed nor redefined
 - [ ] Only `test-generator` is adapted to the stack; the 4 other SDD agents remain masters
 - [ ] The granularity of the auxiliary commands is consistent with the team's other skills
@@ -222,7 +223,7 @@ Focused questions:
 
 ### Generation (Phase 3) — Layer 2 only
 
-The 32 masters are already copied from `core/`. Only the stack-specific files are generated:
+The 34 masters are already copied from `core/`. Only the stack-specific files are generated:
 
 ```
 reference/rules/
@@ -268,7 +269,7 @@ reference/agents/
 2. `sdd-python-django` — Python / Django projects
 3. `sdd-go` — Go services
 
-For each: copy the 32 masters, write Layer 2 (rules + scaffolding + `test-generator`), wire the installers and `skills/README.md`, then validate with `audit.sh`.
+For each: copy the 34 masters, write Layer 2 (rules + scaffolding + `test-generator`), wire the installers and `skills/README.md`, then validate with `audit.sh`.
 
 ---
 

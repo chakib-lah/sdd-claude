@@ -1,7 +1,7 @@
 # Skeleton — Create a new `sdd-<stack>` stack skill
 
 > Step-by-step guide to add a stack to the SDD Claude following the **current model**: a standalone skill (`SKILL.md` + `reference/`) installed via `install.sh` / `install.ps1`.
-> A skill brings together **Layer 1** (the 32 masters copied from `core/`) **and** **Layer 2** (the stack-specific conventions and commands). Layer 3 (business) is added by the team as the project evolves, never here.
+> A skill brings together **Layer 1** (the 34 masters copied from `core/`) **and** **Layer 2** (the stack-specific conventions and commands). Layer 3 (business) is added by the team as the project evolves, never here.
 
 Replace `<stack>` with the stack's name (e.g. `python-fastapi`, `java-spring`).
 
@@ -27,7 +27,7 @@ skills/sdd-<stack>/
 
 ---
 
-## Step 2 — Copy the 32 masters from `core/` (verbatim)
+## Step 2 — Copy the 34 masters from `core/` (verbatim)
 
 Layer 1 must be **byte-identical** to `core/` — this is what `scripts/audit.sh` (section 6) verifies. We copy, we never rewrite by hand.
 
@@ -39,7 +39,7 @@ cp core/templates/*.md  "$S/templates/"
 cp core/rules/*.md      "$S/rules/"
 ```
 
-This installs: the **17 SDD commands**, the **5 agents** (including `test-generator`, which we will adapt in step 4), the **5 templates** and the **4 universal rules**.
+This installs: the **17 SDD commands**, the **5 agents** (including `test-generator`, which we will adapt in step 4), the **9 templates** and the **4 universal rules**.
 
 > Never modify these files in the skill. The source is `core/`; any divergence is detected by the audit.
 
@@ -113,7 +113,7 @@ Must display `✅ AUDIT OK`. The audit checks in particular:
 - the skill's structure (`SKILL.md` + `reference/{agents,commands,rules,templates}`);
 - completeness (17 commands + 5 agents);
 - the wiring in the installers;
-- the hash equality of the 32 masters with `core/`.
+- the hash equality of the 34 masters with `core/`.
 
 ---
 
@@ -129,4 +129,4 @@ Must display `✅ AUDIT OK`. The audit checks in particular:
 
 ## Customization (stays in Layer 2)
 
-A skill can be adjusted for a project type: quality gate levels, specific security rules, additional scaffolding commands. These adjustments remain in **Layer 2**; Layer 1 (the 32 masters) stays untouched.
+A skill can be adjusted for a project type: quality gate levels, specific security rules, additional scaffolding commands. These adjustments remain in **Layer 2**; Layer 1 (the 34 masters) stays untouched.

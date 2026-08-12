@@ -1,13 +1,13 @@
-# Template: Jira story export (retrospective spec)
+# Template: Jira story export (retrospective spec) — FR
 
 <!--
 Used by /retro-spec step 8 to derive exports/jira-story.txt from a retrospective spec.md.
-The output is Jira WIKI MARKUP, ready to paste into a ticket description.
-Before using this structure, check the project's real ticket template (a recent ticket,
-read-only, or a local rule): some projects use another issue type with free-form headings.
-Write the content in the project's working language. Business content only: no technical
-debt, no ✅/⚠️ markers — open questions and 🗣️ declarations go to "Points à confirmer".
-Projects may adapt this template to their own ticketing conventions.
+The export is the content of the fenced block below (Jira WIKI MARKUP, ready to paste):
+strip this title, this comment and the fence. FR variant — an EN variant
+(jira-story-en.md) exists: /retro-spec picks the one matching the project's working
+language, and translates from the -en variant for any other language. Filling rules
+(business-only content, points to confirm, ticket-template check) live in /retro-spec
+step 8. Projects may adapt this file to their own ticketing conventions.
 -->
 
 ```
@@ -33,7 +33,7 @@ h3. (on) Résumé
 
 h3. (/) Critères d'acceptation
 ||N°||Critères||
-|*1*|*Etant donné que* <condition>
+|*1*|*Étant donné que* <condition>
 *Quand* <action>
 *Alors* <résultat>
 *Et* <résultat>|
