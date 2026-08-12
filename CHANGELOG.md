@@ -1,5 +1,23 @@
 # Changelog — SDD Claude
 
+## [1.4.0] — 2026-08-12
+
+### Added
+
+- **`/retro-spec` business-facing exports** — optional deliverables derived from a retrospective spec: a ticket-ready story export and a functional SPEC document, with an export-only mode, a user-provided document format option, and consistent numbering across deliverables.
+- **Four export templates** in two language variants, deployed with the other templates and verified by the audit.
+
+### Changed
+
+- **`/retro-spec` hardened** — flexible targets (module, screen, route or file), an intent-only question protocol (oral answers are never promoted to facts), a self-contained spec, and kebab-case normalization.
+- **Retrospective lifecycle wired across the framework** — status display, archive behavior and upgrade checklists understand retrospective features; project-own export templates are never touched.
+
+### Security
+
+- Ticketing MCP access is read-only for retrospective analysis; exports carry no secrets, credentials, environment URLs or personal data and require human re-read before diffusion.
+
+---
+
 ## [1.3.0] — 2026-08-07
 
 ### Added
