@@ -183,7 +183,7 @@ check_shared "angular" "sdd-symfony-angular sdd-angular-node" \
 check_shared "symfony" "sdd-php-symfony sdd-symfony-angular" \
   commands/symfony-entity.md commands/symfony-service.md commands/symfony-controller.md commands/symfony-test.md \
   rules/doctrine-conventions.md
-[ $err -eq $before ] && ok "30 core masters + angular/symfony groups identical (hash)"
+[ $err -eq $before ] && ok "32 core masters + angular/symfony groups identical (hash)"
 
 # =====================================================================
 echo ""

@@ -105,6 +105,8 @@ _template/spec.md     : [✅ / ❌ / ⚠️]
 _template/plan.md     : [✅ / ❌ / ⚠️]
 _template/tasks.md    : [✅ / ❌ / ⚠️ — phase structure (### Phase N) missing?]
 _template/notes.md    : [✅ structured / ⚠️ "Squash exceptions" section missing (old version)]
+_template/jira-story.md : [✅ / ❌ missing (added with retro-spec AMOA exports)]
+_template/spec-doc.md   : [✅ / ❌ missing (added with retro-spec AMOA exports)]
 sdd/README.md         : [✅ / ❌ / ⚠️ — from reference/templates/sdd-readme.md]
 ```
 

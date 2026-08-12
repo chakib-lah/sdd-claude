@@ -125,6 +125,8 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/sdd/_template/plan.md
 .claude/sdd/_template/tasks.md
 .claude/sdd/_template/notes.md
+.claude/sdd/_template/jira-story.md
+.claude/sdd/_template/spec-doc.md
 .claude/sdd/README.md
 .claude/sdd/_archive/.gitkeep
 .claude/commands/sdd-start.md
