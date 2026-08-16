@@ -35,7 +35,7 @@ The framework stacks three layers: the methodology is universal, the technology 
 
 ---
 
-## The 4 skills
+## The 6 skills
 
 Only one skill activates per project, based on the detected stack:
 
@@ -43,9 +43,11 @@ Only one skill activates per project, based on the detected stack:
 package.json contains @angular/core ?
 ├── YES
 │   ├── Symfony backend (composer.json → symfony/framework-bundle) ? → sdd-symfony-angular
+│   ├── Spring Boot backend (build.gradle / pom.xml) ?               → sdd-java-angular
 │   └── Node backend (express / fastify / @nestjs) ?                 → sdd-angular-node
 └── NO
     ├── composer.json → symfony/framework-bundle ?                   → sdd-php-symfony
+    ├── build.gradle / pom.xml → org.springframework.boot ?          → sdd-java-backend
     └── PHP without a framework (legacy, scripts, OOP) ?             → sdd-php-backend
 ```
 
@@ -55,8 +57,10 @@ package.json contains @angular/core ?
 | `sdd-php-symfony` | PHP + Symfony + Doctrine | Back office, business API |
 | `sdd-symfony-angular` | Symfony + Angular | Full-stack application |
 | `sdd-angular-node` | Angular + Node.js/Express | Full-stack application (Node) |
+| `sdd-java-backend` | Java + Spring Boot + JPA | Business API, batch backend |
+| `sdd-java-angular` | Spring Boot + Angular | Full-stack application (Java) |
 
-Each skill ships the **17 universal commands** + the **5 SDD agents** + its **stack rules** + its own **scaffolding commands** (e.g. `symfony-entity`, `angular-component`, `node-endpoint`). Details in `skills/README.md`.
+Each skill ships the **17 universal commands** + the **5 SDD agents** + its **stack rules** + its own **scaffolding commands** (e.g. `symfony-entity`, `angular-component`, `node-endpoint`, `java-entity`). Details in `skills/README.md`.
 
 ---
 
@@ -164,7 +168,7 @@ The script adds/repairs the skill symlinks, updates stale global agents, and nev
 | `test-generator` | Generates tests from the acceptance criteria | `*-test` commands |
 | `code-reviewer` | Checks AC coverage and anti-patterns | `/sdd-review` |
 
-### 8 global expert agents (installed once into `~/.claude/agents/`)
+### 9 global expert agents (installed once into `~/.claude/agents/`)
 
 | Agent | When to invoke it |
 |---|---|
@@ -176,6 +180,7 @@ The script adds/repairs the skill symlinks, updates stale global agents, and nev
 | `angular-expert` | Angular, Signals, RxJS |
 | `doctrine-migration-expert` | Complex migrations, SQL views |
 | `phpstan-fixer` | PHPStan static analysis errors |
+| `spring-java-expert` | Spring Boot, modern Java, JPA, Flyway |
 
 ---
 
@@ -187,13 +192,13 @@ Run it after **any change** to the toolkit (adding a command/agent/rule, editing
 bash scripts/audit.sh
 ```
 
-In a single pass it checks: the **structure** of the skills, **completeness** (17 commands + 5 agents per skill, 8 global agents), the absence of **ghost references**, the consistency of **agent delegations**, the **docs**, and the **absence of divergent duplication** (files shared across skills must stay byte-identical). Output is `✅ AUDIT OK` or the list of detected problems.
+In a single pass it checks: the **structure** of the skills, **completeness** (17 commands + 5 agents per skill, 9 global agents), the absence of **ghost references**, the consistency of **agent delegations**, the **docs**, and the **absence of divergent duplication** (files shared across skills must stay byte-identical). Output is `✅ AUDIT OK` or the list of detected problems.
 
 ---
 
 ## Extending the framework: adding a stack
 
-The toolkit is not limited to the 4 shipped skills: you can add a skill for a new stack (Java/Spring, Python/Django, Go…) by copying Layer 1 verbatim and writing only Layer 2 (code rules, tests, quality gates, scaffolding).
+The toolkit is not limited to the 6 shipped skills: you can add a skill for a new stack (Python/Django, Go, .NET…) by copying Layer 1 verbatim and writing only Layer 2 (code rules, tests, quality gates, scaffolding).
 
 ➡️ **See [`core/extension-guide.md`](core/extension-guide.md)** for the full walkthrough (anatomy, anti-drift discipline, checklist and validation via `scripts/audit.sh`).
 
@@ -209,4 +214,4 @@ The toolkit is not limited to the 4 shipped skills: you can add a skill for a ne
 | `core/extension-guide.md` | Creating a new stack skill |
 | `core/ci-templates/` | CI snippets |
 
-Version 1.4.0 — August 2026.
+Version 1.5.0 — August 2026.

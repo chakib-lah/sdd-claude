@@ -1,5 +1,24 @@
 # Changelog — SDD Claude
 
+## [1.5.0] — 2026-08-16
+
+### Added
+
+- **Two Java skills** — `sdd-java-backend` (Java + Spring Boot, JPA/Hibernate, Flyway: conventions, test strategy, quality gates, entity/service/controller/test scaffolding) and `sdd-java-angular` (Spring Boot + Angular full-stack with OpenAPI contract synchronization); the toolkit now ships 6 skills.
+- **`spring-java-expert` global agent** — modern Java and Spring Boot guidance (9 global agents now).
+
+### Changed
+
+- Modernized shared Angular conventions: zoneless change detection, signals-first guidance, built-in control flow, Vitest as the default runner for new projects, incremental migration ladder for legacy projects.
+
+### Fixed
+
+- **Agents are invocable everywhere** — every agent's tool declaration uses the recognized bracketed capitalized form, enforced by the audit.
+- **Installers and updaters never destroy user data** — a real directory found at a skill path is backed up, never deleted; divergent global agents are kept and reported, with an explicit `--force` to overwrite.
+- Portable audit hashing (hard failure when no hash tool exists), release-coherence checks, and retroactive release tags.
+
+---
+
 ## [1.4.0] — 2026-08-12
 
 ### Added

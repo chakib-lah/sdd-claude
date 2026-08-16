@@ -6,12 +6,12 @@
 
 ## Target version
 
-- **Angular**: 17+ (18+ recommended)
-- **TypeScript**: 5.x
-- **Node**: 20.x LTS
-- **RxJS**: 7.x
+- **Angular**: 17+ minimum (20+ recommended — zoneless change detection is stable since 20.2 and the default for new projects since 21)
+- **TypeScript**: 5.x+
+- **Node**: 20.x / 22.x / 24.x LTS (20.x EOL April 2026)
+- **RxJS**: 7.x — signals-first: RxJS to fetch and transform, signals to store and display
 
-Adapt per project.
+Adapt per project. Legacy projects on NgModules/zone.js are recorded as-is: migrate incrementally (OnPush everywhere → UI state to signals → zoneless), never in one pass.
 
 ---
 
@@ -43,7 +43,7 @@ export class UserCardComponent {
 
 ### Inputs and Outputs (signal-based)
 
-Angular 17.1+ provides signal-based inputs/outputs:
+Angular provides signal-based inputs and outputs (`input()` since 17.1, `output()` since 17.3 — both long stable):
 
 ```typescript
 import { Component, input, output } from '@angular/core';
@@ -86,12 +86,14 @@ user-card/
 
 ```html
 <!-- ❌ Bad: logic in the template -->
-<div *ngIf="user().status === 'active' && user().roles.includes('admin')">
-  Admin
-</div>
+@if (user().status === 'active' && user().roles.includes('admin')) {
+  <div>Admin</div>
+}
 
 <!-- ✅ Good: computed signal -->
-<div *ngIf="isActiveAdmin()">Admin</div>
+@if (isActiveAdmin()) {
+  <div>Admin</div>
+}
 ```
 
 ```typescript
@@ -311,9 +313,10 @@ ngOnInit(): void {
     .subscribe(users => this.users.set(users));
 }
 
-// ✅ Option 2: async pipe in the template (preferable)
+// ✅ Option 2: prefer converting to a signal with toSignal() for display;
+// use the async pipe when the stream intentionally stays RxJS
 protected readonly users$ = this.userApi.list();
-// in the template: <div *ngFor="let user of users$ | async">
+// in the template: @for (user of users$ | async; track user.id) { ... }
 ```
 
 ### Common operators
@@ -441,7 +444,7 @@ frontend/src/
 
 ```typescript
 // app.config.ts
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -450,9 +453,24 @@ import { errorInterceptor } from './core/http-interceptors/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+  ],
+};
+```
+
+Note: on Angular 21+, new apps are zoneless by default — no change-detection provider is needed at all.
+
+Legacy variant (zone.js projects only, not yet migrated to zoneless):
+
+```typescript
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    // ...
   ],
 };
 ```
@@ -462,7 +480,7 @@ export const appConfig: ApplicationConfig = {
 ## Tests
 
 See `11-tests-strategy.md` for details. In short:
-- Jest preferred over Karma
+- Vitest is the default unit-test runner for new projects since Angular 21; Karma is deprecated. On existing projects, keep whichever runner is in place (Karma/Jasmine or Jest) — do not migrate the runner inside a feature
 - TestBed for components
 - HttpTestingController for HTTP services
 - Cypress for E2E

@@ -133,7 +133,7 @@ core/
 ### Modifying a master (Layer 1)
 
 1. Modify the file in `core/` (the source).
-2. **Propagate the copy verbatim** to the 4 skills (`skills/sdd-*/reference/…`).
+2. **Propagate the copy verbatim** to the 6 skills (`skills/sdd-*/reference/…`).
 3. Run `bash scripts/audit.sh` — section 6 must stay green (byte-identical copies).
 
 > Never edit a master copy directly in a skill: the source is `core/`, and any divergence is detected by the audit.

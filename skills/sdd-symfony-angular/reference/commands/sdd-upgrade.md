@@ -25,14 +25,14 @@ description: SDD maintenance — updates the common core (Layer 1) without touch
 
 Resolve the reference directory, in this order:
 
-1. `~/.claude/skills/<skill>/reference/` — where `<skill>` is the SDD skill matching this project's stack (`sdd-php-backend`, `sdd-php-symfony`, `sdd-symfony-angular`, `sdd-angular-node`)
+1. `~/.claude/skills/<skill>/reference/` — where `<skill>` is the SDD skill matching this project's stack (`sdd-php-backend`, `sdd-php-symfony`, `sdd-symfony-angular`, `sdd-angular-node`, `sdd-java-backend`, `sdd-java-angular`)
 2. If no installed skill is found, **ask the user** for the path to the sdd-claude toolkit, then use `<toolkit>/skills/<skill>/reference/`
 
 If the toolkit's `VERSION` file is reachable (at the toolkit root, e.g. two levels above a symlinked skill directory), read it and state the version in the upgrade plan.
 
 Layer 1 scope within `reference/`:
 
-- `reference/commands/` → universal commands only: every `sdd-*.md` plus `retro-spec.md`. Stack scaffolding commands (`symfony-*.md`, `angular-*.md`, `node-*.md`, `php-*.md`…) are Layer 2 — ignore them.
+- `reference/commands/` → universal commands only: every `sdd-*.md` plus `retro-spec.md`. Stack scaffolding commands (`symfony-*.md`, `angular-*.md`, `node-*.md`, `php-*.md`, `java-*.md`…) are Layer 2 — ignore them.
 - `reference/rules/` → Layer 1 rules only: `00-sdd-framework.md`, `01-constitution.md`, `02-git-conventions.md`, `03-security.md`. Everything else there is Layer 2 — ignore.
 - `reference/templates/` → all files; they deploy to `.claude/sdd/_template/<name>.md`, except `sdd-readme.md` which deploys to `.claude/sdd/README.md` **only if that file does not exist yet**. Once deployed, `.claude/sdd/README.md` is a **live feature index**, not a template: never overwrite it. If its structure must evolve, rebuild it preserving every feature row.
 - `reference/agents/` → the 5 SDD agents (`spec-writer`, `plan-architect`, `task-decomposer`, `code-reviewer`, `test-generator`); they deploy to `.claude/agents/<name>.md`. `test-generator` is **stack-adapted**: the skill's reference is the correct source for this project — never compare it against another skill's copy. Files in `.claude/agents/` that do not exist in the reference are the developer's own agents — **never touch them**.
@@ -135,6 +135,8 @@ List the files that MUST NOT be touched:
 - `.claude/rules/12-quality-gates.md` → Layer 2 (same)
 - `.claude/rules/doctrine-conventions.md` → Layer 2
 - `.claude/rules/angular-conventions.md` → Layer 2
+- `.claude/rules/jpa-conventions.md` → Layer 2
+- `.claude/rules/api-contracts.md` → Layer 2
 - `.claude/skills/` → Layer 3 (in its entirety)
 - `.claude/commands/<stack>-*.md` → Layer 2 (scaffolding commands)
 - `.claude/agents/<non-reference>.md` → the developer's own agents

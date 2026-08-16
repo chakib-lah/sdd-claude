@@ -1,5 +1,5 @@
 # .gitlab-ci.yml — Snippet: frontend/backend OpenAPI sync check
-# For Symfony+Angular or Angular+Node projects with OpenAPI.
+# For Symfony+Angular, Angular+Node or Spring Boot+Angular projects with OpenAPI.
 # This job checks that the Angular types are synchronized with the backend OpenAPI.
 
 openapi-sync-check:
@@ -14,6 +14,8 @@ openapi-sync-check:
       # Symfony: php bin/console api:doc:dump > "$TMP_DIR/openapi.json"
       # Node.js with swagger-jsdoc:
       #   node scripts/generate-openapi.js > "$TMP_DIR/openapi.json"
+      # Spring Boot (springdoc): ./gradlew generateOpenApiDocs && cp build/openapi.json "$TMP_DIR/openapi.json"
+      #   (the plugin forks bootRun: image with JDK + Node required, app must be able to start in CI — see api-contracts.md)
 
       # Regenerate the Angular types in a temporary directory
       npx @openapitools/openapi-generator-cli generate \

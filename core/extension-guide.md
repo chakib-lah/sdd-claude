@@ -92,11 +92,11 @@ bash scripts/audit.sh
 The audit checks in a single pass:
 
 1. **Structure** — `SKILL.md` present, `reference/{agents,commands,rules,templates}/` non-empty, no `settings.json` (option A: no hooks), skill wired into the installers.
-2. **Completeness** — the 17 core commands + the 5 SDD agents present in the skill, the 8 global agents present.
+2. **Completeness** — the 17 core commands + the 5 SDD agents present in the skill, the 9 global agents present.
 3. **Ghost references** — every cited rule / command (`.claude/rules/X.md`, `.claude/commands/X.md`) actually exists.
 4. **Delegations** — `plan-architect` does cite `/sdd-plan`; `test-generator` cites only `*-test` commands actually present in the skill.
 5. **Docs** — correct command count (17), skill documented in `skills/README.md`.
-6. **Anti-drift (hash equality)** — every `core/` master is **byte-identical** (md5) in the 4 skills, **`test-generator` excepted**; and the groups shared between skills of the same family remain identical (`angular-*` commands/rules between `sdd-symfony-angular` and `sdd-angular-node`; `symfony-*` commands/rules between `sdd-php-symfony` and `sdd-symfony-angular`).
+6. **Anti-drift (hash equality)** — every `core/` master is **byte-identical** (md5) in the 6 skills, **`test-generator` excepted**; and the groups shared between skills of the same family remain identical (`angular-*` commands/rules between `sdd-symfony-angular`, `sdd-angular-node` and `sdd-java-angular`; `symfony-*` commands/rules between `sdd-php-symfony` and `sdd-symfony-angular`; `java-*` commands + `jpa-conventions` rule between `sdd-java-backend` and `sdd-java-angular`).
 
 The output must remain `✅ AUDIT OK`. Any drift of a master triggers a `✗ … differs from core/ (drift)`.
 
@@ -150,6 +150,8 @@ One command per artifact type. **This is the option chosen in all the toolkit's 
 | `sdd-symfony-angular` | `/symfony-entity`, `/symfony-service`, `/symfony-controller`, `/symfony-test`, `/angular-component`, `/angular-service`, `/angular-test`, `/api-contract` |
 | `sdd-angular-node` | `/angular-component`, `/angular-service`, `/angular-test`, `/node-endpoint`, `/node-service`, `/node-test`, `/api-design`, `/contract-check` |
 | `sdd-php-backend` | `/php-class`, `/php-test`, `/extract-class` |
+| `sdd-java-backend` | `/java-entity`, `/java-service`, `/java-controller`, `/java-test` |
+| `sdd-java-angular` | `/java-entity`, `/java-service`, `/java-controller`, `/java-test`, `/angular-component`, `/angular-service`, `/angular-test`, `/api-contract` |
 
 > All scaffolding commands are **tools**: they read `spec.md` / `plan.md` to draw from their content, but **never replace** `/sdd-implement`.
 
@@ -254,7 +256,7 @@ reference/agents/
 
 ## Existing skills and extension leads
 
-### Already packaged (4 skills)
+### Already packaged (6 skills)
 
 | Skill | Stack | Typical projects |
 |---|---|---|
@@ -262,12 +264,13 @@ reference/agents/
 | `sdd-php-symfony` | PHP + Symfony + Doctrine | Back-office, business API |
 | `sdd-symfony-angular` | Symfony + Angular | Full-stack application |
 | `sdd-angular-node` | Angular + Node.js/Express | Full-stack application (Node) |
+| `sdd-java-backend` | Java + Spring Boot + JPA | Business API, batch backend |
+| `sdd-java-angular` | Spring Boot + Angular | Full-stack application (Java) |
 
 ### Leads for new stacks
 
-1. `sdd-java-spring` — Java / Spring Boot projects
-2. `sdd-python-django` — Python / Django projects
-3. `sdd-go` — Go services
+1. `sdd-python-django` — Python / Django projects
+2. `sdd-go` — Go services
 
 For each: copy the 34 masters, write Layer 2 (rules + scaffolding + `test-generator`), wire the installers and `skills/README.md`, then validate with `audit.sh`.
 
@@ -300,7 +303,7 @@ If a plugin system is available, package the toolkit as an installable plugin.
 When a `core/` master evolves (new Layer 1 version):
 
 1. Modify the file in `core/` (single source of truth).
-2. **Re-propagate** the master verbatim to the 4 skills (`reference/…`).
+2. **Re-propagate** the master verbatim to the 6 skills (`reference/…`).
 3. Run `bash scripts/audit.sh`: section 6 must turn green again (hash equality restored).
 4. User projects apply the update via `/sdd-upgrade` (updates Layer 1 without touching Layers 2/3).
 

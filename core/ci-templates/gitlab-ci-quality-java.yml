@@ -1,0 +1,81 @@
+# .gitlab-ci.yml — Snippet: Java/Spring Boot quality gates
+# 3-job pipeline, aligned with the skill's 12-quality-gates rule:
+#   quality-java          → static analysis only (no database required)
+#   test-java-unit        → unit tests (Gradle `unitTest` task, see the 11-tests-strategy rule)
+#   test-java-integration → integration tests + JaCoCo report (needs the database)
+#
+# NB: when the `unitTest`/`integrationTest` tasks are wired into `check` (rule 11),
+# do NOT run `./gradlew check` in a database-less job — integrationTest would fail there.
+#
+# Dependency-locking gate: if a gradle.lockfile is committed, any dependency
+# change without a lockfile refresh fails the build with LockOutOfDateException.
+# Regenerate with: ./gradlew dependencies --write-locks
+
+quality-java:
+  stage: quality
+  # Adjust to your Java/Gradle version, e.g. gradle:7-jdk17 for legacy projects
+  # Maven variant: image maven:3.9-eclipse-temurin-21 + mvn checkstyle:check
+  image: gradle:9-jdk21
+  script:
+    - ./gradlew checkstyleMain spotlessCheck --no-daemon
+  only:
+    - merge_requests
+    - develop
+    - main
+
+test-java-unit:
+  stage: test
+  image: gradle:9-jdk21
+  script:
+    - ./gradlew unitTest --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - build/reports/tests/unitTest/
+    reports:
+      junit: build/test-results/unitTest/TEST-*.xml
+  only:
+    - merge_requests
+    - develop
+    - main
+
+test-java-integration:
+  stage: test
+  image: gradle:9-jdk21
+  # Example with a GitLab CI service database.
+  # Projects using Testcontainers do NOT need this service block, but they
+  # need a Docker-enabled runner (dind or a Docker socket) instead.
+  services:
+    - postgres:16
+  variables:
+    SPRING_PROFILES_ACTIVE: ci
+    POSTGRES_DB: app_test
+    POSTGRES_USER: app
+    POSTGRES_PASSWORD: app
+    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/app_test
+    SPRING_DATASOURCE_USERNAME: app
+    SPRING_DATASOURCE_PASSWORD: app
+  script:
+    # jacocoTestReport aggregates both tasks' .exec files (executionData, see rule 12) —
+    # it runs here because this job is the only one with the database available.
+    - ./gradlew integrationTest jacocoTestReport --no-daemon
+    # Print the instruction-coverage total so the `coverage:` regex below matches
+    # (the report-level counter is the last INSTRUCTION counter in the XML).
+    - |
+      REPORT=$(find build/reports/jacoco -name 'jacocoTestReport.xml' | head -1)
+      if [ -n "$REPORT" ]; then
+        grep -o '<counter type="INSTRUCTION"[^/]*/>' "$REPORT" | tail -1 \
+          | awk -F'"' '($4 + $6) > 0 { printf "Total %.0f%%\n", $6 * 100 / ($4 + $6) }'
+      fi
+  coverage: '/Total.*?([0-9]{1,3})%/'
+  artifacts:
+    when: always
+    paths:
+      - build/reports/tests/integrationTest/
+      - build/reports/jacoco/
+    reports:
+      junit: build/test-results/integrationTest/TEST-*.xml
+  only:
+    - merge_requests
+    - develop
+    - main

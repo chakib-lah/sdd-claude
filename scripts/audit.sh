@@ -4,7 +4,7 @@
 #
 # Checks that the framework is installable, consistent, complete and duplication-free:
 #   1. Structure       — skills tree + global-agents + installers
-#   2. Completeness    — 17 core commands + 5 SDD agents per skill, 8 global agents
+#   2. Completeness    — 17 core commands + 5 SDD agents per skill, 9 global agents
 #   3. Ghost refs      — every referenced rule/command actually exists
 #   4. Delegations     — test-generator / plan-architect consistent
 #   5. Docs            — correct command count, skills documented
@@ -15,13 +15,35 @@ err=0
 say(){ printf '%s\n' "$*"; }
 fail(){ printf '  ✗ %s\n' "$*"; err=$((err+1)); }
 ok(){ printf '  ✓ %s\n' "$*"; }
-hashf(){ md5sum < "$1" | cut -d' ' -f1; }
+# ---- Portable hash tool (resolved ONCE at startup) ----
+# The anti-drift check (section 6) is only as trustworthy as this function:
+# a missing tool must be a HARD failure, never a silent empty string
+# (md5sum absent on stock macOS → empty hashes → every file compares equal).
+# Reading from stdin (< "$1") keeps filenames out of the hash output.
+if command -v md5sum >/dev/null 2>&1; then
+  HASH_TOOL='md5sum'
+  hashf(){ md5sum < "$1" | cut -d' ' -f1; }
+elif command -v md5 >/dev/null 2>&1; then
+  HASH_TOOL='md5 (BSD)'
+  hashf(){ md5 < "$1" | awk '{print $NF}'; }
+elif command -v openssl >/dev/null 2>&1; then
+  HASH_TOOL='openssl md5'
+  hashf(){ openssl md5 -r < "$1" | cut -d' ' -f1; }
+elif command -v shasum >/dev/null 2>&1; then
+  HASH_TOOL='shasum -a 256'
+  hashf(){ shasum -a 256 < "$1" | cut -d' ' -f1; }
+else
+  printf 'FATAL: no hash tool available (need one of: md5sum, md5, openssl, shasum).\n' >&2
+  printf 'The anti-drift check (section 6) cannot run without one — aborting.\n' >&2
+  exit 1
+fi
+say "hash tool: $HASH_TOOL"
 
 # ---- Reference lists (the package's sources of truth) ----
-SKILLS="sdd-php-backend sdd-php-symfony sdd-symfony-angular sdd-angular-node"
+SKILLS="sdd-php-backend sdd-php-symfony sdd-symfony-angular sdd-angular-node sdd-java-backend sdd-java-angular"
 CORE_CMDS="sdd-start sdd-spec sdd-clarify sdd-spec-check sdd-plan sdd-tasks sdd-implement sdd-verify sdd-review sdd-mr sdd-archive sdd-status sdd-hotfix sdd-upgrade sdd-changelog sdd-revert retro-spec"
 SDD_AGENTS="spec-writer plan-architect task-decomposer test-generator code-reviewer"
-GLOBAL_AGENTS="debugger git-assistant security-reviewer refactoring-advisor symfony-expert angular-expert doctrine-migration-expert phpstan-fixer"
+GLOBAL_AGENTS="debugger git-assistant security-reviewer refactoring-advisor symfony-expert angular-expert doctrine-migration-expert phpstan-fixer spring-java-expert"
 
 # =====================================================================
 say "== 1. Structure (skills, global-agents, installers) =="
@@ -62,14 +84,23 @@ done
 # global updaters present (they auto-discover skills, no per-skill wiring needed)
 [ -x upgrade-global.sh ]  || fail "upgrade-global.sh missing or not executable"
 [ -f upgrade-global.ps1 ] || fail "upgrade-global.ps1 missing"
+# agent frontmatter: tools must use bracketed capitalized names — lowercase
+# ("tools: read, bash") is not recognized by Claude Code and the agent refuses to spawn
+for f in core/agents/*.md global-agents/*.md skills/*/reference/agents/*.md; do
+  [ -f "$f" ] || continue
+  t=$(grep -m1 '^tools:' "$f" 2>/dev/null)
+  [ -z "$t" ] && continue
+  printf '%s\n' "$t" | grep -qE '^tools: \[[A-Z][A-Za-z]*(, [A-Z][A-Za-z]*)*\]$' \
+    || fail "invalid tools frontmatter (expected e.g. 'tools: [Read, Bash]'): $f"
+done
 for d in skills/*/; do
   s=$(basename "$d")
   echo "$SKILLS" | grep -qw "$s" || fail "skill not declared in the reference list/installer: $s"
 done
-[ $err -eq $before ] && ok "tree of the 4 skills + global-agents + installers conforms"
+[ $err -eq $before ] && ok "tree of the 6 skills + global-agents + installers conforms"
 
 # =====================================================================
-say "== 2. Completeness (17 core commands + 5 SDD agents / skill, 8 global agents) =="
+say "== 2. Completeness (17 core commands + 5 SDD agents / skill, 9 global agents) =="
 before=$err
 for c in $CORE_CMDS; do [ -f "core/commands/$c.md" ] || fail "core: missing command: $c"; done
 for a in $SDD_AGENTS; do [ -f "core/agents/$a.md" ]   || fail "core: missing SDD agent: $a"; done
@@ -78,7 +109,7 @@ for s in $SKILLS; do
   for a in $SDD_AGENTS; do [ -f "skills/$s/reference/agents/$a.md" ]   || fail "$s: missing SDD agent: $a"; done
 done
 for a in $GLOBAL_AGENTS; do [ -f "global-agents/$a.md" ] || fail "missing global agent: $a"; done
-[ $err -eq $before ] && ok "17 core commands + 5 SDD agents present everywhere, 8 global agents present"
+[ $err -eq $before ] && ok "17 core commands + 5 SDD agents present everywhere, 9 global agents present"
 
 # =====================================================================
 say "== 3. Ghost references (cited rules / commands actually exist) =="
@@ -131,12 +162,13 @@ done
 say "== 5. Docs (command count, skills documented, install paths) =="
 before=$err
 # wrong count: the canonical number is 17
-c=$(grep -rlE '\b(9|12|14|15) (command|commande)' README.md INSTALL.md skills/README.md skills/*/SKILL.md 2>/dev/null | wc -l)
+# ((^|[^0-9]) instead of \b: word boundaries are a GNU extension, inert under BSD grep)
+c=$(grep -rlE '(^|[^0-9])(9|12|14|15) (command|commande)' README.md INSTALL.md skills/README.md skills/*/SKILL.md 2>/dev/null | wc -l)
 [ "$c" -eq 0 ] || fail "docs: wrong command count (9/12/14/15) in $c file(s)"
 # wrong count inside command/agent/rule BODIES too (not just top-level docs)
 while IFS= read -r hit; do
   fail "wrong command count in body: $hit"
-done < <(grep -rnE '\b(9|12|14|15) (universal )?(command|commande)' core skills --include='*.md' 2>/dev/null)
+done < <(grep -rnE '(^|[^0-9])(9|12|14|15) (universal )?(command|commande)' core skills --include='*.md' 2>/dev/null)
 # stale version narrative: commands must stay version-agnostic
 while IFS= read -r hit; do
   fail "stale version narrative: $hit"
@@ -150,12 +182,25 @@ v=$(cat VERSION 2>/dev/null)
 for f in README.md INSTALL.md; do
   grep -qF "$v" "$f" 2>/dev/null || fail "docs: $f does not cite current version $v (stale)"
 done
-[ $err -eq $before ] && ok "command count correct (17) and 4 skills documented"
+# release coherence: VERSION must have a CHANGELOG heading (## [X.Y.Z]).
+# "At least one" match — duplicated headings are tolerated (legitimate in forks).
+ve=$(printf '%s' "$v" | sed 's/\./\\./g')
+grep -qE "^## \[$ve\]" CHANGELOG.md 2>/dev/null \
+  || fail "CHANGELOG.md has no '## [$v]' entry for current VERSION"
+# release tag: NON-FATAL notice — the toolkit is legitimately consumed as a ZIP
+# download or a shallow clone, where tags/history are absent
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  git tag --list "v$v" 2>/dev/null | grep -qx "v$v" \
+    || say "  · notice: git tag v$v not found (create it when releasing)"
+else
+  say "  · notice: no git history — release tag check skipped"
+fi
+[ $err -eq $before ] && ok "command count correct (17) and 6 skills documented"
 
 # =====================================================================
 say "== 6. Content equality of shared files (anti-drift) =="
 before=$err
-# 6a. The core/ masters must be byte-identical in the 4 skills.
+# 6a. The core/ masters must be byte-identical in the 6 skills.
 #     Legitimate exclusion: test-generator.md (adapted per stack).
 mcount=0
 for cf in core/commands/*.md core/agents/*.md core/templates/*.md core/rules/*.md; do
@@ -171,7 +216,8 @@ for cf in core/commands/*.md core/agents/*.md core/templates/*.md core/rules/*.m
 done
 # 6b. Shared files OUTSIDE core that must be identical across the relevant skills.
 #     Legitimate exclusions (per-stack divergence): 10-code-conventions, 11-tests-strategy,
-#     12-quality-gates, api-contracts, migration-guard.
+#     12-quality-gates, api-contracts; migration-guard diverges between the symfony pair
+#     but is shared verbatim between the two java skills (hash-checked in the java group).
 check_shared(){
   local label="$1"; local skills="$2"; shift 2
   local rel ref refhash s f h
@@ -195,13 +241,16 @@ done
 c=$(grep -rc "the system \[action\] and \[[a-z ]*result\]" core --include='*.md' 2>/dev/null | awk -F: '$2>0{n+=$2}END{print n+0}')
 canon=$(grep -rc "$AC_FORMAT" core --include='*.md' 2>/dev/null | awk -F: '$2>0{n+=$2}END{print n+0}')
 [ "$c" -eq "$canon" ] || fail "AC format drift: $((c-canon)) non-canonical variant(s) of the AC format in core/"
-check_shared "angular" "sdd-symfony-angular sdd-angular-node" \
+check_shared "angular" "sdd-symfony-angular sdd-angular-node sdd-java-angular" \
   commands/angular-component.md commands/angular-service.md commands/angular-test.md \
   rules/angular-conventions.md
 check_shared "symfony" "sdd-php-symfony sdd-symfony-angular" \
   commands/symfony-entity.md commands/symfony-service.md commands/symfony-controller.md commands/symfony-test.md \
   rules/doctrine-conventions.md
-[ $err -eq $before ] && ok "$mcount core masters + angular/symfony groups identical (hash)"
+check_shared "java" "sdd-java-backend sdd-java-angular" \
+  commands/java-entity.md commands/java-service.md commands/java-controller.md commands/java-test.md \
+  rules/jpa-conventions.md rules/migration-guard.md
+[ $err -eq $before ] && ok "$mcount core masters + angular/symfony/java groups identical (hash)"
 
 # =====================================================================
 echo ""

@@ -1,7 +1,7 @@
 ---
 name: test-generator
 description: Generates automated tests from the acceptance criteria in spec.md. Invoked by /symfony-test. Activates automatically during /sdd-implement when the task is in the [Tests] category. Knows PHPUnit, WebTestCase, KernelTestCase, DataProviders, Doctrine fixtures.
-tools: read, write, bash
+tools: [Read, Write, Bash]
 ---
 
 You are an expert in automated testing for the PHP/Symfony, Angular, and Node.js stacks.

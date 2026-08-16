@@ -16,7 +16,7 @@ sdd-claude/
 │   ├── rules/              ← Methodology + constitution + Git + security
 │   ├── templates/          ← spec/plan/tasks/notes + AMOA exports (jira-story, spec-doc)
 │   └── ci-templates/       ← GitLab CI snippets
-├── skills/                 ← 4 installable skills (Layer 2)
+├── skills/                 ← 6 installable skills (Layer 2)
 │   ├── sdd-php-backend/
 │   │   ├── SKILL.md
 │   │   └── reference/
@@ -26,8 +26,10 @@ sdd-claude/
 │   │       └── templates/
 │   ├── sdd-php-symfony/    ← same structure
 │   ├── sdd-symfony-angular/ ← same structure
-│   └── sdd-angular-node/   ← same structure
-├── global-agents/          ← 8 global agents → ~/.claude/agents/
+│   ├── sdd-angular-node/   ← same structure
+│   ├── sdd-java-backend/   ← same structure
+│   └── sdd-java-angular/   ← same structure
+├── global-agents/          ← 9 global agents → ~/.claude/agents/
 │   ├── debugger.md
 │   ├── git-assistant.md
 │   ├── security-reviewer.md
@@ -35,14 +37,15 @@ sdd-claude/
 │   ├── symfony-expert.md
 │   ├── angular-expert.md
 │   ├── doctrine-migration-expert.md
-│   └── phpstan-fixer.md
+│   ├── phpstan-fixer.md
+│   └── spring-java-expert.md
 ├── scripts/
 │   └── audit.sh            ← consistency guardrail
 ├── install.sh             ← Linux / macOS / WSL2 installer
 ├── install.ps1            ← Windows installer
 ├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
 ├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
-├── VERSION                ← 1.4.0
+├── VERSION                ← 1.5.0
 └── CHANGELOG.md
 ```
 
@@ -58,7 +61,7 @@ cd ~/tools/sdd-claude
 bash install.sh
 ```
 
-The installer links the 4 skills via symlink (auto-updated on every `git pull`) and copies the 8 global agents. Idempotent: safe to re-run.
+The installer links the 6 skills via symlink (auto-updated on every `git pull`) and copies the 9 global agents; re-running is safe — symlinks and byte-identical files are refreshed silently. A real directory found at a skill path is backed up to `<name>.bak-<timestamp>` (never deleted), and a customized global agent is kept and reported (`--force` / `-Force` to overwrite).
 
 ### Windows (PowerShell)
 
@@ -82,6 +85,8 @@ ln -s ~/tools/sdd-claude/skills/sdd-php-backend     ~/.claude/skills/
 ln -s ~/tools/sdd-claude/skills/sdd-php-symfony     ~/.claude/skills/
 ln -s ~/tools/sdd-claude/skills/sdd-symfony-angular ~/.claude/skills/
 ln -s ~/tools/sdd-claude/skills/sdd-angular-node    ~/.claude/skills/
+ln -s ~/tools/sdd-claude/skills/sdd-java-backend    ~/.claude/skills/
+ln -s ~/tools/sdd-claude/skills/sdd-java-angular    ~/.claude/skills/
 
 # 3. Copy the global agents
 mkdir -p ~/.claude/agents
@@ -99,7 +104,7 @@ Expand-Archive sdd-claude.zip -DestinationPath "$env:USERPROFILE\tools\"
 # 2. Copy the skills
 $skillsDir = "$env:USERPROFILE\.claude\skills"
 New-Item -ItemType Directory -Force -Path $skillsDir
-$skills = @("sdd-php-backend","sdd-php-symfony","sdd-symfony-angular","sdd-angular-node")
+$skills = @("sdd-php-backend","sdd-php-symfony","sdd-symfony-angular","sdd-angular-node","sdd-java-backend","sdd-java-angular")
 foreach ($s in $skills) {
   Copy-Item -Recurse "$env:USERPROFILE\tools\sdd-claude\skills\$s" $skillsDir
 }
@@ -117,7 +122,7 @@ Copy-Item "$env:USERPROFILE\tools\sdd-claude\global-agents\*.md" $agentsDir
 ```bash
 # Available skills
 ls ~/.claude/skills/
-# sdd-php-backend  sdd-php-symfony  sdd-symfony-angular  sdd-angular-node
+# sdd-php-backend  sdd-php-symfony  sdd-symfony-angular  sdd-angular-node  sdd-java-backend  sdd-java-angular
 
 # Available global agents
 ls ~/.claude/agents/
@@ -160,7 +165,7 @@ Everyone on the team who clones the repo gets commands + agents + rules in one g
 # If you used symlinks (recommended method)
 cd ~/tools/sdd-claude
 git pull
-# The 4 skills are automatically up to date
+# The 6 skills are automatically up to date
 
 # Update the global ~/.claude (skill symlinks + global agents)
 ./upgrade-global.sh          # Windows: .\upgrade-global.ps1
@@ -179,7 +184,7 @@ Projects are updated separately: run `/sdd-upgrade` inside each project.
 | ZIPs to install | 1 | 2 (toolkit + agents) | **1** |
 | Agents included in the skill | ❌ | ❌ | **✅** |
 | Universal commands | 9 | 14 | **17** |
-| Available skills | 3 | 4 | **4** |
+| Available skills | 3 | 4 | **6** |
 | Global agents | ❌ | Separate | **Included** |
 
 ```bash

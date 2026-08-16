@@ -1,0 +1,185 @@
+---
+name: sdd-java-backend
+description: Generates a Spec-Driven Development framework for a Java/Spring Boot backend project (without frontend framework). Use this skill when the user requests a SDD framework, .claude/ scaffold, or process tooling for a project using Java + Spring Boot, Spring Data JPA/Hibernate, and Flyway or Liquibase migrations - but NOT a separate frontend framework like Angular/React/Vue. Triggers include "generate the SDD framework", "install SDD", "setup SDD", "scaffold SDD", "génère le framework SDD", "installe SDD" when applied to a project where build.gradle or pom.xml contains org.springframework.boot or spring-boot-starter dependencies. Detects brownfield/greenfield mode. Provides fine-grained auxiliary commands (java-entity, java-service, java-controller, java-test). Adds migration-guard for brownfield projects.
+license: Proprietary
+---
+
+# SDD Framework — Java / Spring Boot Backend
+
+This skill installs a complete Spec-Driven Development framework into a Java/Spring Boot backend project by deploying files from `reference/` into the project's `.claude/` directory.
+
+## When to use this skill
+
+Use when:
+- The user asks to generate / install / scaffold a SDD framework
+- The project uses Spring Boot (`build.gradle` or `pom.xml` contains `org.springframework.boot` / `spring-boot-starter`)
+- The project may use Spring Data JPA/Hibernate and Flyway or Liquibase, but does NOT have a separate Angular/React/Vue frontend
+
+Do NOT use when:
+- The project uses Spring Boot + Angular → use `sdd-java-angular` skill instead
+- The project uses PHP/Symfony → use `sdd-php-symfony` skill instead
+- The project is pure PHP without framework → use `sdd-php-backend` skill instead
+- The project uses Angular + Node.js → use `sdd-angular-node` skill instead
+- The project is Java WITHOUT Spring Boot (Quarkus, Micronaut, Jakarta EE) → no dedicated skill yet, adapt manually
+
+## Process
+
+### Phase 0 — Detect mode
+
+Inspect the project root:
+
+- **Greenfield**: no `src/main/java/`, no `build.gradle` / `pom.xml`, no lockfile
+- **Brownfield**: existing code, `build.gradle` or `pom.xml` present, architecture in place
+
+Announce in chat:
+
+```
+Detected mode: [GREENFIELD / BROWNFIELD]
+Reason: [observations]
+```
+
+### Phase 1 — Discovery (brownfield)
+
+Analyze and report on:
+
+**Stack detected**
+```
+build tool               : Gradle x.x (wrapper) / Maven x.x — gradle.lockfile: [yes/no]
+java                     : x
+spring-boot              : x.x.x
+hibernate                : x.x.x
+flyway / liquibase       : x.x.x
+mapstruct / lombok       : x.x.x / x.x.x
+springdoc-openapi        : x.x.x
+junit / mockito          : x.x.x / x.x.x
+testcontainers / emb. DB : [testcontainers x.x.x / embedded PostgreSQL / none]
+```
+
+**Backend architecture**
+- Package structure: layered (`controller/service/repository`) or hexagonal (`domain/application/infrastructure`)?
+- Controllers: thin and delegating, or business logic embedded?
+- Services: behind interfaces or concrete classes injected directly?
+- Mapping: MapStruct mappers, manual mapping, or entities exposed directly?
+- DTOs: records, Lombok classes, validation annotations?
+
+**Existing tests**
+- Unit/integration split: naming pattern (`*IT`, `*IntTest`), separate source set or Gradle/Maven task?
+- Test directories and naming conventions (`*Test.java`)
+- Coverage tooling (JaCoCo) and estimated coverage
+
+**CI/CD and tooling**
+- `.gitlab-ci.yml` or GitHub Actions workflows
+- JaCoCo, Sonar, Checkstyle/Spotless configuration
+- Build tasks or Maven profiles dedicated to quality
+
+**Gaps and debt**
+- Entities or services without tests
+- No committed dependency lockfile
+- Endpoints without springdoc annotations
+- Migrations off naming convention or without documented rollback path
+
+Then ask 4 clarification questions:
+1. Team conventions not visible in code?
+2. Painful repetitive workflows to automate?
+3. Company/client constraints (security, architecture rules)?
+4. Generate retrospective specs for existing features, or only new?
+
+For greenfield, ask the 11 greenfield questions.
+
+### Phase 2 — Propose structure
+
+Display the structure to be deployed and wait for validation.
+
+### Phase 3 — Deploy files
+
+Copy from `reference/` to project's `.claude/`, in this order:
+
+```
+.claude/agents/spec-writer.md
+.claude/agents/plan-architect.md
+.claude/agents/task-decomposer.md
+.claude/agents/test-generator.md
+.claude/agents/code-reviewer.md
+.claude/rules/00-sdd-framework.md
+.claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
+.claude/rules/02-git-conventions.md
+.claude/rules/03-security.md
+.claude/rules/10-code-conventions.md
+.claude/rules/11-tests-strategy.md
+.claude/rules/12-quality-gates.md
+.claude/rules/jpa-conventions.md
+.claude/rules/migration-guard.md          (brownfield only)
+.claude/sdd/_template/spec.md
+.claude/sdd/_template/plan.md
+.claude/sdd/_template/tasks.md
+.claude/sdd/_template/notes.md
+.claude/sdd/_template/jira-story-fr.md
+.claude/sdd/_template/jira-story-en.md
+.claude/sdd/_template/spec-doc-fr.md
+.claude/sdd/_template/spec-doc-en.md
+.claude/sdd/README.md
+.claude/sdd/_archive/.gitkeep
+.claude/commands/sdd-start.md
+.claude/commands/sdd-spec.md
+.claude/commands/sdd-clarify.md
+.claude/commands/sdd-spec-check.md
+.claude/commands/sdd-plan.md
+.claude/commands/sdd-tasks.md
+.claude/commands/sdd-implement.md
+.claude/commands/sdd-verify.md
+.claude/commands/sdd-review.md
+.claude/commands/sdd-mr.md
+.claude/commands/sdd-archive.md
+.claude/commands/sdd-status.md
+.claude/commands/sdd-hotfix.md
+.claude/commands/sdd-upgrade.md
+.claude/commands/sdd-changelog.md
+.claude/commands/sdd-revert.md
+.claude/commands/retro-spec.md
+.claude/commands/java-entity.md
+.claude/commands/java-service.md
+.claude/commands/java-controller.md
+.claude/commands/java-test.md
+```
+
+> **CI/CD**: GitLab CI templates are available in the toolkit's `core/ci-templates/`.
+> Copy the relevant snippets into your `.gitlab-ci.yml`.
+
+### Phase 4 — Adapt to project specifics
+
+After copying, fill in:
+- `.claude/rules/10-code-conventions.md`: Java version, Spring Boot version, build tool (Gradle/Maven), architecture detected
+- `.claude/rules/11-tests-strategy.md`: JUnit version, unit/integration split patterns (`*IT` / `*IntTest`), exact Gradle/Maven test commands
+- `.claude/rules/12-quality-gates.md`: Checkstyle/Sonar/JaCoCo configuration, dependency lockfile policy
+- `.claude/rules/jpa-conventions.md`: Hibernate version, Flyway/Liquibase version — note that Flyway 10+ splits the PostgreSQL support into a separate `flyway-database-postgresql` artifact, while Flyway 9 ships it in the single core artifact
+
+Record the versions **as found**: legacy stacks (e.g. Java 17, Spring Boot 3.3, Gradle 7, Flyway 9) are documented as-is — never force an upgrade. Modern recommendations (Java 25 LTS or 21, Spring Boot 4.1.x or 3.5.x) apply only when the project is greenfield.
+
+### Phase 5 — Announce completion
+
+```
+✅ SDD Framework Java/Spring Boot installed.
+
+SDD agents deployed:
+  spec-writer · plan-architect · task-decomposer
+  test-generator · code-reviewer
+
+Next steps:
+- Create your domain skills in .claude/skills/ if needed
+- Start a feature: /sdd-start <FEATURE-ID>-<description>
+```
+
+## Critical rules
+
+- **Never modify the source code** of the project. Only `.claude/` is touched.
+- **Always wait for validation** before deploying.
+- **Use `reference/` files as source of truth**.
+- **Adapt content** to project specifics from Phase 1 findings.
+- **Migration-guard** is brownfield-only.
+
+## What this skill does NOT do
+
+- Does not create project-specific skills (those go in `.claude/skills/`)
+- Does not configure CI/CD
+- Does not install Spring Boot starters or Gradle/Maven dependencies
+- Does not write production code

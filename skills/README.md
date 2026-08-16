@@ -12,16 +12,22 @@ package.json has @angular/core ?
 │   └── composer.json has symfony/framework-bundle ?
 │       ├── YES  → sdd-symfony-angular
 │       └── NO:
-│           └── package.json has express / fastify / @nestjs/core ?
-│               ├── YES  → sdd-angular-node
-│               └── NO   → core only (Angular frontend only)
+│           └── build.gradle / pom.xml has org.springframework.boot ?
+│               ├── YES  → sdd-java-angular
+│               └── NO:
+│                   └── package.json has express / fastify / @nestjs/core ?
+│                       ├── YES  → sdd-angular-node
+│                       └── NO   → core only (Angular frontend only)
 └── NO:
     └── composer.json has symfony/framework-bundle ?
         ├── YES  → sdd-php-symfony
         └── NO:
-            └── Any .php files present ?
-                ├── YES  → sdd-php-backend
-                └── NO   → no applicable SDD skill
+            └── build.gradle / pom.xml has org.springframework.boot ?
+                ├── YES  → sdd-java-backend
+                └── NO:
+                    └── Any .php files present ?
+                        ├── YES  → sdd-php-backend
+                        └── NO   → no applicable SDD skill
 ```
 
 ---
@@ -34,6 +40,8 @@ package.json has @angular/core ?
 | `sdd-php-symfony` | PHP + Symfony + Doctrine | Back-office, business APIs | `/symfony-entity`, `/symfony-service`, `/symfony-controller`, `/symfony-test` |
 | `sdd-symfony-angular` | Symfony + Angular | Full-stack application | 4 symfony-* + `/angular-component`, `/angular-service`, `/angular-test`, `/api-contract` |
 | `sdd-angular-node` | Angular + Node.js | Full-stack application (Node) | `/angular-component`, `/angular-service`, `/angular-test`, `/node-endpoint`, `/node-service`, `/node-test`, `/api-design`, `/contract-check` |
+| `sdd-java-backend` | Java + Spring Boot + JPA | Business APIs, batch backends | `/java-entity`, `/java-service`, `/java-controller`, `/java-test` |
+| `sdd-java-angular` | Spring Boot + Angular | Full-stack application (Java) | 4 java-* + `/angular-component`, `/angular-service`, `/angular-test`, `/api-contract` |
 
 ---
 
@@ -71,6 +79,19 @@ The **auxiliary** scaffolding commands are specific to each skill:
 - `/api-design` — generates/updates the OpenAPI spec
 - `/contract-check` — checks Angular/backend sync
 
+### sdd-java-backend
+- `/java-entity` — generates JPA entity + Flyway migration
+- `/java-service` — generates service + interface
+- `/java-controller` — generates REST controller with validation
+- `/java-test` — generates JUnit 5 tests (unit + integration)
+
+### sdd-java-angular
+- Everything from sdd-java-backend +
+- `/angular-component` — generates standalone component
+- `/angular-service` — generates typed Angular service
+- `/angular-test` — generates Angular tests
+- `/api-contract` — OpenAPI sync Spring Boot ↔ Angular
+
 ---
 
 ## Structure of a skill
@@ -79,6 +100,7 @@ The **auxiliary** scaffolding commands are specific to each skill:
 sdd-<stack>/
 ├── SKILL.md              ← Frontmatter (name, description) + installation process
 └── reference/
+    ├── agents/           ← The 5 SDD agents (test-generator is stack-adapted)
     ├── commands/         ← All commands (universal + auxiliary)
     ├── rules/            ← All rules (core + stack-specific)
     └── templates/        ← Templates (spec, plan, tasks, notes, sdd-readme + exports AMOA jira-story, spec-doc)

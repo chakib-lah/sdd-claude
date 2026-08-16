@@ -1,7 +1,7 @@
 ---
 name: test-generator
 description: Generates automated tests from the acceptance criteria in spec.md. Invoked by /angular-test and /node-test. Activates automatically during /sdd-implement when the task is in the [Tests] category. Knows Jest+Supertest (Node.js) and Karma+Jasmine or Jest+Testing Library (Angular).
-tools: read, write, bash
+tools: [Read, Write, Bash]
 ---
 
 You are an expert in automated testing for the PHP/Symfony, Angular, and Node.js stacks.
