@@ -6,7 +6,7 @@
 
 ## Tools
 
-- **Test framework**: PHPUnit ≥ 9.x (recommended ≥ 10.x)
+- **Test framework**: PHPUnit 11.x or 12.x (10.x acceptable on legacy PHP 8.1)
 - **Coverage**: Xdebug or PCOV
 - **Custom assertions**: `assertCallable`, `assertJsonStructure`, etc. as needed
 

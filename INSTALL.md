@@ -15,7 +15,6 @@ sdd-claude/
 │   ├── commands/           ← 17 universal SDD commands
 │   ├── rules/              ← Methodology + constitution + Git + security
 │   ├── templates/          ← spec/plan/tasks/notes + AMOA exports (jira-story, spec-doc)
-│   └── ci-templates/       ← GitLab CI snippets
 ├── skills/                 ← 6 installable skills (Layer 2)
 │   ├── sdd-php-backend/
 │   │   ├── SKILL.md
@@ -45,7 +44,7 @@ sdd-claude/
 ├── install.ps1            ← Windows installer
 ├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
 ├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
-├── VERSION                ← 1.5.0
+├── VERSION                ← 1.6.0
 └── CHANGELOG.md
 ```
 
@@ -171,7 +170,7 @@ git pull
 ./upgrade-global.sh          # Windows: .\upgrade-global.ps1
 ```
 
-`upgrade-global.sh` repairs/adds skill symlinks (new skills included), updates **stale but unmodified** global agents, and **never silently overwrites** a customized or translated agent copy — it reports them and asks (`--force` / `--keep-custom` to skip the prompt). Your own agents in `~/.claude/agents/` are never touched.
+`upgrade-global.sh` applies two distinct policies. **Skills**: links are repaired/added silently (a link is not user data); a **real directory** found at a skill path is backed up to `<name>.bak-<timestamp>`, never deleted. **Global agents**: **stale but unmodified** copies are updated; a customized or translated copy is never silently overwritten — it is reported and you are asked (`--force` / `--keep-custom` to skip the prompt). Your own agents in `~/.claude/agents/` are never touched.
 
 Projects are updated separately: run `/sdd-upgrade` inside each project.
 
@@ -205,4 +204,4 @@ cd ~/tools/sdd-claude
 bash scripts/audit.sh
 ```
 
-The script checks: absence of ghost references (rules, and `settings.json` which is no longer deployed), correct agent delegations, 17 commands per skill, docs consistency. Output is `✅ AUDIT OK` or the list of problems.
+The script checks: the skills' structure and installer wiring, completeness (17 commands + 5 agents per skill, 9 global agents), absence of ghost references (rules, and `settings.json` which is no longer deployed), correct agent delegations, docs and release consistency (version, CHANGELOG, tag; anatomies, command write-steps and agent skeletons in sync with the templates; Layer 1 free of forbidden technology names; extension-guide command list complete), anti-drift by hash of the shared files, and the CI templates (pinned images, `rules:`, references). Output is `✅ AUDIT OK` or the list of problems.

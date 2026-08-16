@@ -8,11 +8,11 @@
 
 Three levels to choose from at SDD installation time:
 
-| Level | Profile | PHPStan |
-|---|---|---|
-| **Soft** | Recent project just starting | level 5 |
-| **Medium** | Project being stabilized | level 7 |
-| **Strict** | Mature, demanding code | level 8-9 |
+| Level | Profile | PHPStan | Coverage (diff) |
+|---|---|---|---|
+| **Soft** | Recent project just starting | level 5 | informative (report only) |
+| **Medium** | Project being stabilized | level 7 | ≥ 60% on new/changed code |
+| **Strict** | Mature, demanding code | level 8-9 | ≥ 80% on new/changed code |
 
 **Default recommendation for your projects**: level 8 (balance between robustness and pragmatism).
 
@@ -202,52 +202,24 @@ Target: progressive thresholds based on maturity.
 </coverage>
 ```
 
-Suggested thresholds:
-- Start: 50% overall
-- 6 months: 70% overall, 90% on business services
-- 1 year: 80% overall
-
-Check in CI:
+The gate is wired to the strictness levels above and measured on the **diff**
+(new/changed code) — a global threshold on a legacy codebase is unenforceable,
+which is why this stayed prose for so long. Executable gate, exits non-zero
+below the threshold:
 
 ```bash
-vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+vendor/bin/phpunit --coverage-cobertura=coverage.xml
+diff-cover coverage.xml --compare-branch=origin/develop --fail-under=60   # Medium — 80 in Strict
 ```
 
-## Typical GitLab CI
+`diff-cover` (Python, `pipx install diff-cover`) is the diff-coverage arbiter;
+at the Soft level run it without `--fail-under` (informative report only).
+Aim also for 90% on business services as they stabilize — as a review target,
+not a gate.
 
-```yaml
-stages:
-  - quality
-  - test
+## In the project's CI
 
-phpstan:
-  stage: quality
-  script:
-    - composer install --no-progress --no-interaction
-    - vendor/bin/phpstan analyse --no-progress
-
-cs-fixer:
-  stage: quality
-  script:
-    - composer install --no-progress --no-interaction
-    - vendor/bin/php-cs-fixer fix --dry-run --diff
-
-phpunit-unit:
-  stage: test
-  script:
-    - composer install --no-progress --no-interaction
-    - vendor/bin/phpunit --testsuite=Unit
-
-phpunit-integration:
-  stage: test
-  services:
-    - postgres:15
-  script:
-    - composer install --no-progress --no-interaction
-    - php bin/console doctrine:database:create --env=test --if-not-exists
-    - php bin/console doctrine:schema:create --env=test
-    - vendor/bin/phpunit --testsuite=Integration --testsuite=Functional
-```
+These checks belong in the project's **existing** pipeline, at its quality stage — the toolkit prescribes what must be green, never how the pipeline is wired. Run the same tools as locally: PHPStan, PHP-CS-Fixer (dry-run), then the PHPUnit suites — the integration job needs a database and the test-schema bootstrap (`php bin/console doctrine:database:create --env=test --if-not-exists` then `doctrine:schema:create --env=test`).
 
 ## Ignoring errors
 

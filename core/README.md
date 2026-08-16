@@ -95,10 +95,10 @@ core/
 │   ├── sdd-readme.md
 │   ├── jira-story-{fr,en}.md  ← retro-spec AMOA export (Jira story)
 │   └── spec-doc-{fr,en}.md    ← retro-spec AMOA export (SPEC document)
-├── ci-templates/              ← reusable CI snippets
 └── examples/
     └── skill-template.md      ← Step-by-step guide to create a new stack skill
 ```
+
 
 ---
 
@@ -177,3 +177,5 @@ The toolkit follows SemVer (see `VERSION` and `CHANGELOG.md` at the root):
 - **Major**: methodology change (new phase, gate removal…)
 - **Minor**: non-breaking command addition, new optional template field
 - **Patch**: documentation fixes, clarifications
+
+Working versions produced **during an audit-and-fix cycle** are patch-level, whatever they carry — they are intermediate states of a single body of work. The consolidating **minor** is cut once the cycle's closing audit is green.

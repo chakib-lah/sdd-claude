@@ -9,7 +9,7 @@
 ## Target PHP version
 
 To adapt per project:
-- **Minimum PHP**: 8.1 (recommended), 7.4 (acceptable for legacy)
+- **PHP**: 8.4 target for new code — 8.1 minimum ; 7.4 acceptable for existing legacy only
 - **All new files**: `<?php declare(strict_types=1);` on the first line
 
 ## Autoloading

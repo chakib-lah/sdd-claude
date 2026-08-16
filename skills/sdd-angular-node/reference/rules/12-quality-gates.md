@@ -21,7 +21,14 @@ npx tsc --noEmit
 npm test -- --coverage
 ```
 
-Recommended coverage threshold: 80% lines, 75% branches.
+Executable threshold — `coverageThreshold` in `jest.config.js` (or `coverage.thresholds`
+in `vitest.config.ts`) makes the run itself fail below it:
+
+```js
+coverageThreshold: {
+  global: { lines: 80, branches: 75, functions: 75, statements: 80 },
+},
+```
 
 ---
 

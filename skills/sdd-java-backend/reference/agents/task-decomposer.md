@@ -44,11 +44,14 @@ Group the tasks into implementation phases (not the 4 SDD phases): each phase be
 
 ## Strict format (phase block + tasks)
 
+Division of labour: you produce the **phase blocks and task lines only**. `/sdd-tasks` assembles the full `tasks.md` around them — the `Reminder` recap and the `Overview` section (totals, phases, estimate, dependencies) are the command's job, not yours.
+
 ```markdown
 ### Phase 1: <Milestone name>
 
 - **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
 - **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+- **Rollback**: default = revert of the phase commit; state anything the revert alone does not cover
 
 - [ ] T001 [Category] Short and precise description
   - **Done when**: binary and testable completion criterion
@@ -60,6 +63,8 @@ Group the tasks into implementation phases (not the 4 SDD phases): each phase be
 ```
 
 ## Rules on categories
+
+Every `[SEC]` acceptance criterion in the spec produces at least one task tagged `[SEC]` after its `[Category]` field — a `[SEC]` task is never optional (`/sdd-verify` requires every one of them to be done).
 
 Adapt the categories to the project's stack. Examples:
 - Symfony stack: `[Entity]` `[Repository]` `[Service]` `[Controller]` `[Tests]` `[Migration]`
@@ -76,6 +81,7 @@ Adapt the categories to the project's stack. Examples:
 
 - [ ] All tasks are atomic (≤ 2h each)
 - [ ] Every AC in the spec is covered by at least one task
+- [ ] Every `[SEC]` AC has at least one task tagged `[SEC]` (after `[Category]` on the task line) — never optional
 - [ ] The `Blocked by` dependencies form a DAG (no cycle)
 - [ ] `[P]` tasks do not touch the same files
 - [ ] Every task has a concrete test command

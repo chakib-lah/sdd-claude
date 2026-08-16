@@ -62,8 +62,14 @@ for src in "$TOOLKIT_DIR"/skills/sdd-*/; do
   dst="$SKILLS_DST/$s"
   if [ -L "$dst" ] && [ "$(cd -P "$dst" 2>/dev/null && pwd)" = "$(cd -P "$src" && pwd)" ]; then
     echo "  ✓ $s (current)"
-  elif [ -e "$dst" ] || [ -L "$dst" ]; then
-    rm -rf "$dst"; ln -s "$src" "$dst"
+  elif [ -L "$dst" ]; then
+    rm "$dst"; ln -s "$src" "$dst"   # a link is not user data — replace silently
+    echo "  ~ $s (repaired → symlink)"
+  elif [ -e "$dst" ]; then
+    bak="$dst.bak-$(date -u +%Y%m%dT%H%M%SZ)"
+    mv "$dst" "$bak"   # real directory/file: user data — back up, never delete
+    echo "  ⚠ existing $s was a real directory — backed up to $bak"
+    ln -s "$src" "$dst"
     echo "  ~ $s (repaired → symlink)"
   else
     ln -s "$src" "$dst"

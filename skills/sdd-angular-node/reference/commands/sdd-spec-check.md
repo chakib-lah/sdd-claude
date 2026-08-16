@@ -50,6 +50,11 @@ For each AC:
 - [ ] **No undefined jargon**: domain-specific terms are explained at least once
 - [ ] **Constitution respected**: if `.claude/rules/01-constitution.md` exists with `status: ratified`, the spec violates none of its principles (cite the `PN` otherwise). If there is no ratified constitution, count this criterion as ✅ and note "no constitution".
 
+#### Security criteria
+
+- [ ] **Security section handled**: the "Security considerations" section is filled, or contains a one-line justification of non-applicability (an empty section with neither = ❌)
+- [ ] **`[SEC]` ACs present when required**: if the feature touches authentication, personal data, money, file handling or any external input, at least one AC is tagged `[SEC]`. If none of those apply, count this criterion as ✅ and note "no security surface".
+
 ### 4. Compute a score
 
 ```
@@ -70,20 +75,26 @@ Structure
   Out of scope              : ❌ Section present but empty
   Acceptance criteria       : ✅ 4 ACs
   Design                    : ✅
-  Open questions            : ⚠️ 1 structural question open
+  Open questions            : ✅ section present
 
 Acceptance criteria
   "When X → Y" format       : ✅ 4/4
-  Testable / binary         : ❌ AC-3 too vague: "the system must be responsive"
+  Testable / binary         : ✅
+  Not vague                 : ❌ AC-3 too vague: "the system must be responsive"
   Non-regression covered    : ✅
 
 Design
+  No structural questions   : ❌ "What behavior if the user has no role?" would change the scope
   Specific files mentioned  : ✅
   No undefined jargon       : ✅
   Constitution respected    : ✅ (or ❌ violates P3 — <principle name>)
 
+Security
+  Security section handled  : ✅
+  [SEC] ACs when required   : ✅ (no security surface)
+
 ═══════════════════════════════════════════════════
-  Score: 11/14
+  Score: 14/17
   Status: ⚠️ FIXES REQUIRED
 ═══════════════════════════════════════════════════
 
@@ -95,9 +106,9 @@ Actions to take before approving:
 
 ### 6. Announce the result
 
-- **Score 14/14** → `✅ Spec ready for approval. Set status to "approved" and run /sdd-plan.`
-- **Score ≥ 11/14** → `⚠️ Minor fixes required. See the points above (or run /sdd-clarify to resolve them interactively).`
-- **Score < 11/14** → `❌ Spec not ready. Significant revisions needed — run /sdd-clarify.`
+- **Score 17/17** → `✅ Spec ready for approval. Set status to "approved" and run /sdd-plan.`
+- **Score ≥ 14/17** → `⚠️ Minor fixes required. See the points above (or run /sdd-clarify to resolve them interactively).`
+- **Score < 14/17** → `❌ Spec not ready. Significant revisions needed — run /sdd-clarify.`
 
 ## Stop rules
 

@@ -44,7 +44,7 @@ Read `.claude/rules/02-git-conventions.md` to identify the target branch (often 
 
 ### 5. Generate the MR body
 
-GitLab/GitHub Markdown format. This model is **fixed**: the same two sections for every MR, no extra sections, no per-MR variations. The details (ACs, tests, files touched, vigilance points) stay in the SDD artifacts and the commits — not in the MR description.
+GitLab/GitHub Markdown format. This model is **fixed**: the same two sections for every MR, no extra sections, no per-MR variations. The details (ACs, tests, files touched, points of attention) stay in the SDD artifacts and the commits — not in the MR description.
 
 ```markdown
 ## 🎯 Context

@@ -177,8 +177,9 @@ A valid spec contains these sections, in this order:
 4. **Out of scope**: what we are **not** doing in this feature
 5. **Acceptance criteria**: measurable criteria in the format *"When X, the system Y and Z"*
 6. **Design**: technical sections (endpoints, entities, components — depending on the stack)
-7. **Technical constraints**: decisions and justifications
-8. **Open questions**: what has not been settled
+7. **Security considerations**: data sensitivity, authorization impact, external inputs, abuse cases — filled, or its non-applicability justified in one line
+8. **Technical constraints**: decisions and justifications
+9. **Open questions**: what has not been settled
 
 ### Quality criteria for a spec
 
@@ -186,6 +187,7 @@ A valid spec contains these sections, in this order:
 - ✅ Every AC is measurable (binary: passes or does not pass)
 - ✅ Out of scope is explicit (reduces scope creep)
 - ✅ Structurally significant open questions are resolved **before** approval
+- ✅ Security considerations are filled, or their non-applicability is justified in one line
 - ❌ No vague ACs like "the system must be performant"
 - ❌ No undefined jargon
 
@@ -202,6 +204,7 @@ A valid plan contains:
 5. **Risks and mitigations**: what can go wrong
 6. **Test strategy**: which tests cover which ACs
 7. **Points of attention**: side effects, non-regressions to check
+8. **Remaining questions**: the spec's open questions to resolve before the Tasks phase
 
 ---
 
@@ -210,13 +213,16 @@ A valid plan contains:
 A valid `tasks.md` contains:
 
 1. **Frontmatter**: feature, status, created, author
-2. **Task list**, grouped into **implementation phases** (not to be confused with the 4 SDD phases Specify/Plan/Tasks/Implement), in the strict format:
+2. **Reminder**: the task-format rules recap at the top of the file (markers, `[P]`, `Blocked by`)
+3. **Overview**: total tasks, number of implementation phases, overall estimate, dependencies on other features
+4. **Tasks**, grouped into **implementation phases** (not to be confused with the 4 SDD phases Specify/Plan/Tasks/Implement), in the strict format:
 
 ```markdown
 ### Phase 1: <Milestone name>
 
 - **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
 - **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+- **Rollback**: how to undo the phase if it ships broken — default: revert of the phase commit; read by /sdd-revert, required non-empty by /sdd-verify
 
 - [ ] T001 [Category] Short description of the task
   - **Done when**: testable completion criterion
@@ -364,7 +370,7 @@ Before closing Claude Code, add to `notes.md`:
 Implement T003 [Frontend] — UserList component
 
 ### Points to watch
-- The UserService service returns null if the user does not exist — to be handled on the Angular side
+- The user-lookup service returns null if the user does not exist — to be handled on the frontend side
 ```
 
 This "end-of-session snapshot" is the most effective way to resume quickly.

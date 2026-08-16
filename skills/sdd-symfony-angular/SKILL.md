@@ -158,7 +158,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/commands/api-contract.md
 ```
 
-> **CI/CD**: GitLab CI templates are available in the toolkit's `core/ci-templates/`.
+> **CI/CD**: every project keeps its own pipeline. The rules in `.claude/rules/12-quality-gates.md` state what must be green at the quality stage — wire those checks into your existing CI.
 > Copy the relevant snippets into your `.gitlab-ci.yml`.
 
 ### Phase 4 — Adapt to project specifics

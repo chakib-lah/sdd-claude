@@ -222,57 +222,9 @@ Check in CI:
 ./gradlew jacocoTestReport jacocoTestCoverageVerification
 ```
 
-## Typical GitLab CI
+## In the project's CI
 
-```yaml
-image: gradle:9-jdk21
-
-stages:
-  - quality
-  - test
-
-variables:
-  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
-
-quality:
-  stage: quality
-  script:
-    - ./gradlew checkstyleMain spotlessCheck --no-daemon
-  cache:
-    key: gradle-$CI_COMMIT_REF_SLUG
-    paths:
-      - .gradle/caches
-
-unit-tests:
-  stage: test
-  script:
-    - ./gradlew unitTest --no-daemon
-  artifacts:
-    reports:
-      junit: build/test-results/unitTest/*.xml
-
-integration-tests:
-  stage: test
-  services:
-    - postgres:16
-  variables:
-    SPRING_PROFILES_ACTIVE: ci
-    POSTGRES_DB: app_test
-    POSTGRES_USER: app
-    POSTGRES_PASSWORD: app
-    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/app_test
-    SPRING_DATASOURCE_USERNAME: app
-    SPRING_DATASOURCE_PASSWORD: app
-  script:
-    - ./gradlew integrationTest jacocoTestReport --no-daemon
-```
-
-The postgres service needs `POSTGRES_DB`/`POSTGRES_USER`/`POSTGRES_PASSWORD` or the
-container never starts. `jacocoTestReport` runs in the integration job because it
-depends on both split tasks (see the `executionData` wiring above) — the unit-tests
-job alone has no database for `integrationTest`.
-
-Adapt image and services to the project (Testcontainers needs a Docker-capable runner).
+These gates run in the project's **existing** pipeline, at its quality stage — the toolkit prescribes what must be green, never how the pipeline is wired. Run `./gradlew checkstyleMain spotlessCheck`, then `unitTest`, then `integrationTest jacocoTestReport` — the integration job needs a database service plus `SPRING_PROFILES_ACTIVE=ci` and the `SPRING_DATASOURCE_*` variables, and caching `.gradle/caches` (via `GRADLE_USER_HOME`) avoids re-downloading dependencies on every job.
 
 ## Ignoring violations
 

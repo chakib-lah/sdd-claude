@@ -40,8 +40,8 @@ This section is crucial to avoid scope creep.
 ## Acceptance criteria
 
 <!--
-Mandatory format:
-- [ ] When [situation], the system [action] and [expected result]
+Mandatory format (AC-N is a stable identifier, numbered sequentially from AC-1):
+- [ ] AC-N: When [situation], the system [action] and [expected result]
 
 Each AC must be:
 - Testable (a test can be written to validate it)
@@ -49,11 +49,16 @@ Each AC must be:
 - Precise (no "must be performant" without a threshold)
 
 Include non-regression ACs if the feature touches existing code.
+
+Numbering rule: identifiers are stable for life — never renumber an existing
+AC; a removed AC leaves a hole; a new AC (e.g. added by /sdd-clarify) takes
+the next free number. The [SEC] tag sits after the identifier:
+- [ ] AC-4 [SEC]: When ...
 -->
 
-- [ ] When
-- [ ] When
-- [ ] When
+- [ ] AC-1: When
+- [ ] AC-2: When
+- [ ] AC-3: When
 
 ## Design
 
@@ -118,7 +123,7 @@ file handling, or any external input. See `rules/03-security.md`.
 - Authentication / authorization impact: new endpoints, new roles, object-level checks (IDOR)?
 - External inputs: what is validated, where, against which allow-list?
 - Abuse cases: hostile input, enumeration, replay, resource exhaustion?
-- Security acceptance criteria: add them to the AC section above, tagged [SEC].
+- Security acceptance criteria: add them to the AC section above, tagged [SEC] after the identifier (`- [ ] AC-4 [SEC]: When ...`).
 If truly not applicable, state why in one line instead of deleting the section.
 -->
 

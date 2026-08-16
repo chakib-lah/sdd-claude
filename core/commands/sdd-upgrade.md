@@ -30,6 +30,12 @@ Resolve the reference directory, in this order:
 
 If the toolkit's `VERSION` file is reachable (at the toolkit root, e.g. two levels above a symlinked skill directory), read it and state the version in the upgrade plan.
 
+**The reference itself must be fresh — verify it before auditing anything.** An upgrade run against a stale reference reports success while deploying old files:
+
+- On Linux/macOS/WSL2 the installed skills are **symlinks** into the toolkit repo: a `git pull` in the toolkit refreshes them. Ask the user to confirm the toolkit was pulled recently, or check `git -C <toolkit> log -1 --format=%cd` if the repo is reachable.
+- **On Windows the installed skills are COPIES** — a `git pull` alone changes nothing under `~/.claude/skills/`: `upgrade-global.ps1` must have been run **since** the pull. If in doubt, ask the user to re-run it before continuing.
+- If freshness cannot be checked at all (ZIP install, no git history): state it explicitly in the upgrade plan as a **warning** — "reference freshness unverified (ZIP install)" — and continue. Never hard-block a legitimate offline user; never stay silent about it either.
+
 Layer 1 scope within `reference/`:
 
 - `reference/commands/` → universal commands only: every `sdd-*.md` plus `retro-spec.md`. Stack scaffolding commands (`symfony-*.md`, `angular-*.md`, `node-*.md`, `php-*.md`, `java-*.md`…) are Layer 2 — ignore them.
@@ -39,7 +45,9 @@ Layer 1 scope within `reference/`:
 
 ### 0b. Apply pending file renames (migration map)
 
-The toolkit may have renamed Layer 1/Layer 2 files between versions. Before auditing, **rename** any project file still under an old name (a pure rename: content untouched, customizations preserved). Current map (introduced in v1.3.0):
+The toolkit may have renamed Layer 1/Layer 2 files between versions. Before auditing, **rename** any project file still under an old name (a pure rename: content untouched, customizations preserved).
+
+**Read the project's deployed SDD version first**: `.claude/sdd/.sdd-version` (one line, written by the previous `/sdd-upgrade`). If it exists and is ≥ the version a map entry was introduced in, **skip that entry** — the rename already happened. If the file is absent (install older than the marker), apply the full map. Current map (introduced in v1.3.0):
 
 | Old name (in `.claude/rules/`) | New name |
 |---|---|
@@ -182,6 +190,8 @@ After confirmation:
 - Add the new commands
 - Update the identified files (commands, rules, templates, **SDD agents**)
 - Fully preserve the **content** of Layer 2 and Layer 3 files (step 0b renames excepted)
+
+At the end of the apply step, **write the deployed version marker**: put the toolkit's `VERSION` value into `.claude/sdd/.sdd-version` (single line, create or overwrite). It lives under `.claude/sdd/` — a framework-owned directory — as a dotfile so it can never collide with a feature folder, and the next `/sdd-upgrade` reads it to apply only the relevant part of the migration map.
 
 ### 5. Commit
 

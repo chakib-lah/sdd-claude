@@ -36,7 +36,7 @@ Strict format:
 feature/PROJ-101-user-search
 fix/PROJ-102-auth-token-refresh
 refactor/PROJ-103-export-csv-decoupling
-chore/PROJ-200-bump-symfony-7-4
+chore/PROJ-200-bump-framework-7-4
 docs/COMMON-100-sdd-workflow
 hotfix/PROD-1234-urgent-fix
 ```
@@ -47,6 +47,8 @@ hotfix/PROD-1234-urgent-fix
 - The `<description>` must be in kebab-case (words separated by hyphens)
 - No accents, no uppercase, no special characters
 - 5 words maximum in the description (otherwise shorten)
+
+A project may override this branch model in its own project-level rules (Layer 3): this file states the default, not a mandate.
 
 ## Commit convention
 
@@ -60,14 +62,24 @@ The message is the **subject line only** — no body, no footer, no signature.
 
 ### Commit types
 
-The same as for branches: `feature`, `fix`, `refactor`, `chore`, `docs`, `hotfix`.
+Conventional Commits types — **distinct from the branch prefixes above**:
+
+| Type | When to use it |
+|---|---|
+| `feat` | New business functionality |
+| `fix` | Bug fix |
+| `refactor` | Rework without behavior change |
+| `chore` | Maintenance, dependencies, tooling |
+| `docs` | Documentation only |
+| `test` | Adding tests without changing production code |
+| `perf` | Performance improvement |
+| `style` | Style/formatting change without behavior change |
 
 Possible additions:
-- `test`: adding tests without changing production code
-- `perf`: performance improvement
-- `style`: style/formatting change without behavior change
 - `ci`: CI/CD-related changes
 - `build`: build- or dependency-related changes
+
+There is no `feature` or `hotfix` **commit** type: a commit on a `feature/` branch uses `feat`, and a commit on a `hotfix/` branch uses `fix`.
 
 ### Strict rules
 

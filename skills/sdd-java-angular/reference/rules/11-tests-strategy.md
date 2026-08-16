@@ -328,57 +328,9 @@ Frontend: use `jasmine.clock()` / `jest.useFakeTimers()` — never real `setTime
 
 ---
 
-## CI/CD
+## In the project's CI
 
-### Typical pipeline
-
-```yaml
-stages:
-  - test-backend
-  - test-frontend
-  - e2e
-
-backend-tests:
-  stage: test-backend
-  image: gradle:9-jdk21
-  services:
-    - postgres:16
-  variables:
-    SPRING_PROFILES_ACTIVE: ci
-    POSTGRES_DB: app_test
-    POSTGRES_USER: app
-    POSTGRES_PASSWORD: app
-    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/app_test
-    SPRING_DATASOURCE_USERNAME: app
-    SPRING_DATASOURCE_PASSWORD: app
-  script:
-    - cd backend
-    - ./gradlew unitTest integrationTest jacocoTestReport --no-daemon
-  artifacts:
-    reports:
-      junit: backend/build/test-results/**/*.xml
-
-frontend-tests:
-  stage: test-frontend
-  image: node:22
-  script:
-    - cd frontend && npm ci
-    - npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
-
-e2e-tests:
-  stage: e2e
-  image: cypress/included:14.5.0   # pin the version in real projects
-  script:
-    - cd frontend && npm ci
-    - npm run start:e2e &
-    - npx wait-on http://localhost:4200
-    - npx cypress run
-```
-
-Karma in CI needs a Chromium-capable image (`node:22` + installed Chromium, or a
-browsers image) — set `CHROME_BIN` accordingly.
-
----
+The suites above run in the project's **existing** pipeline — the toolkit prescribes what must be green (backend `unitTest` then `integrationTest` with their database, frontend unit, E2E on the assembled stack), never how the pipeline is wired.
 
 ## Anti-patterns
 

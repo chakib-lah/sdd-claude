@@ -167,31 +167,22 @@ echo "Quality gates: OK ✅"
 
 ## Test coverage as a gate
 
-Target: minimum coverage on **new code** (not on the legacy).
+Target: minimum coverage on **new code** (not on the legacy) — a global
+threshold on a legacy codebase is unenforceable. Executable gate, wired to the
+strictness levels, exits non-zero below the threshold:
 
 ```bash
-vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+vendor/bin/phpunit --coverage-cobertura=coverage.xml
+diff-cover coverage.xml --compare-branch=origin/develop --fail-under=60   # Medium — 80 in Strict
 ```
 
-Suggested threshold (to tighten progressively):
-- Start: no threshold
-- 6 months: 50% on new files
-- 1 year: 70% on new files
-- 2 years: 85% overall
+`diff-cover` (Python, `pipx install diff-cover`) measures on the diff
+(new/changed code). At the Soft level run it without `--fail-under`
+(informative report only).
 
-## CI/CD
+## In the project's CI
 
-Example steps for GitLab CI / GitHub Actions:
-
-```yaml
-quality:
-  stage: quality
-  script:
-    - composer install --no-progress
-    - vendor/bin/phpstan analyse
-    - vendor/bin/php-cs-fixer fix --dry-run --diff
-    - vendor/bin/phpunit --coverage-text
-```
+These checks belong in the project's **existing** pipeline (GitLab CI, GitHub Actions or other), at its quality stage — the toolkit prescribes what must be green, never how the pipeline is wired. The job runs the same commands as the local gate: `composer install`, `phpstan analyse`, `php-cs-fixer fix --dry-run --diff`, `phpunit`.
 
 ## How to tighten progressively
 

@@ -95,8 +95,8 @@ The audit checks in a single pass:
 2. **Completeness** — the 17 core commands + the 5 SDD agents present in the skill, the 9 global agents present.
 3. **Ghost references** — every cited rule / command (`.claude/rules/X.md`, `.claude/commands/X.md`) actually exists.
 4. **Delegations** — `plan-architect` does cite `/sdd-plan`; `test-generator` cites only `*-test` commands actually present in the skill.
-5. **Docs** — correct command count (17), skill documented in `skills/README.md`.
-6. **Anti-drift (hash equality)** — every `core/` master is **byte-identical** (md5) in the 6 skills, **`test-generator` excepted**; and the groups shared between skills of the same family remain identical (`angular-*` commands/rules between `sdd-symfony-angular`, `sdd-angular-node` and `sdd-java-angular`; `symfony-*` commands/rules between `sdd-php-symfony` and `sdd-symfony-angular`; `java-*` commands + `jpa-conventions` rule between `sdd-java-backend` and `sdd-java-angular`).
+5. **Docs** — correct command count (17), skill documented in `skills/README.md`, docs cite the current `VERSION`, `CHANGELOG.md` has a `## [VERSION]` entry (a matching git tag is expected — non-fatal notice, ZIP/shallow consumers have no history); anatomy↔template sync (every `## ` section of `core/templates/{spec,plan,tasks}.md` appears in the matching anatomy of `00-sdd-framework.md`); write-step↔template sync (every `#### ` block of a command's "Write" step names `Frontmatter` or a real template section); Layer 1 stays stack-agnostic (`00-sdd-framework.md` names none of the technologies this guide forbids); every file in `core/commands/` is named in this guide's command list (anchored match — a missing short command name is not covered by a longer one that starts with it).
+6. **Anti-drift (hash equality)** — every `core/` master is **byte-identical** in the 6 skills, **`test-generator` excepted**; and the groups shared between skills of the same family remain identical (`angular-*` commands/rules between `sdd-symfony-angular`, `sdd-angular-node` and `sdd-java-angular`; `symfony-*` commands/rules between `sdd-php-symfony` and `sdd-symfony-angular`; `java-*` commands + `jpa-conventions` rule between `sdd-java-backend` and `sdd-java-angular`). The hash tool is resolved at startup (`md5sum`, BSD `md5`, `openssl md5` or `shasum -a 256`); if none is available the audit aborts rather than passing blind.
 
 The output must remain `✅ AUDIT OK`. Any drift of a master triggers a `✗ … differs from core/ (drift)`.
 
@@ -107,7 +107,7 @@ The output must remain `✅ AUDIT OK`. Any drift of a master triggers a `✗ …
 ### ❌ Prohibitions
 
 **Never rename or redefine the 17 universal SDD commands**:
-`/sdd-start`, `/sdd-spec`, `/sdd-spec-check`, `/sdd-plan`, `/sdd-tasks`, `/sdd-implement`, `/sdd-verify`, `/sdd-review`, `/sdd-mr`, `/sdd-archive`, `/sdd-status`, `/sdd-hotfix`, `/sdd-upgrade`, `/sdd-changelog`, `/retro-spec`.
+`/sdd-start`, `/sdd-spec`, `/sdd-clarify`, `/sdd-spec-check`, `/sdd-plan`, `/sdd-tasks`, `/sdd-implement`, `/sdd-verify`, `/sdd-review`, `/sdd-mr`, `/sdd-archive`, `/sdd-status`, `/sdd-hotfix`, `/sdd-upgrade`, `/sdd-changelog`, `/sdd-revert`, `/retro-spec`.
 
 These commands belong to Layer 1. Modifying them breaks team portability across projects.
 
@@ -116,6 +116,7 @@ These commands belong to Layer 1. Modifying them breaks team portability across 
 **Never pollute the methodology with tech**:
 - No mention of "PHPUnit", "Jest", "JUnit" in `00-sdd-framework.md`.
 - No mention of "Symfony", "Angular", "Spring" in the process files.
+- No mention of "composer", "npm", "gradle", "npx" in the process files — package-manager and runner names belong to Layer 2, where they are actually written (each skill's 10/11/12 rules).
 
 **Never include business skills** in a stack skill:
 - Project-specific skills (e.g. SSO, SOAP, billing) are project-specific, not stack-specific.

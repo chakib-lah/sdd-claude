@@ -297,70 +297,9 @@ Suggested thresholds: 75% global, 85% on services.
 
 ---
 
-## Typical CI
+## In the project's CI
 
-```yaml
-stages:
-  - quality
-  - test
-  - build
-
-# === BACKEND ===
-backend:quality:
-  stage: quality
-  image: gradle:9-jdk21
-  script:
-    - cd backend
-    - ./gradlew checkstyleMain spotlessCheck --no-daemon
-
-backend:tests:
-  stage: test
-  image: gradle:9-jdk21
-  services:
-    - postgres:16
-  variables:
-    SPRING_PROFILES_ACTIVE: ci
-    POSTGRES_DB: app_test
-    POSTGRES_USER: app
-    POSTGRES_PASSWORD: app
-    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/app_test
-    SPRING_DATASOURCE_USERNAME: app
-    SPRING_DATASOURCE_PASSWORD: app
-  script:
-    - cd backend
-    - ./gradlew check jacocoTestReport --no-daemon   # fails on LockOutOfDateException if lockfile is stale
-  artifacts:
-    reports:
-      junit: backend/build/test-results/**/*.xml
-
-# === FRONTEND ===
-frontend:quality:
-  stage: quality
-  image: node:22
-  script:
-    - cd frontend && npm ci
-    - npx eslint . --max-warnings=0
-    - npx tsc --noEmit
-
-frontend:tests:
-  stage: test
-  image: node:22
-  script:
-    - cd frontend && npm ci
-    - npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
-
-frontend:build:
-  stage: build
-  image: node:22
-  script:
-    - cd frontend && npm ci
-    - npx ng build --configuration production
-```
-
-Adapt images and services to the project (Testcontainers needs a Docker-capable
-runner; Karma needs Chromium available in the image).
-
----
+These gates run in the project's **existing** pipeline, at its quality stage — the toolkit prescribes what must be green, never how the pipeline is wired. Backend: `./gradlew checkstyleMain spotlessCheck`, `unitTest`, then `integrationTest jacocoTestReport` (database service + `SPRING_PROFILES_ACTIVE=ci` + `SPRING_DATASOURCE_*` variables); frontend: ESLint, `tsc --noEmit`, production build, tests with coverage.
 
 ## Makefile to orchestrate everything
 

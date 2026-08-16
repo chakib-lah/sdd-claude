@@ -6,10 +6,10 @@
 
 ## Target versions (to adapt per project)
 
-- **PHP**: 8.1+ (recommended 8.2 or 8.3)
+- **PHP**: 8.4 target — 8.1 minimum (the conventions below require attributes, enums and readonly, all 8.1)
 - **Symfony**: 6.4 LTS or 7.x
 - **Doctrine ORM**: 3.x
-- **PHPUnit**: 10.x or 11.x
+- **PHPUnit**: 11.x or 12.x (12 = current major as of early 2026 — verify before pinning)
 
 ## Mandatory rules on all new code
 

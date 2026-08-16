@@ -8,10 +8,10 @@
 ## Target versions (adapt per project)
 
 ### Backend
-- **PHP**: 8.1+ (8.2 or 8.3 recommended)
+- **PHP**: 8.4 target — 8.1 minimum (attributes, enums, readonly)
 - **Symfony**: 6.4 LTS or 7.x
 - **Doctrine ORM**: 3.x
-- **PHPUnit**: 10.x or 11.x
+- **PHPUnit**: 11.x or 12.x (12 = current major as of early 2026 — verify before pinning)
 
 ### Frontend
 - **Angular**: 17+ (18+ recommended for stable Signals)

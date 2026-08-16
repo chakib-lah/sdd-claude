@@ -28,11 +28,12 @@ Identify the feature from the Git branch. If ambiguous, apply the fallback in `.
 Scan the spec for, in priority order:
 
 1. **Unresolved structural open questions** — anything in "Open questions" that would change the architecture or the scope
-2. **Vague terms without a measurable threshold** — "fast", "performant", "user-friendly", "robust", "soon", "many"…
-3. **ACs missing their error/edge cases** — an AC that only describes the nominal path
-4. **Contradictions** — between Objectives, ACs, Out of scope and Design
-5. **Undefined jargon** — domain terms never explained
-6. **Silent assumptions** — behaviors the Design implies but no AC pins down (permissions, empty states, concurrency, i18n, pagination…)
+2. **Security ambiguities** — unstated data sensitivity, unstated authorization/ownership rules (who can access what), unvalidated external input, missing abuse cases
+3. **Vague terms without a measurable threshold** — "fast", "performant", "user-friendly", "robust", "soon", "many"…
+4. **ACs missing their error/edge cases** — an AC that only describes the nominal path
+5. **Contradictions** — between Objectives, ACs, Out of scope and Design
+6. **Undefined jargon** — domain terms never explained
+7. **Silent assumptions** — behaviors the Design implies but no AC pins down (permissions, empty states, concurrency, i18n, pagination…)
 
 ### 4. Ask at most 5 targeted questions
 
@@ -43,8 +44,9 @@ Do not ask a question whose answer is already in the spec, the ticket or the cod
 ### 5. Update `spec.md` with the answers
 
 Apply each answer where it belongs:
-- Sharpen the affected AC (or add the missing error-case AC)
+- Sharpen the affected AC (or add the missing error-case AC). A new AC takes the **next free number** — AC identifiers are stable for life: never renumber existing ACs; a removed AC leaves a hole
 - Move newly excluded items to "Out of scope"
+- Record security answers (data sensitivity, authorization rules, input validation, abuse cases) under "Security considerations" — any resulting AC is tagged `[SEC]`
 - Record decisions and their rationale under "Technical constraints"
 - Remove the resolved entries from "Open questions"
 

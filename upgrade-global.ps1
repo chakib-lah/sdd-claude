@@ -69,7 +69,18 @@ $skillDirs | ForEach-Object {
     if ($targets -contains $src.TrimEnd('\')) {
         Write-Host "  OK $($_.Name) (current)"
     } elseif (Test-Path $dst) {
-        Remove-DirEntry $dst
+        $existing = Get-Item $dst -Force
+        if ($existing.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+            # a link (junction/symlink) is not user data - unlink and relink
+            Remove-DirEntry $dst
+        } else {
+            # real directory/file: user data - back up, never delete
+            # (upgrade-global creates junctions, so a real directory here is never
+            # the normal re-run case: it is a customization or an old copy)
+            $bak = "$dst.bak-" + (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
+            Move-Item $dst $bak
+            Write-Host "  !  existing $($_.Name) was a real directory - backed up to $bak"
+        }
         New-Item -ItemType Junction -Path $dst -Target $src | Out-Null
         Write-Host "  ~  $($_.Name) (repaired -> junction)"
     } else {

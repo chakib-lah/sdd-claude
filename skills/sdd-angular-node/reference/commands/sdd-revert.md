@@ -34,7 +34,9 @@ For each targeted SHA, verify it exists in the history (`git cat-file -t <sha>`)
 
 ### 3. Build the revert plan
 
-Order the reverts **most recent commit first** (reverse chronological order, newest phase first) to minimize conflicts. Display:
+Order the reverts **most recent commit first** (reverse chronological order, newest phase first) to minimize conflicts.
+
+For each phase to revert, read its **Rollback** line in `tasks.md`: anything it lists beyond the revert itself (compensating data migration, feature flag to flip) becomes a manual step to confirm with the user. Display:
 
 ```
 Revert plan — <FEATURE-ID>
@@ -47,6 +49,9 @@ Will revert (newest first):
   3. git revert <sha-phase-1>   — Phase 1 <name> (T001-T002)
 
 Not touched: <phases kept, if partial revert>
+
+Rollback notes (from tasks.md):
+  Phase 3: <content of the phase's Rollback line — manual steps beyond the revert>
 
 Do you confirm this revert?
 ```

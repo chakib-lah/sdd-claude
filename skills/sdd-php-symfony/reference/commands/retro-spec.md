@@ -144,8 +144,14 @@ implemented_in: src/Module/, src/Controller/XController.php   # ← ALL resolved
 #### Context and problem
 Reconstruction of the historical context (date the code was introduced if Git allows it — `git log --follow` often gives solid anchors; if history bottoms out in a squash/migration commit, say so and mark the earlier intent as unrecoverable).
 
+#### Objectives
+Reconstructed from the observed behavior: what the feature accomplishes today, in business language (2-4 bullets). A retrospective spec carries this section like any other — `/sdd-spec-check` scores its presence.
+
+#### Out of scope
+What the feature does **not** do, plus the boundaries of this analysis (adjacent behaviors deliberately left out of the perimeter resolved at step 1).
+
 #### Acceptance criteria
-The ACs are **reconstructed** from the observed behavior, so they are checked `- [x]` (the behavior already exists). **1 checkbox = 1 AC** — that is the count announced at step 9. Mark each AC with:
+The ACs are **reconstructed** from the observed behavior, so they are checked `- [x]` (the behavior already exists). **1 checkbox = 1 AC**, numbered `AC-1...AC-N` (stable identifiers, same rule as a greenfield spec) — that is the count announced at step 9. Mark each AC with:
 - ✅ verified by existing tests: tests/.../FileTest.php::testX
 - ⚠️ inferred from the code, not tested: undocumented regression risk
 - 🗣️ intent declared by \<role\> on \<date\>, to be confirmed (obtained at step 5)
@@ -155,12 +161,17 @@ Precise description of the existing code: files, classes, methods, public signat
 
 For a **cross-stack feature** (backend endpoints + frontend consumer), the "Endpoints / API" subsection becomes the contract: per endpoint, method/route/payload/response codes, the frontend consumer (service/component), and the **observed divergences** between the two sides (mismatched envelopes, unused fields, desynchronized interfaces). If the project provides an `api-contract` command, note that a formal OpenAPI contract can be derived with it — the retrospective spec still documents the observed divergences that an OpenAPI cannot express.
 
-#### Identified technical debt
-Section specific to retrospective specs — placed **after "Technical constraints" and before "Open questions"**. Number the debt points `DT1…DTn` (a distinct prefix avoids collisions with lettered AC groups):
+#### Security considerations
+The security posture **as observed** in the code: sensitivity of the data handled, authorization checks as implemented (including object-level ownership), external inputs and where they are validated. A retrospective spec does not invent `[SEC]` ACs — the ACs describe existing behavior; an observed security gap is recorded here explicitly, cross-referenced as a technical-debt point and, if intent is unclear, as an open question.
+
+#### Technical constraints
+Standards and decisions observed in the code, and the **identified technical debt** — numbered `DT1…DTn` (a distinct prefix avoids collisions with lettered AC groups):
 - Untested code
 - Broken conventions (including outdated Layer 2 rules spotted at step 2)
 - Tight couplings
 - Regression risks
+
+Debt lives inside this section so a retrospective spec keeps the template's universal section set (no ad-hoc section).
 
 #### Open questions
 **Mandatory** in a retrospective spec. Gather here:

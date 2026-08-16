@@ -202,12 +202,17 @@ echo "✅ Quality gates OK"
 
 ### Backend
 
+Executable gate, measured on the **diff** (new/changed code — a global
+threshold on legacy is unenforceable), exits non-zero below the threshold:
+
 ```bash
 cd backend
-vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+vendor/bin/phpunit --coverage-cobertura=coverage.xml
+diff-cover coverage.xml --compare-branch=origin/develop --fail-under=60   # Medium — 80 in Strict
 ```
 
-Suggested thresholds: 80% global, 90% on business services.
+`diff-cover` (Python, `pipx install diff-cover`). Aim for 90% on business
+services as a review target.
 
 ### Frontend
 
@@ -236,70 +241,9 @@ module.exports = {
 
 ---
 
-## Typical GitLab CI/CD
+## In the project's CI
 
-```yaml
-stages:
-  - quality
-  - test
-  - e2e
-
-# === BACKEND ===
-backend:phpstan:
-  stage: quality
-  image: php:8.2
-  script:
-    - cd backend && composer install --no-progress
-    - vendor/bin/phpstan analyse --no-progress
-
-backend:cs-fixer:
-  stage: quality
-  image: php:8.2
-  script:
-    - cd backend && composer install --no-progress
-    - vendor/bin/php-cs-fixer fix --dry-run --diff
-
-backend:tests:
-  stage: test
-  image: php:8.2
-  services:
-    - postgres:15
-  script:
-    - cd backend && composer install --no-progress
-    - php bin/console doctrine:database:create --env=test --if-not-exists
-    - php bin/console doctrine:schema:create --env=test
-    - vendor/bin/phpunit --coverage-text
-
-# === FRONTEND ===
-frontend:lint:
-  stage: quality
-  image: node:20
-  script:
-    - cd frontend && npm ci
-    - npm run lint
-    - npx tsc --noEmit
-
-frontend:tests:
-  stage: test
-  image: node:20
-  script:
-    - cd frontend && npm ci
-    - npm test -- --coverage --watch=false
-
-# === E2E ===
-e2e:cypress:
-  stage: e2e
-  image: cypress/included:latest
-  script:
-    - docker-compose up -d backend
-    - cd frontend && npm ci
-    - npm run build
-    - npm run start:e2e &
-    - sleep 10
-    - npx cypress run
-```
-
----
+These gates run in the project's **existing** pipeline, at its quality stage — the toolkit prescribes what must be green, never how the pipeline is wired. Backend: PHPStan, PHP-CS-Fixer (dry-run), PHPUnit unit then integration (database service + test-schema bootstrap `doctrine:database:create/schema:create --env=test`); frontend: ESLint, `tsc --noEmit`, production build, tests with coverage.
 
 ## Makefile to orchestrate everything
 

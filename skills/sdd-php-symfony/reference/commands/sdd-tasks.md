@@ -69,13 +69,16 @@ Fill in the template `.claude/sdd/_template/tasks.md` with:
 #### Frontmatter
 - `feature`, `status: draft`, `created`, `author`
 
+#### Reminder
+- Keep the template's format-rules recap at the top of the file (valid markers, `[P]`, `Blocked by`, commit SHAs)
+
 #### Overview
 - Total number of tasks
 - Number of implementation phases
 - Overall duration estimate
 - Any dependencies on other features
 
-#### Task list
+#### Tasks
 
 Strict format — tasks grouped under their implementation phase:
 
@@ -84,6 +87,7 @@ Strict format — tasks grouped under their implementation phase:
 
 - **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
 - **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+- **Rollback**: how to undo this phase if it ships broken — default: revert of the phase commit (`/sdd-revert <FEATURE-ID> "Phase N"`); add anything the revert alone does not cover (compensating data migration, feature flag to flip)
 
 - [ ] T001 [Category] Short, active description of the task
   - **Done when**: testable and observable completion criterion
@@ -95,6 +99,8 @@ Strict format — tasks grouped under their implementation phase:
 
 - [ ] T002 [P] [Category] ...
 ```
+
+Every `[SEC]` acceptance criterion in the spec produces **at least one task tagged `[SEC]`** on its task line, after the `[Category]` field (e.g. `- [ ] T003 [Backend] [SEC] Enforce the ownership check on export`). A `[SEC]` task is never optional — `/sdd-verify` checks that every one of them is done.
 
 ### 7. Verify coverage
 

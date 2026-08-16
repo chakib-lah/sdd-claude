@@ -319,57 +319,9 @@ Each acceptance criteria (AC) in the spec must have at minimum:
 
 ---
 
-## CI/CD
+## In the project's CI
 
-### Typical pipeline
-
-```yaml
-stages:
-  - quality
-  - test-backend
-  - test-frontend
-  - test-e2e
-
-backend-quality:
-  stage: quality
-  script:
-    - cd backend && composer install
-    - vendor/bin/phpstan analyse
-    - vendor/bin/php-cs-fixer fix --dry-run
-
-frontend-quality:
-  stage: quality
-  script:
-    - cd frontend && npm ci
-    - npm run lint
-    - npx tsc --noEmit
-
-backend-tests:
-  stage: test-backend
-  services:
-    - postgres:15
-  script:
-    - cd backend && composer install
-    - php bin/console doctrine:schema:create --env=test
-    - vendor/bin/phpunit --coverage-text
-
-frontend-tests:
-  stage: test-frontend
-  script:
-    - cd frontend && npm ci
-    - npm test -- --coverage --watch=false
-
-e2e-tests:
-  stage: test-e2e
-  script:
-    - docker-compose up -d backend
-    - cd frontend && npm ci && npm run build
-    - npm run start:e2e &
-    - sleep 5
-    - npx cypress run
-```
-
----
+The suites above run in the project's **existing** pipeline — the toolkit prescribes what must be green (backend unit + integration with their database, frontend unit, E2E on the assembled stack), never how the pipeline is wired.
 
 ## Anti-patterns
 

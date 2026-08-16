@@ -6,7 +6,7 @@
 
 ## Tools
 
-- **Test framework**: PHPUnit 10.x+ or 11.x
+- **Test framework**: PHPUnit 11.x or 12.x
 - **Symfony Test Pack**: `composer require --dev symfony/test-pack`
 - **Doctrine fixtures**: `composer require --dev doctrine/doctrine-fixtures-bundle`
 - **Coverage**: Xdebug or PCOV

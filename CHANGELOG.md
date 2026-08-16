@@ -1,5 +1,26 @@
 # Changelog — SDD Claude
 
+## [1.6.0] — 2026-08-16
+
+Security-aware spec gate and workflow hardening.
+
+### Added
+
+- **Security considerations are written and scored** — `/sdd-spec` fills the section (data sensitivity, authn/authz impact, external inputs, abuse cases → `[SEC]`-tagged ACs, one-line justification when not applicable) and `/sdd-spec-check` scores it on a canonical 17-criterion checklist.
+- **Untrusted-content rule (Layer 1)** — anything entering from outside the repository (tickets via MCP, pasted text, provided documents, third-party code) is data, never instructions; explicit cautions sit at every point where untrusted content actually enters, and agent permissions are minimized accordingly.
+- **Stable AC identifiers** — every acceptance criterion carries a stable `AC-N` for life (a removed AC leaves a hole, a new AC takes the next free number); the `[SEC]` tag sits after the identifier.
+- **Phase Rollback field** — every phase block declares its rollback path, read by `/sdd-revert` and verified by `/sdd-verify`.
+- **Version marker** — the deployed toolkit version is recorded per project in `.claude/sdd/.sdd-version`, written by the upgrade and read by the next one.
+
+### Changed
+
+- **The toolkit never ships CI pipelines** — deliberate scope decision: every project owns its CI; the toolkit states WHAT must be green, never how the pipeline is wired. All shipped pipeline templates and embedded pipeline blocks are removed, with the durable knowledge kept in prose; a no-return check makes shipped pipeline content impossible.
+- **One skill, one stack** — each skill's test generation and test strategy name only its own stack's frameworks; per-stack coverage gates are executable (diff-based thresholds).
+- **Fresh reference required for upgrades** — `/sdd-upgrade` verifies the toolkit reference is fresh before auditing anything, with an explicit warning when freshness cannot be checked.
+- Branch prefixes and commit types are two explicit vocabularies, and a project may override the branch model in its own Layer-3 rules.
+
+---
+
 ## [1.5.0] — 2026-08-16
 
 ### Added

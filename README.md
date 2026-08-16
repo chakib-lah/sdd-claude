@@ -106,14 +106,14 @@ The **3 ✋ MANUAL GATES** (spec → plan → tasks) guarantee that we never bui
 | Command | Phase | Role |
 |---|---|---|
 | `/sdd-start` | Init | Creates the branch + the feature folder |
-| `/sdd-spec` | 1 | Interview → `spec.md` via `@spec-writer` |
+| `/sdd-spec` | 1 | Interview → `spec.md` (auto-delegates to `spec-writer`) |
 | `/sdd-clarify` | 1 | Dedicated ambiguity-resolution pass on the spec |
 | `/sdd-spec-check` | 1 | Quality checklist before validation |
-| `/sdd-plan` | 2 | `spec.md` approved → `plan.md` via `@plan-architect` |
-| `/sdd-tasks` | 3 | `plan.md` approved → `tasks.md` via `@task-decomposer` |
+| `/sdd-plan` | 2 | `spec.md` approved → `plan.md` (auto-delegates to `plan-architect`) |
+| `/sdd-tasks` | 3 | `plan.md` approved → `tasks.md` (auto-delegates to `task-decomposer`) |
 | `/sdd-implement` | 4 | One task → one local commit; one phase → one branch commit (+ `[P]` subagents) |
 | `/sdd-verify` | Gate | Tests + quality gates + security gate (technical) |
-| `/sdd-review` | Gate | Acceptance criteria coverage via `@code-reviewer` |
+| `/sdd-review` | Gate | Acceptance criteria coverage (auto-delegates to `code-reviewer`) |
 | `/sdd-mr` | Closure | Generated Merge Request body |
 | `/sdd-archive` | Closure | Artifacts → `_archive/` post-merge |
 | `/sdd-status` | Tracking | Dashboard of features in progress |
@@ -134,7 +134,7 @@ Security is built into the method, not bolted on (see `core/rules/03-security.md
 - **Spec phase** — every spec has a **Security considerations** section (data sensitivity, authorization impact, abuse cases); security acceptance criteria are tagged `[SEC]`.
 - **Implementation** — baseline rules always apply: server-side input validation, parameterized queries, contextual output encoding, no secrets in code, explicit access control on every endpoint.
 - **Verify phase** — `/sdd-verify` runs a **security gate**: dependency audit (`composer audit` / `npm audit`), secret scan on the diff, `[SEC]` task completion, and no debug leftovers. A hotfix does not skip this gate.
-- **Review phase** — `@code-reviewer` treats any unmitigated risk as a blocking finding, and the `security-reviewer` global agent covers deeper OWASP audits on demand.
+- **Review phase** — the `code-reviewer` agent (auto-delegated by `/sdd-review`, never invoked by name) treats any unmitigated risk as a blocking finding, and the `security-reviewer` global agent covers deeper OWASP audits on demand.
 
 ---
 
@@ -192,7 +192,7 @@ Run it after **any change** to the toolkit (adding a command/agent/rule, editing
 bash scripts/audit.sh
 ```
 
-In a single pass it checks: the **structure** of the skills, **completeness** (17 commands + 5 agents per skill, 9 global agents), the absence of **ghost references**, the consistency of **agent delegations**, the **docs**, and the **absence of divergent duplication** (files shared across skills must stay byte-identical). Output is `✅ AUDIT OK` or the list of detected problems.
+In a single pass it checks: the **structure** of the skills, **completeness** (17 commands + 5 agents per skill, 9 global agents), the absence of **ghost references**, the consistency of **agent delegations**, the **docs and release coherence** (version cited everywhere, CHANGELOG entry, expected tag), the **absence of divergent duplication** (files shared across skills must stay byte-identical — the hash tool is probed at startup and a missing one aborts the audit), and the **CI templates** (pinned images, `rules:`-based, referenced both ways). Output is `✅ AUDIT OK` or the list of detected problems.
 
 ---
 
@@ -212,6 +212,5 @@ The toolkit is not limited to the 6 shipped skills: you can add a skill for a ne
 | `upgrade-global.sh` / `.ps1` | Updates the global `~/.claude` (skills + agents) after a `git pull` |
 | `skills/README.md` | Skills decision tree |
 | `core/extension-guide.md` | Creating a new stack skill |
-| `core/ci-templates/` | CI snippets |
 
-Version 1.5.0 — August 2026.
+Version 1.6.0 — August 2026.

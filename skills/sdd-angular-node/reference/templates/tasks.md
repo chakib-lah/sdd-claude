@@ -20,12 +20,22 @@ author: <name>
 
 ---
 
+## Overview
+
+- **Total tasks**: <N>
+- **Implementation phases**: <N>
+- **Overall estimate**: <e.g. 6-8 h>
+- **Depends on features**: <FEATURE-ID(s), or none>
+
+---
+
 ## Tasks
 
 ### Phase 1: <Milestone name>
 
 - **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
 - **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+- **Rollback**: how to undo this phase if it ships broken — default: revert of the phase commit (`/sdd-revert <FEATURE-ID> "Phase N"`); add anything the revert alone does not cover (compensating data migration, feature flag to flip)
 
 - [ ] T001 [Category] Short description of the task
   - **Done when**: testable and binary completion criterion
@@ -39,6 +49,7 @@ author: <name>
 
 - **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
 - **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+- **Rollback**: how to undo this phase if it ships broken — default: revert of the phase commit (`/sdd-revert <FEATURE-ID> "Phase N"`); add anything the revert alone does not cover (compensating data migration, feature flag to flip)
 
 - [ ] T002 [Category] Short description [P]
   - **Done when**: completion criterion
