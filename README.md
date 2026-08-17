@@ -192,7 +192,7 @@ Run it after **any change** to the toolkit (adding a command/agent/rule, editing
 bash scripts/audit.sh
 ```
 
-In a single pass it checks: the **structure** of the skills, **completeness** (17 commands + 5 agents per skill, 9 global agents), the absence of **ghost references**, the consistency of **agent delegations**, the **docs and release coherence** (version cited everywhere, CHANGELOG entry, expected tag), the **absence of divergent duplication** (files shared across skills must stay byte-identical — the hash tool is probed at startup and a missing one aborts the audit), and the **CI templates** (pinned images, `rules:`-based, referenced both ways). Output is `✅ AUDIT OK` or the list of detected problems.
+In a single pass — **six sections** — it checks: the **structure** of the skills, **completeness** (17 commands + 5 agents per skill, 9 global agents), the absence of **ghost references**, the consistency of **agent delegations**, the **docs and release coherence** (version cited everywhere, CHANGELOG entry, expected tag), and the **absence of divergent duplication** (files shared across skills must stay byte-identical — the hash tool is probed at startup and a missing one aborts the audit). Output is `✅ AUDIT OK` or the list of detected problems.
 
 ---
 
@@ -213,4 +213,4 @@ The toolkit is not limited to the 6 shipped skills: you can add a skill for a ne
 | `skills/README.md` | Skills decision tree |
 | `core/extension-guide.md` | Creating a new stack skill |
 
-Version 1.6.0 — August 2026.
+Version 1.7.0 — August 2026.

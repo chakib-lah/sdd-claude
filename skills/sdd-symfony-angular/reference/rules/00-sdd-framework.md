@@ -222,7 +222,7 @@ A valid `tasks.md` contains:
 
 - **Goal**: one line — the coherent, revertable state this phase leaves the codebase in
 - **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
-- **Rollback**: how to undo the phase if it ships broken — default: revert of the phase commit; read by /sdd-revert, required non-empty by /sdd-verify
+- **Rollback**: how to undo the phase if it ships broken — default: revert of the phase commit; read by /sdd-revert. An absent line is accepted by /sdd-verify and means the default; an empty line is reported
 
 - [ ] T001 [Category] Short description of the task
   - **Done when**: testable completion criterion
@@ -271,7 +271,7 @@ This is the golden rule. Never chain tasks automatically. Between each task, a h
 
 During development, each task produces **exactly one local commit** (this preserves traceability and human validation between tasks). If the implementation generates several sub-modifications, they go into the same local commit.
 
-When the **last task of an implementation phase** completes, `/sdd-implement` **squashes the phase's task commits into a single commit** — always before the phase's first push. The history presented to reviewers therefore contains **one commit per phase** (plus at most one final `chore(<TICKET-ID>): update SDD artifacts` bookkeeping commit): a small feature (one phase) is reviewed as a single code commit.
+When the **last task of an implementation phase** completes, `/sdd-implement` **squashes the phase's task commits into a single commit** — always before the phase's first push. The history presented to reviewers therefore contains **one commit per phase** (plus at most one final `<TICKET-ID>: update SDD artifacts` bookkeeping commit): a small feature (one phase) is reviewed as a single code commit.
 
 ### The commit SHAs are tracked in `tasks.md`
 

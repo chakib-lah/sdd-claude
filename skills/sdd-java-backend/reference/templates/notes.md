@@ -32,10 +32,11 @@ feature: <kebab-case-name>
 
 ## Squash exceptions
 
-<!-- Phases NOT squashed (commits pushed mid-phase).
+<!-- Phases NOT squashed, because a guard of /sdd-implement step 11b fired:
+     commits pushed mid-phase | history not contiguous | staged changes present.
      Format: Phase N — reason + list of the per-task SHAs kept.
      /sdd-verify checks this section when a phase is marked
-     "not squashed — commits pushed mid-phase" -->
+     "not squashed — <reason>, see notes.md" -->
 
 ---
 

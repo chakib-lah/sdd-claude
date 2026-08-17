@@ -403,6 +403,9 @@ grep -q 'AC-1' core/commands/sdd-hotfix.md \
 #     "### Phase" example block); each must appear in "Anatomy of a tasks.md".
 #     Wiring enumeration: tasks.md is the only template with a phase block
 #     (spec/plan carry none — not wired). Empty derived list = fatal.
+#     SYNC IS TWO-WAY (added at cycle close, proven one-way by its own negative
+#     test): template → anatomy below, then anatomy → template — a field the
+#     anatomy declares must still exist in the template, or the method lost it.
 pf=$(awk '/^### Phase 1:/{f=1;next} f&&/^- \[ \]/{exit} f' core/templates/tasks.md | sed -n 's/^- \*\*\([^*]*\)\*\*.*/\1/p' | sort -u)
 [ -n "$pf" ] || fail "phase-field net: derived field list is EMPTY (check templates/tasks.md phase block)"
 anat=$(awk '/^## Anatomy of a tasks.md/{f=1;next} /^## /{f=0} f' core/rules/00-sdd-framework.md)
@@ -413,6 +416,14 @@ while IFS= read -r fld; do
 done <<EOF_PF
 $pf
 EOF_PF
+af=$(printf '%s\n' "$anat" | sed -n 's/^- \*\*\([^*]*\)\*\*.*/\1/p' | sort -u)
+while IFS= read -r fld; do
+  [ -n "$fld" ] || continue
+  printf '%s\n' "$pf" | grep -qxF "$fld" \
+    || fail "templates/tasks.md lost phase-block field still declared by the anatomy: $fld"
+done <<EOF_AF
+$af
+EOF_AF
 check_shared "angular" "sdd-symfony-angular sdd-angular-node sdd-java-angular" \
   commands/angular-component.md commands/angular-service.md commands/angular-test.md \
   rules/angular-conventions.md

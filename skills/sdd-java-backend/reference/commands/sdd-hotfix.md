@@ -122,7 +122,8 @@ Mode: lightweight SDD workflow
 
 Hotfix reminders:
   1. Complete spec.md (context + minimum ACs)
-  2. Set spec.md to status: approved manually
+  2. Set spec.md AND tasks.md to status: approved manually
+     (/sdd-implement refuses a tasks.md left in draft)
   3. Write the test that reproduces the bug FIRST (T001)
   4. Fix it (T002) — the test must turn green
   5. Run /sdd-verify

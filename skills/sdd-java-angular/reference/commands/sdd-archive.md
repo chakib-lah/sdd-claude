@@ -68,7 +68,7 @@ mv .claude/sdd/<FEATURE-ID>-<description>/ .claude/sdd/_archive/<FEATURE-ID>-<de
 ### 6. Commit
 
 ```
-chore(<TICKET-ID>): archive SDD artefacts post-merge
+<TICKET-ID>: archive SDD artefacts post-merge
 ```
 
 ### 7. Announce in the chat

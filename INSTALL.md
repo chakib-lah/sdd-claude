@@ -44,7 +44,7 @@ sdd-claude/
 ├── install.ps1            ← Windows installer
 ├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
 ├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
-├── VERSION                ← 1.6.0
+├── VERSION                ← 1.7.0
 └── CHANGELOG.md
 ```
 
@@ -204,4 +204,4 @@ cd ~/tools/sdd-claude
 bash scripts/audit.sh
 ```
 
-The script checks: the skills' structure and installer wiring, completeness (17 commands + 5 agents per skill, 9 global agents), absence of ghost references (rules, and `settings.json` which is no longer deployed), correct agent delegations, docs and release consistency (version, CHANGELOG, tag; anatomies, command write-steps and agent skeletons in sync with the templates; Layer 1 free of forbidden technology names; extension-guide command list complete), anti-drift by hash of the shared files, and the CI templates (pinned images, `rules:`, references). Output is `✅ AUDIT OK` or the list of problems.
+The script checks, in six sections: the skills' structure and installer wiring, completeness (17 commands + 5 agents per skill, 9 global agents), absence of ghost references (rules, and `settings.json` which is no longer deployed), correct agent delegations, docs and release consistency (version, CHANGELOG, tag; anatomies, command write-steps and agent skeletons in sync with the templates; Layer 1 free of forbidden technology names; extension-guide command list complete), and anti-drift by hash of the shared files. Output is `✅ AUDIT OK` or the list of problems.

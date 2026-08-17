@@ -177,6 +177,7 @@ For each uncovered AC, add a corrective task at the end of `tasks.md` (without m
 
 - **Goal**: cover the ACs flagged by /sdd-review
 - **Phase commit SHA**: *(filled in by /sdd-implement after the phase squash)*
+- **Rollback**: how to undo this phase if it ships broken — default: revert of the phase commit (`/sdd-revert <FEATURE-ID> "Phase N+1"`); add anything the revert alone does not cover
 
 - [ ] TC001 [Fix] Cover AC-N: <short description of the missing behavior>
   - **Done when**: the test validating AC-N is green

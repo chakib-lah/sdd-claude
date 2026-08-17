@@ -196,7 +196,7 @@ At the end of the apply step, **write the deployed version marker**: put the too
 ### 5. Commit
 
 ```
-chore(sdd): upgrade SDD core to toolkit v<X.Y.Z>
+sdd: upgrade SDD core to toolkit v<X.Y.Z>
 ```
 
 ### 6. Announce in the chat

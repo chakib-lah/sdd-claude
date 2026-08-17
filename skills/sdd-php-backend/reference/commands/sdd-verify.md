@@ -23,7 +23,7 @@ Read `.claude/sdd/<feature>/tasks.md` and verify that **all** tasks are `done` (
 
 For each `done` task, verify that the `**Commit SHA**` field is filled in.
 
-For each implementation phase whose tasks are all `done`, verify that the `**Phase commit SHA**` field is filled in (i.e. the phase was squashed by `/sdd-implement` step 11b). Accepted exceptions: a phase marked `*(not squashed — commits pushed mid-phase, see notes.md)*` **with** the incident documented in `notes.md`, and **hotfix features** (`type: hotfix` frontmatter or `hotfix/` branch), which are exempt from the squash — for them, only check the per-task `Commit SHA` fields. A `tasks.md` without `### Phase` headings counts as one implicit phase.
+For each implementation phase whose tasks are all `done`, verify that the `**Phase commit SHA**` field is filled in (i.e. the phase was squashed by `/sdd-implement` step 11b). Accepted exceptions: a phase marked `*(not squashed — <reason>, see notes.md)*` (the guards of step 11b: `commits pushed mid-phase`, `history not contiguous`, `staged changes present`) **with** the incident documented in `notes.md`, and **hotfix features** (`type: hotfix` frontmatter or `hotfix/` branch), which are exempt from the squash — for them, only check the per-task `Commit SHA` fields. A `tasks.md` without `### Phase` headings counts as one implicit phase.
 
 **If a task is not `done`, has no SHA, or a completed phase is not squashed**:
 
@@ -118,9 +118,9 @@ git diff <integration-branch>..HEAD | grep -E "TODO|FIXME|console\.log|var_dump|
 ### 9. Check the SDD artifacts
 
 - `spec.md` exists and has `status: approved`
-- `plan.md` exists and has `status: approved`
+- `plan.md` exists and has `status: approved` — except for **hotfix features** (`type: hotfix` frontmatter or `hotfix/` branch, the same detection as the step 2 squash exemption), for which `plan.md` is optional
 - `tasks.md` exists with all tasks `done`
-- every implementation phase in `tasks.md` has a non-empty **Rollback** line (the default — revert of the phase commit — is acceptable); `/sdd-revert` reads it
+- the **Rollback** line of each implementation phase, three cases: **absent** — accepted, means the implicit default (revert of the phase commit); every `tasks.md` written before the field existed is valid as-is. **Present and filled** — read by `/sdd-revert` at revert time. **Present but empty** — report it as a finding (fill it or remove the line); an empty line says neither the default nor an intent
 - `notes.md` may contain free-form notes (no gate)
 
 ### 10. Produce the global report

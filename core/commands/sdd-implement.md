@@ -134,7 +134,7 @@ Before committing, display the diff and validate it mentally:
 
 This commit is a **local, per-task commit**: it will be squashed into the phase commit at step 11b when the phase completes. Stage any pending SDD-artifact bookkeeping (from the previous task's step 11) together with the task's changes. Strictly follow `.claude/rules/02-git-conventions.md` for:
 - The message format (subject line only, short)
-- Including the ticket in the scope
+- Leading the subject with the ticket — and never repeating the branch's type in the message
 
 **Never use `--no-verify`**: if a pre-commit hook blocks, diagnose and fix.
 
@@ -149,20 +149,30 @@ Capture the SHA of the resulting commit.
 
 If, after step 11, **all the tasks of the current task's implementation phase are `- [x]`**, squash the phase's local commits into a single commit. A `tasks.md` without `### Phase` headings counts as **one implicit phase** covering all tasks (squash when the last task completes). **Exception: hotfixes** (`type: hotfix` frontmatter or `hotfix/` branch) are never squashed — the red-test commit must stay visible before the fix commit.
 
-1. **Push guard**: if the branch has an upstream, verify that none of the phase's task commits has already been pushed (e.g. `git merge-base --is-ancestor <first-task-sha-of-phase> @{upstream}` must fail). If any was pushed → **skip the squash**, set `**Phase commit SHA**: *(not squashed — commits pushed mid-phase, see notes.md)*` and log the incident in `notes.md`. `/sdd-revert` will fall back to the per-task SHAs for that phase.
+1. **Guards** — `git reset --soft` rewrites history, so it is only safe when the phase's commits are the last commits of the branch and nothing else is in flight. Run the three checks below **before** touching anything. If any of them fails → **skip the squash** (never force it), set `**Phase commit SHA**: *(not squashed — <reason>, see notes.md)*` and log the incident in `notes.md` under "Squash exceptions"; `/sdd-revert` then falls back to the per-task SHAs for that phase.
+
+   ```bash
+   BASE=$(git rev-parse <first-task-sha-of-phase>^)
+   ```
+
+   | Guard | Check | Why | `<reason>` |
+   |---|---|---|---|
+   | Push | if the branch has an upstream, `git merge-base --is-ancestor <first-task-sha-of-phase> @{upstream}` must **fail** | rewriting pushed commits forces a `--force` push on shared history | `commits pushed mid-phase` |
+   | Contiguity | `git rev-list "$BASE"..HEAD` must list **exactly** the phase's task SHAs, nothing else | any foreign commit in the range (a merge from the integration or release branch pulled in mid-phase, a commit from another feature, a manual commit) would be silently swallowed into the phase commit | `history not contiguous` |
+   | Index | `git diff --cached --quiet` must **succeed** | `reset --soft` leaves the index untouched, so anything staged at that moment would be folded into the phase commit — step 11's bookkeeping stays unstaged and rides in the next commit | `staged changes present` |
+
 2. **Propose the squash** to the user with the planned phase commit message, and wait for explicit confirmation (same human-validation discipline as between tasks).
 3. Execute (never `git rebase -i`, unavailable here):
 
    ```bash
-   BASE=$(git rev-parse <first-task-sha-of-phase>^)
    git reset --soft "$BASE"
    git commit   # single phase commit
    ```
 
-4. Message: `<type>(<TICKET-ID>): <phase summary in imperative lowercase>` — subject line only; the squashed tasks stay traceable in `tasks.md`.
+4. Message: `<TICKET-ID>: <phase summary in imperative lowercase>` — subject line only; the squashed tasks stay traceable in `tasks.md`.
 5. Capture the phase SHA → fill in `**Phase commit SHA**`, and **replace every per-task `Commit SHA` of the phase** with the phase SHA suffixed `*(squashed)*` (the local SHAs become unreachable after the squash).
 
-Note: as for per-task commits, the `tasks.md` bookkeeping edit recording the phase SHA rides in the next commit — or, for the feature's final phase, in a tiny trailing `chore(<TICKET-ID>): update SDD artifacts` commit so the tree is clean for `/sdd-verify`.
+Note: as for per-task commits, the `tasks.md` bookkeeping edit recording the phase SHA rides in the next commit — or, for the feature's final phase, in a tiny trailing `<TICKET-ID>: update SDD artifacts` commit so the tree is clean for `/sdd-verify`.
 
 ### 12. Announce in the chat
 
@@ -173,15 +183,25 @@ Commit (local): <SHA> <message>
 Tests: ✅ all green
 Quality gates: ✅ OK
 
+Phase N (<phase name>): <done>/<total> tasks — squash when T0ZZ completes
 Next task: T00Y [Category] - <description>
 
 Type `/sdd-implement` to continue.
 ```
 
+The **phase line is mandatory on every invocation**: the squash only fires when the phase's last task is checked off, so without it the accumulating per-task commits look like a broken squash. `T0ZZ` is the phase's last task. For a hotfix (exempt from the squash) or a phase already skipped by a guard, say so instead of announcing a squash to come.
+
 If the task completed its phase, add:
 
 ```
 ✅ Phase N squashed → <phase-SHA> <phase commit message>
+```
+
+If a guard of step 11b skipped the squash, add instead:
+
+```
+⚠️ Phase N complete but NOT squashed — <reason> (documented in notes.md)
+   The phase keeps its per-task commits; /sdd-revert will use them.
 ```
 
 If there are no tasks left:
@@ -208,7 +228,7 @@ Next step: /sdd-verify for the technical gate.
 
 ❌ **Never push mid-phase.** Push only after the completed phases have been squashed (step 11b).
 
-❌ **Never skip the phase squash silently.** The only sanctioned exception is the push guard of step 11b, and it must be documented in `notes.md`.
+❌ **Never skip the phase squash silently.** The only sanctioned exceptions are the three guards of step 11b (push, contiguity, index); each must be announced in the chat and documented in `notes.md`.
 
 ❌ **Do not modify `spec.md`, `plan.md` or `tasks.md` beyond progress tracking.** The content of these artifacts is frozen once approved. If a structural change is needed, go back through the earlier phases.
 

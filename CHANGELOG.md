@@ -1,5 +1,18 @@
 # Changelog — SDD Claude
 
+## [1.7.0] — 2026-08-17
+
+Consolidating release closing the 1.6 stabilization line.
+
+### Changed
+
+- **Backward-compatible Rollback gate** — a phase without a Rollback line is accepted and means the implicit default (revert of the phase commit); present-and-filled is read by `/sdd-revert`; present-but-empty is reported.
+- **Phase-squash safety guards** — the squash verifies history contiguity (a foreign commit in the range skips the squash instead of swallowing it) and a clean index; a guard-skipped squash is announced and documented, and phase progress is visible in every `/sdd-implement` announcement.
+- **Commit messages drop the type** — the format becomes `<TICKET-ID>: <imperative description>`; the work's nature lives in the branch name, not in a second per-subject taxonomy.
+- Hotfix features are exempt from the plan requirement, and `/sdd-hotfix` instructs approving `tasks.md` as well as the spec.
+
+---
+
 ## [1.6.0] — 2026-08-16
 
 Security-aware spec gate and workflow hardening.

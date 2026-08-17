@@ -18,7 +18,7 @@ description: SDD rollback — un-ships a feature (or one of its implementation p
 ## Blocking prerequisites
 
 - The feature folder exists in `.claude/sdd/` (or `.claude/sdd/_archive/` for a merged feature)
-- `tasks.md` has the `Phase commit SHA` field filled in for the targeted phase(s) — without SHAs, refuse and explain that traceability is missing. Exception: for a phase marked `*(not squashed — commits pushed mid-phase, see notes.md)*` and for hotfixes (exempt from the squash), fall back to that phase's per-task `Commit SHA` fields. A `tasks.md` without `### Phase` headings counts as one implicit phase: its unit of revert is the **deduplicated** set of per-task SHAs (after a squash all tasks share the phase SHA → one single revert); an unsquashed phase reverts each distinct per-task SHA, newest first
+- `tasks.md` has the `Phase commit SHA` field filled in for the targeted phase(s) — without SHAs, refuse and explain that traceability is missing. Exception: for a phase marked `*(not squashed — <reason>, see notes.md)*` (a guard of `/sdd-implement` step 11b fired) and for hotfixes (exempt from the squash), fall back to that phase's per-task `Commit SHA` fields. A `tasks.md` without `### Phase` headings counts as one implicit phase: its unit of revert is the **deduplicated** set of per-task SHAs (after a squash all tasks share the phase SHA → one single revert); an unsquashed phase reverts each distinct per-task SHA, newest first
 - The Git tree is clean
 - You are on a **dedicated revert branch** (e.g. `revert/<FEATURE-ID>`), never directly on the integration branch — create it if needed
 
@@ -26,7 +26,7 @@ description: SDD rollback — un-ships a feature (or one of its implementation p
 
 ### 1. Locate the feature and load `tasks.md`
 
-Look in `.claude/sdd/<feature>/` first, then `.claude/sdd/_archive/<feature>/`. Collect the implementation phases and their `Phase commit SHA` (falling back to per-task SHAs for a documented unsquashed phase). The trailing `chore(<TICKET-ID>): update SDD artifacts` commit, if any, touches only SDD artifacts and is **not** part of the revert plan.
+Look in `.claude/sdd/<feature>/` first, then `.claude/sdd/_archive/<feature>/`. Collect the implementation phases and their `Phase commit SHA` (falling back to per-task SHAs for a documented unsquashed phase). The trailing `<TICKET-ID>: update SDD artifacts` commit, if any, touches only SDD artifacts and is **not** part of the revert plan.
 
 ### 2. Verify the SHAs
 
