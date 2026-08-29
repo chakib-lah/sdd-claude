@@ -1,5 +1,19 @@
 # Changelog — SDD Claude
 
+## [1.9.0] — 2026-08-29
+
+Lifecycle hardening: existing gates become stricter so commands can no longer silently consume artifacts whose schema predates the current contract. Not fully backward-compatible for projects carrying legacy artifacts.
+
+### Changed
+
+- **`/sdd-verify` blocks malformed or duplicated task identifiers** — the canonical shape is `T` + digits (zero-padded, stable for life); legacy or duplicated identifiers block the gate with a safe manual-migration procedure. Numeric gaps are tolerated.
+- **Hotfix verification validates the real Test→Fix Git relationship** — both commits must resolve, be distinct, correctly ordered and reachable; merged production history is never rewritten to satisfy the gate.
+- **Complete canonical `AC-N` coverage required** — `/sdd-spec-check` and `/sdd-review` refuse specs with unidentified or mixed acceptance criteria rather than silently skipping them; migration preserves wording, meaning and order, and remediation follows each gate's own prerequisites.
+- **`.claude/sdd/README.md` becomes a static guide** — live feature state is derived from the feature folders and frontmatter by `/sdd-status`; the old duplicated index is migrated safely, custom project prose preserved.
+- **Honest upgrade outcomes** — residual divergences are classified after the apply, and any warning-class residual or pending manual review yields a partial result, never an unconditional success.
+
+---
+
 ## [1.8.0] — 2026-08-29
 
 The three-layer model gains its code-quality slot, upgrades gain layer triage, and the repository becomes publicly distributable.

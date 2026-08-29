@@ -40,7 +40,7 @@ Layer 1 scope within `reference/`:
 
 - `reference/commands/` → universal commands only: every `sdd-*.md` plus `retro-spec.md`. Stack scaffolding commands (`symfony-*.md`, `angular-*.md`, `node-*.md`, `php-*.md`, `java-*.md`…) are Layer 2 — ignore them.
 - `reference/rules/` → **the prefix is the rule**: every `0x-*.md` file is Layer 1 (owned by the toolkit — audit and upgrade it); every `1x-*.md` file and every unnumbered rule file is Layer 2 or 3 — ignore it. Apply the prefix rule to what the reference actually contains, never to a memorized list: a `0x` rule added by a newer toolkit (illustration, non-exhaustive: `04-code-quality.md`) is in scope even though older deployments never had it.
-- `reference/templates/` → all files; they deploy to `.claude/sdd/_template/<name>.md`, except `sdd-readme.md` which deploys to `.claude/sdd/README.md` **only if that file does not exist yet**. Once deployed, `.claude/sdd/README.md` is a **live feature index**, not a template: never overwrite it. If its structure must evolve, rebuild it preserving every feature row.
+- `reference/templates/` → all files; they deploy to `.claude/sdd/_template/<name>.md`, except `sdd-readme.md` which deploys to `.claude/sdd/README.md` **only if that file does not exist yet**. `.claude/sdd/README.md` is a **static SDD guide** — live feature state is derived by `/sdd-status` from the feature folders and their frontmatter, never stored in that file. A project still carrying the older framework-generated **dynamic index** schema is migrated in step 4b.
 - `reference/agents/` → the 5 SDD agents (`spec-writer`, `plan-architect`, `task-decomposer`, `code-reviewer`, `test-generator`); they deploy to `.claude/agents/<name>.md`. `test-generator` is **stack-adapted**: the skill's reference is the correct source for this project — never compare it against another skill's copy. Files in `.claude/agents/` that do not exist in the reference are the developer's own agents — **never touch them**.
 
 ### 0b. Apply pending file renames (migration map)
@@ -118,7 +118,7 @@ _template/jira-story-fr.md : [✅ / ❌ missing (added with retro-spec AMOA expo
 _template/jira-story-en.md : [✅ / ❌ missing (added with retro-spec AMOA exports) / ⚠️ divergent — likely a legitimate project override (custom trame): never overwrite without explicit request]
 _template/spec-doc-fr.md   : [✅ / ❌ missing (added with retro-spec AMOA exports) / ⚠️ divergent — likely a legitimate project override (custom trame): never overwrite without explicit request]
 _template/spec-doc-en.md   : [✅ / ❌ missing (added with retro-spec AMOA exports) / ⚠️ divergent — likely a legitimate project override (custom trame): never overwrite without explicit request]
-sdd/README.md         : [✅ / ❌ / ⚠️ — from reference/templates/sdd-readme.md]
+sdd/README.md         : [✅ static guide / ❌ missing (deploy from reference/templates/sdd-readme.md) / ⚠️ old dynamic-index schema → step 4b migration]
 ```
 
 #### 1.4 — SDD agents
@@ -205,6 +205,34 @@ After confirmation:
 
 At the end of the apply step, **write the deployed version marker**: put the toolkit's `VERSION` value into `.claude/sdd/.sdd-version` (single line, create or overwrite). It lives under `.claude/sdd/` — a framework-owned directory — as a dotfile so it can never collide with a feature folder, and the next `/sdd-upgrade` reads it to apply only the relevant part of the migration map.
 
+### 4b. Migrate the legacy `sdd/README.md` dynamic index
+
+If the project's `.claude/sdd/README.md` still follows the older framework-generated **dynamic index** schema (tables `## Features in progress` — `| Feature | Branch | Spec status | Created on |` —, `## Retrospective specs`, and manually synchronized `## Archived features` rows), migrate it:
+
+- replace the **framework-owned dynamic tables and their headings** with the current static guide from `reference/templates/sdd-readme.md`;
+- do **not** touch the feature folders, do **not** reconstruct missing rows, do **not** infer statuses — that state was duplicated and is now derived live by `/sdd-status`;
+- **preserve any custom project prose** the team added to the file (any section that is not one of the framework-owned tables/headings above);
+- if custom content is interleaved with the framework-owned sections so the ownership boundary is ambiguous: **do not overwrite the file** — report "manual review required for `.claude/sdd/README.md`" and leave it unchanged.
+
+### 4c. Post-upgrade residual-divergence report
+
+After the apply (and the step 4b migration), answer the question an upgrade used to leave open: **"what still differs from the reference?"** Using the **same reference resolved in step 0** — never a different one —, recompute the Layer-1 comparison and classify **every residual divergence**. This step **reports only**: it never moves, deletes, creates or rewrites anything, and produces no persistent manifest — it is recomputed fresh at each upgrade.
+
+Every residual receives exactly one classification:
+
+| Classification | Meaning | Suggested action |
+|---|---|---|
+| `DECLARED_PROJECT_OVERRIDE` | explicit, sanctioned project override of a Layer 1 subject | keep if intentional |
+| `IMPLICIT_PROJECT_OVERRIDE` | project decision on a Layer 1 subject, not declared at every divergent site | candidate for explicit declaration / consolidation |
+| `MISLAYERED_STACK_TRUTH` | stack/tool/framework truth still living in a Layer 1 file | candidate relocation to the matching Layer 2 file |
+| `MISLAYERED_PROJECT_TRUTH` | project/path/host/team/application truth still living in a Layer 1 file (e.g. a project's authentication architecture inside `03-security.md`) | candidate relocation to a Layer 3 rule |
+| `ALLOWED_TEXTUAL_VARIANT` | semantically equivalent textual/localized variant the step 1 classification explicitly recognizes (translation-only deployments) | none |
+| `UNEXPLAINED_DIVERGENCE` | cannot be justified from any known project or framework rule | manual investigation |
+
+For each residual, report: **file · divergent subject (concise) · classification · reason · suggested destination/action · user confirmation required (yes/no)**.
+
+**Not residuals** — normal, expected project state, never reported as drift: a filled/ratified `01-constitution.md`; project-own template overrides already classified as such in step 1.3; every Layer 2/3 file (prefix rule, step 2); the developer's own agents; the stack-adapted `test-generator`; a `sdd/README.md` already migrated to the static guide.
+
 ### 5. Commit
 
 ```
@@ -215,12 +243,24 @@ Subject line only — never a `Co-Authored-By` or any tool-generated trailer (se
 
 ### 6. Announce in the chat
 
+Derive the final status from the step 4c report **and** the step 4b outcome — never emit an unconditional success. The decision is exhaustive:
+
+- **Benign residual classes**: `DECLARED_PROJECT_OVERRIDE`, `ALLOWED_TEXTUAL_VARIANT`.
+- **Warning residual classes**: `IMPLICIT_PROJECT_OVERRIDE`, `MISLAYERED_STACK_TRUTH`, `MISLAYERED_PROJECT_TRUTH`, `UNEXPLAINED_DIVERGENCE`.
+- **README manual review pending** (step 4b reported "manual review required") is a separate outcome flag — not a seventh residual class.
+
+**✅ UPDATED** if and only if no README manual review is pending AND (the residual set is empty OR every residual belongs to a benign class). **⚠️ UPDATED WITH RESIDUALS** if and only if a README manual review is pending OR at least one residual belongs to a warning class. Mixed sets are deterministic: benign + any warning residual → ⚠️; benign-only (in any combination) → ✅; no residual but README review pending → ⚠️.
+
 ```
-✅ SDD Core updated.
+✅ SDD Core UPDATED — benign residuals only (or none), no pending README review.
+(or)
+⚠️ SDD Core UPDATED WITH RESIDUALS — review the residual-divergence table (step 4c) and/or the pending README manual review (step 4b).
 
 Renamed: <old name → new name list, per the step 0b map — or (none)>
 Added:   <list of added commands/rules/templates/agents>
 Updated: <list of updated files>
+Residuals: <count by classification — or (none)>
+README:    <static guide already / migrated (step 4b) / ⚠️ manual review required>
 
 Layer 2 (stack conventions): content unchanged ✅ (N file(s) renamed)
 Layer 3 (project skills): unchanged ✅
@@ -234,5 +274,5 @@ Layer 3 (project skills): unchanged ✅
 - ❌ **Never rename** the 17 existing universal commands
 - ❌ **Never touch** the developer's own agents (`.claude/agents/` files absent from the reference)
 - ❌ **Never overwrite** a project's filled-in `01-constitution.md` — only deploy the skeleton where none exists
-- ❌ **Never overwrite** `.claude/sdd/README.md` — it is a live feature index; deploy it only where missing, and preserve every feature row if its structure must be rebuilt
+- ❌ **Never overwrite** `.claude/sdd/README.md` blindly — deploy it only where missing; the one sanctioned rewrite is the step 4b migration of the known framework-owned dynamic-index schema (framework-owned tables replaced, custom project prose preserved, ambiguous ownership → manual review, never a blind overwrite)
 - ✅ **Always wait** for explicit confirmation before writing anything

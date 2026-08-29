@@ -21,6 +21,25 @@ From the current Git branch.
 
 ### 2. Read `spec.md`
 
+### 2b. Validate the AC schema (eligibility — before any scoring)
+
+Enumerate **every** checkbox line of the "Acceptance criteria" section. Each criterion must carry **exactly one** canonical `AC-N` identifier (`AC-` followed by digits whose integer value is **≥ 1** — numbering starts at `AC-1`, so `AC-0` is not canonical; the identifier sits on the checkbox line, and a `[SEC]` tag, when present, sits after it), and every canonical identifier must be **unique**. Numeric gaps are allowed (stable identifiers — a missing number means a removed AC).
+
+This is an **eligibility gate, not a scored criterion**: if any criterion lacks a canonical `AC-N` (bare checkbox, legacy label such as `CA-N`, or a mixed section) or an `AC-N` is duplicated, **stop before scoring**:
+
+```
+❌ Acceptance-criteria schema not canonical — check stopped before scoring.
+
+Offending line(s): <quote each non-canonical or duplicated criterion line>
+
+Migrate the metadata manually — preserve every criterion's wording, meaning
+and order; add stable AC-N identifiers; update unambiguous legacy references;
+ask where a mapping is ambiguous; never invent, remove, merge or split ACs.
+Commit the metadata migration when appropriate, then re-run /sdd-spec-check.
+```
+
+An already-`approved` artifact never re-enters this command by itself — `/sdd-review` applies the same schema defense at its own gate.
+
 ### 3. Run the quality checklist
 
 For each criterion, display ✅ (OK) or ❌ (problem) with an actionable comment.

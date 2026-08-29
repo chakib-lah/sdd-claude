@@ -28,9 +28,38 @@ Read:
 - `.claude/sdd/<feature>/plan.md` (technical design reference)
 - `.claude/sdd/<feature>/tasks.md` (AC ↔ tasks ↔ commits mapping)
 
-### 3. Extract the list of acceptance criteria
+### 3. Validate the AC schema, then extract the list of acceptance criteria
 
-Parse the "Acceptance criteria" section of `spec.md` and list each AC under the `AC-N` identifier it carries in the spec (identifiers are stable — a missing number means a removed AC, not a numbering error):
+**Validate the schema before extracting anything.** Enumerate **every** checkbox line of the "Acceptance criteria" section — not only the lines that already look canonical. Each criterion must carry **exactly one** canonical `AC-N` identifier (`AC-` followed by digits whose integer value is **≥ 1** — numbering starts at `AC-1`, so `AC-0` is not canonical; the identifier sits on the checkbox line, and the `[SEC]` tag, when present, sits after it). Canonical identifiers must be **unique**. Numeric gaps are fine (identifiers are stable — a missing number means a removed AC, not a numbering error).
+
+**Block the review** if any criterion checkbox lacks a canonical `AC-N` (fully legacy spec with bare checkboxes, legacy labels such as `CA-N`, or a **mixed** section where canonical and legacy criteria coexist), or if a canonical `AC-N` is duplicated. A naive parse of such a section would review only the canonical lines and silently skip the rest — a review that cannot prove full coverage must refuse to run:
+
+```
+❌ Acceptance-criteria schema not canonical — review blocked.
+
+Feature: <FEATURE-ID>-<description>
+Offending line(s):
+  - "- [ ] the user can log in"   (no AC-N identifier)
+  - "- [ ] CA-3: ..."             (legacy label, not canonical AC-N)
+  - "- [ ] AC-1: ..."             (AC-1 duplicated)
+
+A review over a legacy or mixed schema cannot safely prove coverage:
+criteria without canonical identifiers would be silently skipped.
+
+Safe manual migration — NEVER invent, remove, merge or split ACs, and never
+rewrite approved business meaning:
+  1. preserve `status: approved` — this migration touches identifier metadata ONLY;
+  2. preserve each criterion's wording, meaning and order;
+  3. add a stable AC-N identifier to every criterion;
+  4. update only unambiguous legacy references in SDD metadata (tasks' "ACs covered", notes.md);
+  5. ask the user where a mapping is ambiguous;
+  6. commit the metadata migration, then re-run /sdd-review.
+     (/sdd-spec-check has no role here: it accepts only draft/in-review specs.)
+```
+
+A feature already `implemented` is eligible for neither `/sdd-spec-check` nor `/sdd-review`: a legacy AC schema in an implemented historical artifact requires **no migration merely because the framework was upgraded** — migrating it becomes relevant only if the team deliberately reopens the feature in a workflow that parses canonical ACs.
+
+Once the schema is valid, list each AC under the identifier it carries in the spec:
 
 ```
 AC-1: When [situation], the system [action] and [expected result]

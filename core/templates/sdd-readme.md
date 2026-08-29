@@ -1,30 +1,15 @@
 # Project SDD features
 
-> Index of features handled with the Spec-Driven Development framework.
+> Guide to the `.claude/sdd/` directory — home of the project's Spec-Driven Development artifacts.
 
-## Features in progress
+## How this directory works
 
-| Feature | Branch | Spec status | Created on |
-|---|---|---|---|
-| | | | |
+- Each feature lives in its own folder: `.claude/sdd/<FEATURE-ID>-<description>/` (`spec.md`, `plan.md`, `tasks.md`, `notes.md`, and `exports/` for retrospective deliverables).
+- **Live feature state is never stored in this file.** Statuses, task ratios and the active feature are derived from the feature folders and their frontmatter — run `/sdd-status` for the current dashboard.
+- Merged features are moved into [`_archive/`](./_archive/) by `/sdd-archive`; the folder itself is the archive record.
+- Templates used by the commands live in `_template/`.
 
-## Retrospective specs
-
-| Feature | Documented code | Created on |
-|---|---|---|
-| | | |
-
-## Archived features
-
-Merged features are moved into `_archive/`. Click to see the history:
-
-- [_archive/](./_archive/)
-
----
-
-## How to work with SDD
-
-To start a new feature:
+## How to start a feature
 
 ```
 /sdd-start <FEATURE-ID>-<description>

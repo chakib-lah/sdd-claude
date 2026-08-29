@@ -54,18 +54,7 @@ merged into the integration branch yet. Continue anyway? (y/n)
 mv .claude/sdd/<FEATURE-ID>-<description>/ .claude/sdd/_archive/<FEATURE-ID>-<description>/
 ```
 
-### 5. Update the index `.claude/sdd/README.md`
-
-- Remove the feature from the "Features in progress" section
-- Add it to the "Archived features" section:
-
-```markdown
-| Feature | Archived on | Final status |
-|---|---|---|
-| <FEATURE-ID>-<description> | <date> | implemented |
-```
-
-### 6. Commit
+### 5. Commit
 
 ```
 <TICKET-ID>: archive SDD artefacts post-merge
@@ -73,7 +62,7 @@ mv .claude/sdd/<FEATURE-ID>-<description>/ .claude/sdd/_archive/<FEATURE-ID>-<de
 
 Subject line only — never a `Co-Authored-By` or any tool-generated trailer (see `02-git-conventions.md` § Absolute prohibitions).
 
-### 7. Announce in the chat
+### 6. Announce in the chat
 
 ```
 ✅ Feature archived: .claude/sdd/_archive/<FEATURE-ID>-<description>/
@@ -84,9 +73,8 @@ Artifacts preserved:
   - tasks.md (N/N tasks done)
   - notes.md
 
-Index updated: .claude/sdd/README.md
-
-The feature is now archived and will no longer appear in /sdd-status.
+The feature is now archived: /sdd-status derives its state from the folder's
+new location under _archive/ — there is no index to update.
 ```
 
 ## Stop rules

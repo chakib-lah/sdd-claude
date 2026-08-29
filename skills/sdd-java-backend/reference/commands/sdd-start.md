@@ -71,17 +71,7 @@ Pre-fill the frontmatter of each artifact with:
 - `created: <today's date>`
 - `author: <git config user.name>`
 
-### 4. Update the index
-
-Update `.claude/sdd/README.md` by adding the feature to the "Features in progress" section:
-
-```markdown
-| Feature | Branch | Spec status | Created on |
-|---|---|---|---|
-| <FEATURE-ID>-<description> | <type>/<FEATURE-ID>-<description> | draft | <date> |
-```
-
-### 5. Announce in the chat
+### 4. Announce in the chat
 
 ```
 ✅ Feature initialized: <FEATURE-ID>-<description>

@@ -118,7 +118,7 @@ This is intentional. Moving to `approved` is the act by which a human takes resp
 
 ```
 .claude/sdd/
-├── README.md                                  ← feature index
+├── README.md                                  ← static SDD guide (live state: /sdd-status)
 ├── _template/                                 ← skeletons
 │   ├── spec.md
 │   ├── plan.md

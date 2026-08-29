@@ -19,7 +19,35 @@ Identify the feature from the Git branch.
 
 ### 2. Check task completeness
 
-Read `.claude/sdd/<feature>/tasks.md` and verify that **all** tasks are `done` (`- [x]`).
+Read `.claude/sdd/<feature>/tasks.md`.
+
+**Task-identifier contract — validated before anything else in this step.** Enumerate every task line (`- [ ]`, `- [~]`, `- [x]`) and extract its identifier:
+
+- **Format** — every identifier must satisfy BOTH: its shape matches `^T[0-9]{3,}$` (a `T` followed by digits only, zero-padded to at least 3 — `T001`, `T027`, `T999`, `T1000`), AND its numeric suffix read as an integer is **≥ 1** (numbering starts at `T001`). `T1`, `T27`, `T027a`, `T027d1` fail the shape; `T000` fails the numeric boundary. Either failure is malformed and **blocks the gate**.
+- **Uniqueness** — the same identifier on two task lines **blocks the gate**.
+- **Numeric continuity** — a gap in the sequence (`T001, T002, T004` — `T003` absent) is **reported, never blocking**: a planned task may have been legitimately removed after approval while the stable identifiers were kept. (`task-decomposer` generates continuous numbering at creation time; this gate only requires canonical, unique identifiers on an established artifact.)
+
+**If an identifier is malformed or duplicated**:
+
+```
+❌ Task-identifier contract violated:
+   - T027a: malformed identifier (canonical shape: T followed by digits only, min. 3 — e.g. T028)
+   - T014: duplicated identifier (appears twice)
+
+A tasks.md with malformed or duplicated identifiers cannot be verified safely:
+SHA tracking, Blocked by links and AC mappings become ambiguous.
+
+Safe manual migration — NEVER auto-renumber an approved tasks.md:
+  1. preserve each task's wording, status and Commit SHA;
+  2. assign canonical unique identifiers;
+  3. update every unambiguous identifier reference (Blocked by, notes.md, "ACs covered" mappings, other SDD metadata);
+  4. ask the user for any ambiguous mapping;
+  5. commit this SDD-artifact-only migration separately, then re-run /sdd-verify.
+```
+
+**If the only anomaly is a numeric gap**, report it and continue: `ℹ️ numeric gap(s) in task identifiers: T003 (tolerated — stable identifiers survive a removed task)`.
+
+Then verify that **all** tasks are `done` (`- [x]`).
 
 For each `done` task, verify that the `**Commit SHA**` field is filled in.
 
@@ -37,6 +65,18 @@ Action: finish the tasks via /sdd-implement (which performs the phase squash) be
 ```
 
 Once `/sdd-verify` has recorded its verdict, **never re-squash a phase it has already verified**: the review gate compares HEAD against the verified commit, and rewriting verified history would invalidate it. New phases created after the gate (e.g. `Phase N+1: Review fixes` from `/sdd-review`) are squashed normally by `/sdd-implement` — then `/sdd-verify` must be re-run.
+
+**Hotfix Test→Fix contract.** For a hotfix feature (same detection as above: `type: hotfix` frontmatter or `hotfix/` branch), filled per-task SHAs are not enough: the defining safety property of a hotfix is that the **red-test commit stays visible before the fix commit** (`/sdd-hotfix` forbids the phase squash precisely for that). Validate the real Git history:
+
+1. **Identify the canonical pair structurally** — never by line position: the task carrying the `[Test]` category, and the task carrying the `[Fix]` category whose `**Blocked by**` names that Test task. If there is not exactly one such pair (no `[Test]` task, no `[Fix]` task, several candidates, or a missing `Blocked by` link), **block**: `❌ hotfix Test→Fix pair structurally ambiguous — <what was found instead>`.
+2. **Test SHA present** — otherwise `❌ Test commit SHA missing (<task>)`.
+3. **Fix SHA present** — otherwise `❌ Fix commit SHA missing (<task>)`.
+4. **Both resolve to commits** — `git cat-file -t <sha>` must answer `commit` for each; otherwise `❌ <task> SHA does not resolve to a commit: <sha>`.
+5. **Distinct** — identical values mean the red test was never committed separately: `❌ Test and Fix carry the same commit SHA (<sha>) — the red-test commit must exist before the fix commit`.
+6. **Ordered** — `git merge-base --is-ancestor <TEST_SHA> <FIX_SHA>` must succeed; otherwise `❌ Test commit is not an ancestor of the Fix commit`. Test and Fix need **not** be adjacent — other legitimate commits may sit between them.
+7. **Reachable** — `git merge-base --is-ancestor <sha> HEAD` must succeed for both; otherwise `❌ <task> commit not reachable from the feature HEAD`.
+
+If this contract fails on an **active/unmerged** hotfix: manually restore a separate red-test commit before the fix commit, if history can still be corrected safely. On an **already merged/historical** hotfix: do **not** fabricate or rewrite production history merely to satisfy this gate — record the legacy deviation in `notes.md` and keep the artifact as history.
 
 ### 3. Check that the Git tree is clean
 
@@ -92,7 +132,7 @@ Read `.claude/rules/03-security.md` (if present) for the full baseline. At minim
 
 - **Dependency audit**: run the stack's audit tool (`composer audit`, `npm audit --audit-level=high`, or equivalent). No unacknowledged high/critical finding — acknowledged findings must be listed in `notes.md` with a remediation date.
 - **Secret scan**: scan the diff for credential patterns (`git diff <integration-branch>..HEAD` + `gitleaks`/`trufflehog` if available, otherwise grep for obvious patterns: `password=`, `api_key`, `BEGIN PRIVATE KEY`, tokens).
-- **Security AC**: every task tagged `[SEC]` is `done`, and every security acceptance criterion in `spec.md` is covered by a test.
+- **Security AC**: every task tagged `[SEC]` is `done`, and every security acceptance criterion in `spec.md` is covered by a test. This enumeration relies on the canonical AC schema (canonical = `AC-` followed by digits whose integer value is **≥ 1** — `AC-0` is not canonical): if a criterion checkbox in the "Acceptance criteria" section lacks a canonical `AC-N` identifier, or an `AC-N` is duplicated, the `[SEC]` criteria cannot be enumerated safely — **block**; preserve the spec's status and apply the same identifier-metadata-only manual migration `/sdd-review` describes, then re-run `/sdd-verify`.
 - **Debug leftovers**: no debug mode, verbose error display, or disabled security control (CSRF, TLS verification, auth middleware) left in the diff.
 
 ```
@@ -157,6 +197,8 @@ SDD artifacts:
   - spec.md:              ✅ approved
   - plan.md:              ✅ approved
   - tasks.md:             ✅ N/N tasks done
+  - Task identifiers:     ✅ canonical & unique (gaps: none / reported)
+  - Hotfix Test→Fix:      ✅ distinct, ordered, reachable (hotfix only — otherwise n/a)
 
 ═══════════════════════════════════════════════════════════
   GLOBAL STATUS: ✅ READY (or ❌ BLOCKED)

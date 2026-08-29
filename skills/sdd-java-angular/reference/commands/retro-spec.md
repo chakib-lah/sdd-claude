@@ -180,9 +180,7 @@ Debt lives inside this section so a retrospective spec keeps the template's univ
 
 ### 7. Save
 
-Write `.claude/sdd/<FEATURE-ID>-<description>/spec.md`, and fill in `notes.md` (session journal: what was read, the step 5 questions and their answers or "I don't know"s).
-
-Update `.claude/sdd/README.md` by adding the feature to a "Retrospective specs" section.
+Write `.claude/sdd/<FEATURE-ID>-<description>/spec.md`, and fill in `notes.md` (session journal: what was read, the step 5 questions and their answers or "I don't know"s). No index to maintain: `/sdd-status` derives the retrospective features from the `retrospective: true` frontmatter of the folders themselves.
 
 ### 8. Offer the AMOA deliverables (optional)
 
@@ -259,7 +257,7 @@ modified. /sdd-plan and /sdd-implement do not apply to this feature.
 - **Read-only**: no modification of the source code
 - **No Git branch creation**: the retrospective spec is documentation
 - **Never fill plan.md or tasks.md**: they exist only as "not applicable" stubs — we are not re-developing, we are documenting
-- **Only write inside the feature folder** — two sanctioned exceptions: adding the feature to `.claude/sdd/README.md` (step 7), and saving a user-provided document format as the project's `_template/spec-doc-<lang>.md` override (step 8, after explicit confirmation)
+- **Only write inside the feature folder** — one sanctioned exception: saving a user-provided document format as the project's `_template/spec-doc-<lang>.md` override (step 8, after explicit confirmation). `.claude/sdd/README.md` is a static guide and receives no feature row (step 7).
 - **Self-contained spec**: no reference to `plan.md`, `tasks.md`, `notes.md` nor any SDD command from `spec.md`
 - **Jira/Confluence read-only**: never create, update, comment or transition a ticket from this command — the story is delivered as a file to copy-paste (same prohibition as `/sdd-mr` for MRs)
 - **Honesty about uncertainty**: if part of the code is obscure, mark it "inferred, to be validated" rather than inventing an intent; an oral answer stays 🗣️ "to be confirmed" — never promote a declaration to a confirmed fact without a verifiable trace
