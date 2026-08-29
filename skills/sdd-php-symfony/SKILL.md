@@ -1,7 +1,7 @@
 ---
 name: sdd-php-symfony
 description: Generates a Spec-Driven Development framework for a PHP/Symfony backend project (without frontend framework). Use this skill when the user requests a SDD framework, .claude/ scaffold, or process tooling for a project using PHP + Symfony, Doctrine ORM, and possibly Twig templates - but NOT a separate frontend framework like Angular/React/Vue. Triggers include "generate the SDD framework", "install SDD", "setup SDD", "scaffold SDD", "génère le framework SDD", "installe SDD" when applied to a project where composer.json contains symfony/framework-bundle. Detects brownfield/greenfield mode. Provides fine-grained auxiliary commands (symfony-entity, symfony-service, symfony-controller, symfony-test). Adds migration-guard for brownfield projects.
-license: Proprietary
+license: MIT
 ---
 
 # SDD Framework — PHP / Symfony Backend
@@ -101,6 +101,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/02-git-conventions.md
 .claude/rules/03-security.md
+.claude/rules/04-code-quality.md
 .claude/rules/10-code-conventions.md
 .claude/rules/11-tests-strategy.md
 .claude/rules/12-quality-gates.md

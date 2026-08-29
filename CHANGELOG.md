@@ -1,5 +1,24 @@
 # Changelog — SDD Claude
 
+## [1.8.0] — 2026-08-29
+
+The three-layer model gains its code-quality slot, upgrades gain layer triage, and the repository becomes publicly distributable.
+
+### Added
+
+- **`03-code-quality.md` (Layer 1)** — generic, stack-agnostic development best practices (debug leftovers, dead code, swallowed exceptions, non-regression tests, duplicated business logic, backward compatibility, quality bypasses, test honesty, data migrations), loaded while code is written, checked by the reviewer, reported by `/sdd-review`.
+- **`/sdd-upgrade` layer triage** — before the upgrade plan, every divergence of an owned file is classified with the layer decision test and given a destination; "already covered elsewhere" requires pasted proof on the project's actual file — no proof, no discard.
+- **MIT license and public documentation** — the framework is distributed under the MIT License; the documentation states the public-framework/private-project-data boundary: project-specific rules, internal names, ticket references and private hostnames belong in the consuming project's private configuration, never in this framework.
+
+### Changed
+
+- **The reviewer reads the rules instead of containing them** — embedded anti-pattern catalogs moved to their correct layers; no skill ships another stack's examples.
+- **`Co-Authored-By` and generated trailers are forbidden by name** — the prohibition is stated at every commit-composition point, and the consistency audit rejects any shipped instruction to add such a trailer.
+- **The layer boundary is an operational test** — Layer 1: true for every project; Layer 2: true for the whole stack; Layer 3: everything else — documented in the extension guide with the audit deriving its vocabulary from it.
+- **Audit coherence** — declared counts are computed, version citations are exact whole tokens, universal commands are version-agnostic by pattern, and the extension guide carries the register of accepted deterministic audit boundaries.
+
+---
+
 ## [1.7.0] — 2026-08-17
 
 Consolidating release closing the 1.6 stabilization line.

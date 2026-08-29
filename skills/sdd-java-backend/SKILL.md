@@ -1,7 +1,7 @@
 ---
 name: sdd-java-backend
 description: Generates a Spec-Driven Development framework for a Java/Spring Boot backend project (without frontend framework). Use this skill when the user requests a SDD framework, .claude/ scaffold, or process tooling for a project using Java + Spring Boot, Spring Data JPA/Hibernate, and Flyway or Liquibase migrations - but NOT a separate frontend framework like Angular/React/Vue. Triggers include "generate the SDD framework", "install SDD", "setup SDD", "scaffold SDD", "génère le framework SDD", "installe SDD" when applied to a project where build.gradle or pom.xml contains org.springframework.boot or spring-boot-starter dependencies. Detects brownfield/greenfield mode. Provides fine-grained auxiliary commands (java-entity, java-service, java-controller, java-test). Adds migration-guard for brownfield projects.
-license: Proprietary
+license: MIT
 ---
 
 # SDD Framework — Java / Spring Boot Backend
@@ -104,6 +104,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/02-git-conventions.md
 .claude/rules/03-security.md
+.claude/rules/04-code-quality.md
 .claude/rules/10-code-conventions.md
 .claude/rules/11-tests-strategy.md
 .claude/rules/12-quality-gates.md

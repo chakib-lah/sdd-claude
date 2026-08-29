@@ -4,7 +4,7 @@
 > For any team that wants to turn a ticket into shipped code in a disciplined, reproducible way, whatever the stack.
 > **Golden rule: no production code is written before a spec has been approved (`status: approved`).**
 
-> **Language** — The framework is English-first, but all skills and agents also respond to French trigger phrases, and Claude adapts its interactive output to the user's language.
+> **Language** — Skills and agents recognize both English and French trigger phrases, and Claude adapts its interactive output to the user's language.
 
 ---
 
@@ -204,6 +204,21 @@ The toolkit is not limited to the 6 shipped skills: you can add a skill for a ne
 
 ---
 
+## Public framework, private project data
+
+This framework is public and generic. Anything specific to your own projects belongs in the consuming project's private `.claude/` configuration (Layer 3) — never in a contribution to this repository:
+
+- project-specific rules and conventions;
+- internal project or application names;
+- ticket references;
+- private hostnames and URLs;
+- credentials and secrets;
+- any other client-specific information.
+
+Framework examples stay neutral (`Order`, `User`, `Payment`, `PROJ-xxx`): replace them with your own identifiers inside your project, not here.
+
+---
+
 ## See also
 
 | File | Contents |
@@ -213,4 +228,4 @@ The toolkit is not limited to the 6 shipped skills: you can add a skill for a ne
 | `skills/README.md` | Skills decision tree |
 | `core/extension-guide.md` | Creating a new stack skill |
 
-Version 1.7.0 — August 2026.
+Version 1.8.0 — August 2026.

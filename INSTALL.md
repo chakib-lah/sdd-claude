@@ -2,7 +2,7 @@
 
 > One package. One command. Everything included.
 
-> ⚠️ **Warning** — sdd-claude uses the same skill and agent names as sdd-toolkit. Installing it therefore replaces any previously installed sdd-toolkit skills/agents: the two should not be installed simultaneously.
+> ⚠️ **Warning** — installing these skills and agents replaces any previously installed skill or agent with the same name in `~/.claude/skills/` and `~/.claude/agents/`.
 
 ---
 
@@ -44,7 +44,7 @@ sdd-claude/
 ├── install.ps1            ← Windows installer
 ├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
 ├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
-├── VERSION                ← 1.7.0
+├── VERSION                ← 1.8.0
 └── CHANGELOG.md
 ```
 
@@ -158,7 +158,7 @@ Everyone on the team who clones the repo gets commands + agents + rules in one g
 
 ---
 
-## Updating
+## Updating sdd-claude
 
 ```bash
 # If you used symlinks (recommended method)
@@ -173,25 +173,6 @@ git pull
 `upgrade-global.sh` applies two distinct policies. **Skills**: links are repaired/added silently (a link is not user data); a **real directory** found at a skill path is backed up to `<name>.bak-<timestamp>`, never deleted. **Global agents**: **stale but unmodified** copies are updated; a customized or translated copy is never silently overwritten — it is reported and you are asked (`--force` / `--keep-custom` to skip the prompt). Your own agents in `~/.claude/agents/` are never touched.
 
 Projects are updated separately: run `/sdd-upgrade` inside each project.
-
----
-
-## Difference with previous packages (former sdd-toolkit V1/V2)
-
-| | V1 | V2 | sdd-claude |
-|---|---|---|---|
-| ZIPs to install | 1 | 2 (toolkit + agents) | **1** |
-| Agents included in the skill | ❌ | ❌ | **✅** |
-| Universal commands | 9 | 14 | **17** |
-| Available skills | 3 | 4 | **6** |
-| Global agents | ❌ | Separate | **Included** |
-
-```bash
-git pull
-./upgrade-global.sh
-# The skill symlinks follow the pull automatically; the script also
-# refreshes the global agents (Windows: .\upgrade-global.ps1).
-```
 
 ---
 

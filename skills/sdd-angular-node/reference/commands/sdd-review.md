@@ -81,6 +81,10 @@ If the spec contains non-regression ACs (typical for bugfixes), explicitly verif
 
 If `.claude/rules/01-constitution.md` exists with `status: ratified`, verify that the diff violates none of its principles. A violation of a ratified principle is a **blocking finding** (cite the `PN` and the offending files). Without a ratified constitution, skip with the mention "no constitution".
 
+### 8b. Check the code-quality baseline
+
+Check the diff against `.claude/rules/04-code-quality.md` — the same baseline the auto-delegated `code-reviewer` agent applies. Report each violation with its file and line in the report below. A violation of one of the rule's **non-negotiables** is blocking; any other violation is non-blocking but listed.
+
 ### 9. Produce the AC-by-AC report
 
 ```
@@ -111,6 +115,9 @@ AC-3: ...
 ═══════════════════════════════════════════════════════════
   Constitution: ✅ respected (or ❌ violates P2 / — no constitution)
 ═══════════════════════════════════════════════════════════
+  Code quality (04-code-quality): ✅ baseline respected
+  (or ❌ N violation(s) — file:line each)
+═══════════════════════════════════════════════════════════
   Non-regressions:
   - AC-3 (first save): ✅ covered by testFirstSave
 ═══════════════════════════════════════════════════════════
@@ -127,8 +134,9 @@ AC-3: ...
 ✅ Functional gate passed.
 
 spec.md keeps `status: approved` — /sdd-mr requires it.
-Push and run /sdd-mr; the switch to `status: implemented`
-happens after the merge (that step belongs to /sdd-mr).
+Push and run /sdd-mr; after the merge, YOU set
+`status: implemented` yourself (/sdd-mr reminds you of it,
+and /sdd-archive refuses to run until it is done).
 ```
 
 **If one or more ACs are not covered**:

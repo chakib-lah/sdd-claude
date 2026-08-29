@@ -348,10 +348,14 @@ this.http.get(`${this.baseUrl}/${id}`);
 - ❌ EntityManager in Controllers
 - ❌ `any` or untyped DTOs
 - ❌ Generic public setters on entities
+- ❌ Leftover debug output (`var_dump`, `dump()`, `dd()`)
+- ❌ PHPStan suppression (`@suppress`, `@phpstan-ignore`) without a written justification
 
 ### Frontend
-- ❌ `any` — use `unknown` if truly unknown
-- ❌ Subscribing to an Observable without unsubscribing (memory leak)
+- ❌ `any` — use `unknown` if truly unknown (HttpClient responses included)
+- ❌ `console.log` left in the code
+- ❌ Subscribing to an Observable without `takeUntilDestroyed()` or the `async` pipe (memory leak)
+- ❌ Direct state mutation (without `.update()` or spread)
 - ❌ Business logic in HTML templates
 - ❌ Components > 300 lines (split them up)
 - ❌ Services that do HTTP + state + transformation (split into several services)

@@ -331,3 +331,5 @@ Standard mapping via an EventListener:
 - ❌ Mocking the EntityManager in a unit test (use an integration test with a test DB)
 - ❌ Mutable DTOs (always `readonly`)
 - ❌ Doctrine YAML/XML annotations for a new entity (use PHP 8 attributes)
+- ❌ Leftover debug output (`var_dump`, `dump()`, `dd()`)
+- ❌ PHPStan suppression (`@suppress`, `@phpstan-ignore`) without a written justification

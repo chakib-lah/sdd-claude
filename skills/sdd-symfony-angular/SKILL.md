@@ -1,7 +1,7 @@
 ---
 name: sdd-symfony-angular
 description: Generates a Spec-Driven Development framework for a full-stack project combining PHP/Symfony backend AND Angular frontend. Use this skill when the user requests a SDD framework, .claude/ scaffold, or process tooling for a project where the backend uses Symfony (composer.json has symfony/framework-bundle) AND the frontend uses Angular (package.json has @angular/core). Triggers include "generate the SDD framework", "install SDD", "setup SDD", "scaffold SDD", "génère le framework SDD", "installe SDD" when applied to a Symfony+Angular full-stack project. Detects brownfield/greenfield. Provides fine-grained auxiliary commands for both backend (symfony-entity, symfony-service, symfony-controller, symfony-test) and frontend (angular-component, angular-service, angular-test) plus api-contract for OpenAPI sync. Adds migration-guard for brownfield.
-license: Proprietary
+license: MIT
 ---
 
 # SDD Framework — Symfony + Angular Full-Stack
@@ -114,6 +114,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/02-git-conventions.md
 .claude/rules/03-security.md
+.claude/rules/04-code-quality.md
 .claude/rules/10-code-conventions.md
 .claude/rules/11-tests-strategy.md
 .claude/rules/12-quality-gates.md

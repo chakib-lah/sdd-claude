@@ -206,6 +206,8 @@ public function findAll(): array
 - ❌ SQL concatenation in business code (always via PDO bindings or a helper)
 - ❌ `die()` or `exit()` outside an entry point
 - ❌ Global functions outside `index.php` or bootstrap (prefer static utility classes at worst)
+- ❌ Leftover debug output (`var_dump`, `dump()`, `dd()`)
+- ❌ PHPStan suppression (`@suppress`, `@phpstan-ignore`) without a written justification
 
 ## Legacy code
 

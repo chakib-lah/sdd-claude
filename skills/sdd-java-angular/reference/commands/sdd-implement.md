@@ -77,6 +77,7 @@ Before writing any code, load:
 - `.claude/rules/00-sdd-framework.md` (methodology)
 - `.claude/rules/01-constitution.md` if present and ratified (durable project principles — binding on every task)
 - `.claude/rules/03-security.md` (secure-coding baseline — applies to every task)
+- `.claude/rules/04-code-quality.md` (generic code-quality baseline — applies to every task)
 - `.claude/rules/10-code-conventions.md` if present (stack code conventions)
 - `.claude/rules/02-git-conventions.md` (universal Git conventions)
 - `.claude/rules/11-tests-strategy.md` if present (test strategy)
@@ -126,8 +127,7 @@ Run the quality tools defined in `.claude/rules/12-quality-gates.md`. If one fai
 
 Before committing, display the diff and validate it mentally:
 - Are we staying within the scope of the task?
-- No TODO left hanging?
-- No forgotten console.log / dump / var_dump?
+- No TODO left hanging, no leftover debug output, no commented-out code? (see `.claude/rules/04-code-quality.md`)
 - No accidental modification of files outside the scope?
 
 ### 10. Commit (local)
@@ -135,6 +135,7 @@ Before committing, display the diff and validate it mentally:
 This commit is a **local, per-task commit**: it will be squashed into the phase commit at step 11b when the phase completes. Stage any pending SDD-artifact bookkeeping (from the previous task's step 11) together with the task's changes. Strictly follow `.claude/rules/02-git-conventions.md` for:
 - The message format (subject line only, short)
 - Leading the subject with the ticket — and never repeating the branch's type in the message
+- **No `Co-Authored-By` and no tool-generated trailer** — absolute prohibition, no exception; strip any trailer a harness injects before committing
 
 **Never use `--no-verify`**: if a pre-commit hook blocks, diagnose and fix.
 
@@ -169,7 +170,7 @@ If, after step 11, **all the tasks of the current task's implementation phase ar
    git commit   # single phase commit
    ```
 
-4. Message: `<TICKET-ID>: <phase summary in imperative lowercase>` — subject line only; the squashed tasks stay traceable in `tasks.md`.
+4. Message: `<TICKET-ID>: <phase summary in imperative lowercase>` — subject line only, **never a `Co-Authored-By` or any tool-generated trailer**; the squashed tasks stay traceable in `tasks.md`.
 5. Capture the phase SHA → fill in `**Phase commit SHA**`, and **replace every per-task `Commit SHA` of the phase** with the phase SHA suffixed `*(squashed)*` (the local SHAs become unreachable after the squash).
 
 Note: as for per-task commits, the `tasks.md` bookkeeping edit recording the phase SHA rides in the next commit — or, for the feature's final phase, in a tiny trailing `<TICKET-ID>: update SDD artifacts` commit so the tree is clean for `/sdd-verify`.

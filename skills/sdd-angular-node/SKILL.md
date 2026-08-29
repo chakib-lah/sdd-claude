@@ -1,7 +1,7 @@
 ---
 name: sdd-angular-node
 description: Generates a Spec-Driven Development framework for a full-stack project combining Angular frontend AND Node.js/Express (or Fastify, NestJS) backend. Use this skill when the user requests a SDD framework, .claude/ scaffold, or process tooling for a project where the frontend uses Angular (package.json has @angular/core) AND the backend uses Node.js (package.json has express, fastify, or @nestjs/core) WITHOUT a PHP/Symfony backend. Triggers include "generate the SDD framework", "install SDD", "setup SDD", "scaffold SDD", "create SDD framework", as well as "génère le framework SDD", "installe SDD" when applied to an Angular+Node.js full-stack project. Detects brownfield/greenfield. Provides fine-grained auxiliary commands for both frontend (angular-component, angular-service, angular-test) and backend (node-endpoint, node-service, node-test) plus contract-check for API sync and api-design for OpenAPI generation.
-license: Proprietary
+license: MIT
 ---
 
 # SDD Framework — Angular + Node.js Full-Stack
@@ -132,6 +132,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/02-git-conventions.md
 .claude/rules/03-security.md
+.claude/rules/04-code-quality.md
 .claude/rules/10-code-conventions.md
 .claude/rules/11-tests-strategy.md
 .claude/rules/12-quality-gates.md

@@ -71,6 +71,8 @@ mv .claude/sdd/<FEATURE-ID>-<description>/ .claude/sdd/_archive/<FEATURE-ID>-<de
 <TICKET-ID>: archive SDD artefacts post-merge
 ```
 
+Subject line only — never a `Co-Authored-By` or any tool-generated trailer (see `02-git-conventions.md` § Absolute prohibitions).
+
 ### 7. Announce in the chat
 
 ```

@@ -72,3 +72,20 @@ In summary:
 - HTTP only in `*ApiService` services
 - `takeUntilDestroyed()` systematically on subscriptions
 - Never `any` on `HttpClient` responses
+
+---
+
+## Anti-patterns to ban
+
+### Frontend (Angular)
+- ❌ `console.log` left in the code
+- ❌ `any` — use `unknown` if truly unknown (HttpClient responses included)
+- ❌ Subscribe without `takeUntilDestroyed()` or the `async` pipe (memory leak)
+- ❌ Direct state mutation (without `.update()` or spread)
+- ❌ Direct `document.querySelector` (go through an Angular service or `Renderer2`)
+
+### Backend (Node.js)
+- ❌ `console.log` left in the code (use the project logger)
+- ❌ Endpoint without Zod validation on its inputs
+- ❌ `try/catch` without a call to `next(err)` (errors must reach the error middleware)
+- ❌ Environment variables used without prior validation

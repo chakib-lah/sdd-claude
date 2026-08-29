@@ -1,7 +1,7 @@
 ---
 name: sdd-php-backend
 description: Generates a Spec-Driven Development framework for a PHP backend project WITHOUT a framework (Symfony, Laravel, etc.). Use this skill when the user requests a SDD framework, .claude/ scaffold, or process tooling for a project that is pure PHP, legacy PHP, procedural PHP, OOP PHP without framework, PHP scripts, home-grown APIs, or PHP migration projects. Triggers include "generate the SDD framework", "install SDD", "setup SDD", "scaffold SDD", "create SDD framework", "génère le framework SDD", "installe SDD" when applied to a PHP-only project (no Symfony, no Laravel detected). Detects brownfield/greenfield mode and adapts. Adds refactoring-guard and legacy-rules for brownfield migrations.
-license: Proprietary
+license: MIT
 ---
 
 # SDD Framework — Pure PHP Backend
@@ -97,6 +97,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/02-git-conventions.md
 .claude/rules/03-security.md
+.claude/rules/04-code-quality.md
 .claude/rules/10-code-conventions.md
 .claude/rules/11-tests-strategy.md
 .claude/rules/12-quality-gates.md

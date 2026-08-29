@@ -137,6 +137,15 @@ If a task turns out to be more complex than expected and requires several commit
 
 ❌ **Never commit secrets** (API keys, passwords, tokens). If it happened: `git reset`, add to `.gitignore`, and revoke the secret.
 
+❌ **Never add a `Co-Authored-By` trailer — nor any tool-generated trailer** (`Generated with…`, `Signed-off-by` added by a tool, or any other footer an assistant or harness appends by reflex). The message is the subject line only; this prohibition is absolute, with no exception, and it must be honored **at the moment the message is composed** — an agent whose harness injects such a trailer must strip it before committing.
+
+The canonical list below is the **machine-enforced subset** of that prohibition: `scripts/audit.sh` extracts these entries verbatim (literal markers, one per line) and fails on any shipped file that mentions one without negating it. The wider prohibition above ("or any other footer…") remains a **semantic rule enforced by human review** — a newly observed trailer family is only caught automatically once it is added to this list.
+
+- Forbidden trailer: "Co-Authored-By"
+- Forbidden trailer: "Generated with Claude"
+- Forbidden trailer: "Generated with [Claude Code]("
+- Forbidden trailer: "Signed-off-by"
+
 ## Typical ticket → merge workflow
 
 ```

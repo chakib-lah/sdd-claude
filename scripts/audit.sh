@@ -4,7 +4,7 @@
 #
 # Checks that the framework is installable, consistent, complete and duplication-free:
 #   1. Structure       — skills tree + global-agents + installers
-#   2. Completeness    — 17 core commands + 5 SDD agents per skill, 9 global agents
+#   2. Completeness    — every listed core command + SDD agent per skill, every global agent (counts computed from the name lists below)
 #   3. Ghost refs      — every referenced rule/command actually exists
 #   4. Delegations     — test-generator / plan-architect consistent
 #   5. Docs            — command count, skills documented, version/CHANGELOG/tag
@@ -102,7 +102,8 @@ done
 [ $err -eq $before ] && ok "tree of the 6 skills + global-agents + installers conforms"
 
 # =====================================================================
-say "== 2. Completeness (17 core commands + 5 SDD agents / skill, 9 global agents) =="
+NCMD=$(echo $CORE_CMDS | wc -w); NSAG=$(echo $SDD_AGENTS | wc -w); NGAG=$(echo $GLOBAL_AGENTS | wc -w)
+say "== 2. Completeness ($NCMD core commands + $NSAG SDD agents / skill, $NGAG global agents) =="
 before=$err
 for c in $CORE_CMDS; do [ -f "core/commands/$c.md" ] || fail "core: missing command: $c"; done
 for a in $SDD_AGENTS; do [ -f "core/agents/$a.md" ]   || fail "core: missing SDD agent: $a"; done
@@ -111,7 +112,7 @@ for s in $SKILLS; do
   for a in $SDD_AGENTS; do [ -f "skills/$s/reference/agents/$a.md" ]   || fail "$s: missing SDD agent: $a"; done
 done
 for a in $GLOBAL_AGENTS; do [ -f "global-agents/$a.md" ] || fail "missing global agent: $a"; done
-[ $err -eq $before ] && ok "17 core commands + 5 SDD agents present everywhere, 9 global agents present"
+[ $err -eq $before ] && ok "$NCMD core commands + $NSAG SDD agents present everywhere, $NGAG global agents present"
 
 # =====================================================================
 say "== 3. Ghost references (cited rules / commands actually exist) =="
@@ -163,29 +164,110 @@ done
 # =====================================================================
 say "== 5. Docs (command count, skills documented, install paths) =="
 before=$err
-# wrong count: the canonical number is 17
+# Command-count coherence: every DECLARED command count must equal the COMPUTED one — the source
+# of truth is ls core/commands/*.md | wc -l, never a blacklist of known-wrong
+# values (the old (9|12|14|15) net proved "no known-bad value", not "17", and
+# let "16 universal commands" pass green). Declaration grammar, from the real
+# corpus (measured 2026-08-20): a number followed by up to two qualifiers from
+# {universal, SDD, core, existing} then "command(s)"/"commande(s)" — covers
+# "17 commands", "17 SDD commands", "17 universal commands",
+# "17 universal SDD commands", "17 core commands", "17 existing universal
+# commands". Enumerated FALSE POSITIVE, deliberately excluded: "Layer N
+# commands" (sdd-upgrade.md — a layer label, not a count); "Layer <n>" is
+# stripped from the line before extraction. Wiring enumeration (the invariant):
+# every .md under core/ and skills/ plus README.md and INSTALL.md — the same
+# set the pattern is greped over; nothing matched is left unchecked.
 # ((^|[^0-9]) instead of \b: word boundaries are a GNU extension, inert under BSD grep)
-c=$(grep -rlE '(^|[^0-9])(9|12|14|15) (command|commande)' README.md INSTALL.md skills/README.md skills/*/SKILL.md 2>/dev/null | wc -l)
-[ "$c" -eq 0 ] || fail "docs: wrong command count (9/12/14/15) in $c file(s)"
-# wrong count inside command/agent/rule BODIES too (not just top-level docs)
+CMD_COUNT=$(ls core/commands/*.md 2>/dev/null | wc -l)
+[ "$CMD_COUNT" -gt 0 ] || fail "command-count net: computed count is 0 — core/commands/*.md missing"
+CMD_DECL='[0-9]+( (universal|SDD|core|existing)){0,2} (command|commande)s?'
+decl_seen=0
 while IFS= read -r hit; do
-  fail "wrong command count in body: $hit"
-done < <(grep -rnE '(^|[^0-9])(9|12|14|15) (universal )?(command|commande)' core skills --include='*.md' 2>/dev/null)
-# stale version narrative: commands must stay version-agnostic
+  cfile=${hit%%:*}; rest=${hit#*:}; clineno=${rest%%:*}; cline=${rest#*:}
+  cleaned=$(printf '%s' "$cline" | sed -E 's/Layer [0-9]+//g')
+  while IFS= read -r m; do
+    [ -n "$m" ] || continue
+    decl_seen=$((decl_seen+1))
+    n=$(printf '%s' "$m" | grep -oE '^[0-9]+')
+    [ "$n" -eq "$CMD_COUNT" ] \
+      || fail "declared command count $n != computed $CMD_COUNT (ls core/commands/*.md): $cfile:$clineno"
+  done < <(printf '%s' "$cleaned" | grep -oE "(^|[^0-9])$CMD_DECL" | grep -oE "$CMD_DECL")
+done < <(grep -rnE "(^|[^0-9])$CMD_DECL" core skills README.md INSTALL.md --include='*.md' 2>/dev/null)
+[ "$decl_seen" -gt 0 ] || fail "command-count net: no count declaration found anywhere — the net matched nothing (grammar broken?)"
+# Universal commands are version-agnostic. MACHINE-ENFORCED boundary
+# — no EXPLICIT VERSION TOKEN (vX.Y or X.Y.Z) in a universal command body
+# — "added in v1.7.0", "since 1.2.3", "new in v1.8" are all caught by the
+# pattern, not by a list of historical phrasings. Release narrative WITHOUT a
+# version token ("added in the previous release") remains a semantic rule
+# enforced by human review — see the Known-Limits Register in
+# core/extension-guide.md. EXCEPT: the enumerated migration/version-handling sections of
+# sdd-upgrade.md, which legitimately name versions —
+#   "### 0. Locate the toolkit reference"  (the freshness check)
+#   "### 0b. Apply pending file renames"   (the rename map + .sdd-version marker)
+# The exclusion applies to those two sections of that one file only — never the
+# whole file, never another command. Wiring enumeration (the invariant): every
+# universal command master (core/commands/*.md) AND its 6 skill copies (same
+# basenames under skills/*/reference/commands/); Layer 2 scaffolding commands
+# (symfony-*, angular-*, node-*, php-*, java-*) are NOT wired — they may
+# legitimately cite stack versions, and they exist only in skills.
 while IFS= read -r hit; do
-  fail "stale version narrative: $hit"
-done < <(grep -rnE 'new command v[0-9]' core skills --include='*.md' 2>/dev/null)
-# every skill must be documented in the decision tree
+  fail "version narrative in a universal command: $hit"
+done < <(for c in core/commands/*.md; do
+  b=$(basename "$c")
+  for f in "$c" skills/*/reference/commands/"$b"; do
+    [ -f "$f" ] || continue
+    up=0; [ "$b" = "sdd-upgrade.md" ] && up=1
+    awk -v FILE="$f" -v UP="$up" '
+      /^### /{sec=$0}
+      /v[0-9]+\.[0-9]+|[0-9]+\.[0-9]+\.[0-9]+/{
+        if (UP == 1 && (sec ~ /^### 0\. Locate the toolkit reference/ || sec ~ /^### 0b\. Apply pending file renames/)) next
+        print FILE ":" FNR
+      }' "$f"
+  done
+done)
+# Decision-tree coverage: every skill must be documented IN THE DECISION TREE — the check reads
+# the actual '## Decision tree' block of skills/README.md, not the whole file
+# (the old whole-file grep passed when a skill only appeared in the skills
+# table). An empty or missing block is fatal. Wiring enumeration (the
+# invariant): all skills of $SKILLS, against that one block.
+sp_dt=$(awk '/^## Decision tree/{f=1;next} /^## /{f=0} f' skills/README.md 2>/dev/null)
+[ -n "$sp_dt" ] || fail "skills/README.md: '## Decision tree' block missing or empty"
 for s in $SKILLS; do
-  grep -q "$s" skills/README.md 2>/dev/null || fail "skills/README.md does not mention $s"
+  printf '%s\n' "$sp_dt" | grep -q "$s" || fail "skills/README.md: $s absent from the '## Decision tree' block"
 done
-# version coherence: docs must cite the current VERSION
+# Version coherence — the canonical current-version CARRIERS must cite
+# VERSION exactly. The GUIDE owns the carrier list: derived from the
+# '- Current-version carrier: "X"' lines of core/extension-guide.md (section d),
+# never hard-coded here. Entries are literal repo-relative file paths — checked
+# with -f and grep -F, never interpreted as regex fragments. An EMPTY derived
+# list OR a declared carrier missing on disk (e.g. a "READM.md" typo silently
+# shrinking coverage) must FAIL LOUDLY. Deliberately NOT wired: every other
+# version-looking number (Layer 2 stack versions, CHANGELOG history, the
+# sdd-upgrade rename map) — those are outside the deterministic guarantee, as
+# the guide's boundary sentence states; whether a NON-carrier may claim a
+# current version at all is a different, semantic rule.
 v=$(cat VERSION 2>/dev/null)
-for f in README.md INSTALL.md; do
-  grep -qF "$v" "$f" 2>/dev/null || fail "docs: $f does not cite current version $v (stale)"
-done
+CARRIERS=$(grep '^- Current-version carrier:' core/extension-guide.md | grep -oE '"[^"]+"' | tr -d '"')
+[ -n "$CARRIERS" ] || fail "version-coherence net: derived carrier list is EMPTY (check extension-guide's 'Current-version carrier:' lines)"
+# Exact-token citation: the citation must be the version as a WHOLE TOKEN, not a substring
+# ("11.8.20" contains "1.8.2" and grep -qF let it pass). Accepted carrier
+# grammar: exactly the content of VERSION (digits and dots), delimited on both
+# sides by start/end of line or any character that is NOT a digit, a dot or a
+# hyphen. Consequences, deliberate: "Version 1.8.3 —" and "← 1.8.3" pass
+# (space/EOL delimiters); "11.8.30" and "1.8.30" fail (digit glue); "1.8.3.1"
+# fails (dot continues a version); "1.8.3-beta" fails (hyphen starts a
+# pre-release suffix — suffixes are NOT part of the accepted grammar: a carrier
+# must cite the released version exactly as VERSION states it).
+vtok=$(printf '%s' "$v" | sed 's/\./\\./g')
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  [ -f "$f" ] || { fail "version-coherence net: declared carrier '$f' does not exist as a regular file"; continue; }
+  grep -qE "(^|[^0-9.-])${vtok}(\$|[^0-9.-])" "$f" 2>/dev/null || fail "docs: $f does not cite current version $v exactly (stale or glued token)"
+done <<EOF_CARRIERS
+$CARRIERS
+EOF_CARRIERS
 # release coherence: VERSION must have a CHANGELOG heading (## [X.Y.Z]).
-# "At least one" match — duplicated headings are tolerated (legitimate in forks).
+# "At least one" match — duplicate historical headings are tolerated (legitimate here).
 ve=$(printf '%s' "$v" | sed 's/\./\\./g')
 grep -qE "^## \[$ve\]" CHANGELOG.md 2>/dev/null \
   || fail "CHANGELOG.md has no '## [$v]' entry for current VERSION"
@@ -220,6 +302,30 @@ while IFS= read -r t; do
   printf '%s\n' "$anat" | grep -qF "**$t**" \
     || fail "00-sdd-framework: plan anatomy missing template section: $t"
 done < <(sed -n 's/^## //p' core/templates/plan.md)
+# SYNC IS TWO-WAY (replicating the phase-field model below, which was
+# already bidirectional): an anatomy entry the template lost — or never had —
+# is method drift too ("Ghost section" stayed green for three versions).
+# Reverse direction: every NUMBERED bold entry of each anatomy must exist as a
+# '## ' section of the matching template. EXPLICIT EXEMPTION, explicitly tested:
+# **Frontmatter** is a numbered entry of all three anatomies but is YAML
+# frontmatter, never a '## ' section of any template — same exemption the
+# write-step net already grants. Wiring enumeration (the invariant): the same
+# 3 anatomy/template pairs as the forward direction above; an anatomy yielding
+# ZERO numbered entries would silently pass — fatal.
+for sp_pair in "spec:Anatomy of a spec" "plan:Anatomy of a plan" "tasks:Anatomy of a tasks.md"; do
+  sp_tpl=${sp_pair%%:*}; sp_anat_h=${sp_pair#*:}
+  sp_entries=$(awk "/^## $sp_anat_h/{f=1;next} /^## /{f=0} f" core/rules/00-sdd-framework.md | sed -n 's/^[0-9]*\. \*\*\([^*:]*\)\*\*.*/\1/p')
+  [ -n "$sp_entries" ] || { fail "00-sdd-framework: '$sp_anat_h' yields no numbered entries (anatomy moved or reformatted?)"; continue; }
+  sp_tsec=$(sed -n 's/^## //p' "core/templates/$sp_tpl.md")
+  while IFS= read -r e; do
+    [ -n "$e" ] || continue
+    [ "$e" = "Frontmatter" ] && continue
+    printf '%s\n' "$sp_tsec" | grep -qxF "$e" \
+      || fail "templates/$sp_tpl.md lost section still declared by the anatomy: $e"
+  done <<EOF_ANAT
+$sp_entries
+EOF_ANAT
+done
 # command → template: every #### sub-block of a "Write <file>" step names either
 # Frontmatter or a real ## section of the template it fills (a command writing
 # a section name the template abandoned was a known defect class).
@@ -260,8 +366,10 @@ done < <(sed -n 's/^## //p' core/templates/plan.md)
 #   - core/commands/ and core/agents/ — carry LEGITIMATE stack mentions and stay out:
 #     test-generator is stack-adapted by design (already excluded from the hash net),
 #     sdd-upgrade must name Layer-2 file patterns, task-decomposer illustrates
-#     per-stack task categories, retro-spec/sdd-changelog use worked examples,
-#     code-reviewer's stack anti-patterns are a known backlog item (move to Layer 2).
+#     per-stack task categories, retro-spec/sdd-changelog use worked examples
+#     (code-reviewer's worked example was stack-neutralised —
+#     and the stack anti-pattern CATALOGS moved to Layer 2 —
+#     but the directory stays out for the agents above).
 #   - core/README.md, core/extension-guide.md, core/examples/ — package docs, not
 #     deployed process files.
 # Case-insensitive (a lowercase "symfony-7-4" is still a name). Multi-word names
@@ -286,29 +394,43 @@ EOF_FORBIDDEN
 # the test frameworks of their skill's own stack. Five of six test-generators
 # shipped the same multi-stack skeleton for six versions — this file is excluded
 # from the hash net (adapted per skill), which is exactly why nothing reported it.
+# The GUIDE owns the vocabulary — derived from the
+# '- Stack test vocabulary (<stack>): "X", "Y"' and '- Skill stacks: <skill> = ...'
+# lines of core/extension-guide.md, never hard-coded here (the six copy-pasted
+# per-skill blacklists were the last instance of the v1.8.0 pattern). For each
+# skill, the forbidden set = the vocabulary of every stack the skill does NOT
+# declare in its membership line; a vocabulary stack with no member skill
+# (python) is forbidden everywhere. The vocabulary is FINITE by design — unknown
+# framework names stay semantic (Known-Limits Register in the guide). Entries
+# are letters/spaces only (no regex metachars), matched boundary-guarded and
+# case-insensitively to avoid substring collisions. Emptiness guards: no stacks,
+# an empty per-stack vocabulary, or a skill without a membership line = fatal.
 # Wiring enumeration (the invariant):
 #   - all 6 skills wired, for BOTH files (11-tests-strategy is the same class and
 #     is currently clean — wired at zero cost to keep it that way)
 #   - core/agents/test-generator.md NOT wired: it is the generic multi-stack base
 #     each skill adapts — naming several stacks is its purpose
-# Boundary-guarded case-insensitive match to avoid substring collisions.
-check_stack_purity(){
-  local skill="$1"; shift
-  local w f
-  for f in "skills/$skill/reference/agents/test-generator.md" "skills/$skill/reference/rules/11-tests-strategy.md"; do
-    [ -f "$f" ] || { fail "$skill: missing $(basename "$f")"; continue; }
-    for w in "$@"; do
-      grep -qiE "(^|[^a-zA-Z])${w}([^a-zA-Z]|\$)" "$f" \
-        && fail "$skill: $(basename "$f") names an out-of-stack framework: $w"
-    done
+SP_STACKS=$(sed -n 's/^- Stack test vocabulary (\([a-z]*\)):.*/\1/p' core/extension-guide.md)
+[ -n "$SP_STACKS" ] || fail "stack-purity net: derived stack list is EMPTY (check extension-guide's 'Stack test vocabulary' lines)"
+for s in $SKILLS; do
+  sp_member=$(sed -n "s/^- Skill stacks: $s = //p" core/extension-guide.md | tr -d ' ')
+  [ -n "$sp_member" ] || { fail "stack-purity net: no 'Skill stacks:' membership line for $s in extension-guide"; continue; }
+  for st in $SP_STACKS; do
+    case ",$sp_member," in *",$st,"*) continue;; esac   # own stack -> allowed
+    sp_vocab=$(grep "^- Stack test vocabulary ($st):" core/extension-guide.md | grep -oE '"[^"]+"' | tr -d '"')
+    [ -n "$sp_vocab" ] || { fail "stack-purity net: vocabulary for stack '$st' is EMPTY"; continue; }
+    while IFS= read -r w; do
+      [ -n "$w" ] || continue
+      for f in "skills/$s/reference/agents/test-generator.md" "skills/$s/reference/rules/11-tests-strategy.md"; do
+        [ -f "$f" ] || { fail "$s: missing $(basename "$f")"; continue; }
+        grep -qiE "(^|[^a-zA-Z])${w}([^a-zA-Z]|\$)" "$f" \
+          && fail "$s: $(basename "$f") names an out-of-stack framework: $w (stack $st)"
+      done
+    done <<EOF_SPV
+$sp_vocab
+EOF_SPV
   done
-}
-check_stack_purity sdd-php-backend     jest vitest playwright cypress jasmine "testing library" supertest junit mockito
-check_stack_purity sdd-php-symfony     jest vitest playwright cypress jasmine "testing library" supertest junit mockito
-check_stack_purity sdd-angular-node    phpunit junit mockito
-check_stack_purity sdd-symfony-angular junit mockito
-check_stack_purity sdd-java-backend    phpunit jest vitest playwright cypress jasmine "testing library" supertest
-check_stack_purity sdd-java-angular    phpunit
+done
 # the toolkit states WHAT must be green — it never ships a CI pipeline (owner's
 # scope decision). Three markers prove a pipeline; anything else is
 # application/methodology configuration and must NOT fire:
@@ -326,6 +448,41 @@ c=$(find core skills -name '*.yml' -o -name '*.yaml' 2>/dev/null | wc -l)
 while IFS= read -r hit; do
   fail "CI pipeline content in a shipped file: $hit"
 done < <(grep -rnE '^stages:|^# \.gitlab-ci\.yml|^  stage: ' core skills --include='*.md' 2>/dev/null)
+# Generated-trailer prohibition: no file the toolkit ships may instruct adding a Co-Authored-By or any
+# generated trailer — owner decision, absolute, no exception. Every mention of
+# such a trailer in a shipped file must be a PROHIBITION: the same line must
+# carry a negation marker (never/forbid/prohibit/strip/no-exception or
+# "no exception"/❌ — the regex below matches exactly this list; an earlier revision fixed a
+# false positive where the comment named no-exception but the regex lacked it;
+# a later fix restricted a separator wildcard that accepted ANY separator — a
+# no_exception spelling let a trailer instruction escape as a false negative);
+# a line that mentions the trailer without negating it reads as an instruction
+# to add it and fails, naming the file. The RULE owns the trailer list: the
+# families searched are derived from the '- Forbidden trailer: "X"' lines of
+# core/rules/02-git-conventions.md (the master — skill copies are hash-identical
+# by net 6), never hard-coded here and never parsed from the prose sentence
+# (note: the prose is open-ended; only the canonical list is machine-enforced,
+# and the rule states that boundary itself). Entries are LITERAL markers:
+# matched with grep -F so a future entry containing '.', '[', '*' or '|'
+# cannot silently change the search semantics. An EMPTY derived list would
+# turn this net into a silent ✓ — fatal. Wiring enumeration (the invariant):
+# every .md under core/, skills/ and global-agents/ — the full set of process
+# files the toolkit ships. scripts/ is deliberately excluded: this net itself
+# must name the strings in order to hunt them. Case-insensitive. The canonical
+# list lines themselves say "Forbidden" and therefore carry their own negation
+# marker — they must not fire the net (explicit false-positive fixture).
+TRAILERS=$(grep '^- Forbidden trailer:' core/rules/02-git-conventions.md | grep -oE '"[^"]+"' | tr -d '"')
+[ -n "$TRAILERS" ] || fail "generated-trailer net: derived canonical trailer list is EMPTY (check 02-git-conventions.md '- Forbidden trailer:' lines)"
+while IFS= read -r t; do
+  [ -n "$t" ] || continue
+  while IFS= read -r hit; do
+    line=${hit#*:}; line=${line#*:}
+    printf '%s' "$line" | grep -qiE 'never|forbid|prohibit|strip|no[- ]exception|❌' \
+      || fail "generated-trailer instruction: $hit"
+  done < <(grep -rniF "$t" core skills global-agents --include='*.md' 2>/dev/null)
+done <<EOF_TRAILERS
+$TRAILERS
+EOF_TRAILERS
 # every shipped command is named in the extension guide (its "17 commands"
 # list once held 15 — a wrong LIST is invisible to the numeric count check;
 # anchored match: a missing /sdd-spec must not be covered by /sdd-spec-check).
@@ -336,7 +493,7 @@ for c in core/commands/*.md; do
   grep -qE "/$n"'([^a-z-]|$)' core/extension-guide.md \
     || fail "extension-guide does not name command /$n"
 done
-[ $err -eq $before ] && ok "command count correct (17) and 6 skills documented"
+[ $err -eq $before ] && ok "declared command counts match computed ($CMD_COUNT), carriers cite VERSION, 6 skills documented"
 
 # =====================================================================
 say "== 6. Content equality of shared files (anti-drift) =="
