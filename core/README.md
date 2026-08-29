@@ -7,16 +7,16 @@
 
 ## Role of `core/`
 
-`core/` contains the **35 "masters"**: the Layer 1 (methodology) files, identical for all stacks. Each skill embeds a **byte-identical copy** of these 35 masters in its `reference/` directory. The consistency of these copies is verified by hash in `scripts/audit.sh` (section 6).
+`core/` contains the **34 "masters"**: the Layer 1 (methodology) files, identical for all stacks. Each skill embeds a **byte-identical copy** of these 34 masters in its `reference/` directory. The consistency of these copies is verified by hash in `scripts/audit.sh` (section 6).
 
-The 35 masters:
+The 34 masters:
 
 | Category | Count | Files |
 |---|---|---|
 | Commands | **17** | the 17 universal SDD commands (see table below) |
 | Agents | **4** | `spec-writer`, `plan-architect`, `task-decomposer`, `code-reviewer` |
 | Templates | **9** | `spec.md`, `plan.md`, `tasks.md`, `notes.md`, `sdd-readme.md`, `jira-story-fr.md`, `jira-story-en.md`, `spec-doc-fr.md`, `spec-doc-en.md` |
-| Rules | **5** | `00-sdd-framework.md`, `01-constitution.md`, `02-git-conventions.md`, `03-security.md`, `04-code-quality.md` |
+| Rules | **4** | `00-sdd-framework.md`, `02-git-conventions.md`, `03-security.md`, `04-code-quality.md` |
 
 > **Exception: `agents/test-generator.md` is NOT a master.** It is **adapted per skill** (each stack cites only its own test commands). It is therefore excluded from the hash equality check. `core/agents/` nevertheless contains a generic source version of `test-generator.md` as a starting point.
 
@@ -50,7 +50,7 @@ Review  →  Functional gate: acceptance criteria coverage
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ LAYER 1 — METHODOLOGY (the 35 masters, source here)        │
+│ LAYER 1 — METHODOLOGY (the 34 masters, source here)        │
 │ Universal, identical across all projects                   │
 └────────────────────────────────────────────────────────────┘
                             ▼ plugged in per stack
@@ -64,7 +64,7 @@ Review  →  Functional gate: acceptance criteria coverage
 └────────────────────────────────────────────────────────────┘
 ```
 
-A **skill** (`skills/sdd-<stack>/`) is the packaging that brings together Layer 1 (the 35 copied masters) **and** Layer 2 (the stack-specific conventions and commands). It is the unit installed on a project. Layer 3 is added manually by the team as the project evolves.
+A **skill** (`skills/sdd-<stack>/`) is the packaging that brings together Layer 1 (the 34 copied masters) **and** Layer 2 (the stack-specific conventions and commands). It is the unit installed on a project. Layer 3 is added manually by the team as the project evolves.
 
 ---
 
@@ -76,7 +76,6 @@ core/
 ├── extension-guide.md         ← Notes on creating a new stack
 ├── rules/                     ← 5 universal rules (masters)
 │   ├── 00-sdd-framework.md    ← The methodology in detail
-│   ├── 01-constitution.md     ← Durable project principles (skeleton)
 │   ├── 02-git-conventions.md  ← Universal Git conventions
 │   ├── 03-security.md         ← Secure-coding baseline + security gate
 │   └── 04-code-quality.md     ← Generic code-quality baseline
@@ -141,7 +140,7 @@ core/
 
 ### Creating a new stack skill
 
-Follow the step-by-step skeleton: **`examples/skill-template.md`**. In short: create `skills/sdd-<stack>/reference/{agents,commands,rules,templates}/`, copy the 35 masters from `core/`, write Layer 2 (conventions + scaffolding commands), adapt `test-generator.md`, write the `SKILL.md`, wire the skill into `install.sh` / `install.ps1` / `skills/README.md`, then validate with `bash scripts/audit.sh`.
+Follow the step-by-step skeleton: **`examples/skill-template.md`**. In short: create `skills/sdd-<stack>/reference/{agents,commands,rules,templates}/`, copy the 34 masters from `core/`, write Layer 2 (conventions + scaffolding commands), adapt `test-generator.md`, write the `SKILL.md`, wire the skill into `install.sh` / `install.ps1` / `skills/README.md`, then validate with `bash scripts/audit.sh`.
 
 ---
 

@@ -117,7 +117,6 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/agents/test-generator.md
 .claude/agents/code-reviewer.md
 .claude/rules/00-sdd-framework.md
-.claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/02-git-conventions.md
 .claude/rules/03-security.md
 .claude/rules/04-code-quality.md
@@ -167,14 +166,16 @@ Copy from `reference/` to project's `.claude/`, in this order:
 
 > **CI/CD**: every project keeps its own pipeline. The rules in `.claude/rules/12-quality-gates.md` state what must be green at the quality stage — wire those checks into your existing CI.
 
-### Phase 4 — Adapt to project specifics
+### Phase 4 — Dispose of the detected project facts (Layer 2 stays untouched)
 
-Fill in within the deployed files:
-- Backend: Java version, Spring Boot version, build tool (Gradle/Maven) — note that Flyway 10+ splits the PostgreSQL support into a separate `flyway-database-postgresql` artifact, while Flyway 9 ships it in the single core artifact
-- Frontend: Angular, TypeScript, Node versions; zoneless or zone.js; test runner (Karma vs Jest); UI lib (Material, PrimeNG, Tailwind...)
-- Integration: springdoc configuration, generated-client path for frontend types
+The Layer-2 files just deployed are **skill-owned**: immediately after installation the project's Layer 2 is **byte-identical to `reference/`**, and it stays that way — never edit a deployed Layer-2 rule with project findings. Instead, dispose of every Phase 1 finding by ownership:
 
-Record the versions **as found**: legacy stacks are documented as-is — never force an upgrade. Modern recommendations (Java 25 LTS or 21, Spring Boot 4.1.x or 3.5.x, Angular 20+ zoneless) apply only when the project is greenfield.
+- **Discoverable on demand — do not persist**: backend versions and build tool (`build.gradle`/`pom.xml`), frontend versions, zoneless vs zone.js, test runner and UI library (`package.json`, `angular.json`, `main.ts`), springdoc configuration (`application.yml`, build files). Commands read these canonical sources when they need them. (Diagnostic aid, already stack knowledge in `jpa-conventions.md`: Flyway 10+ splits PostgreSQL support into `flyway-database-postgresql`; Flyway 9 ships it in core.)
+- **Durable project context → Layer 3**: the backend↔frontend integration wiring (generated-client path for frontend types) and architecture observations — `.claude/rules/project-architecture.md`.
+- **Project policies → Layer 3**: team decisions on test strategy or state management — `.claude/rules/project-testing.md` / `.claude/rules/project-architecture.md`.
+- **Diagnostic only**: the Phase 1 stack report is announced in the chat and not persisted. Report versions **as found** — never force an upgrade; modern recommendations (Java 25 LTS or 21, Spring Boot 4.1.x or 3.5.x, Angular 20+ zoneless) apply only to greenfield scaffolding.
+
+Create a Layer-3 file **only if at least one durable fact or policy needs that subject**; when an existing project rule already owns the subject, reuse it — never create empty or placeholder project files, and never create a second owner for the same subject.
 
 ### Phase 5 — Announce completion
 
@@ -198,7 +199,7 @@ Next steps:
 - **Never modify the source code** of the project. Only `.claude/` is touched.
 - **Always wait for validation** before deploying.
 - **Use `reference/` files as source of truth**.
-- **Adapt content** to project specifics from Phase 1 findings.
+- **Never edit a deployed Layer-2 rule with project facts** — Layer 2 stays byte-identical to `reference/` (that is what lets `/sdd-upgrade` keep it in sync with the skill); project truth goes to Layer 3 (Phase 4).
 - **Migration-guard** is brownfield-only.
 
 ## What this skill does NOT do

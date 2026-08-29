@@ -67,7 +67,7 @@ For each AC:
 - [ ] **No structural open questions**: no question in "Open questions" that would change the architecture or the scope if resolved differently
 - [ ] **Impacted files mentioned**: the Design section points to specific files/services/entities (not "the users service")
 - [ ] **No undefined jargon**: domain-specific terms are explained at least once
-- [ ] **Constitution respected**: if `.claude/rules/01-constitution.md` exists with `status: ratified`, the spec violates none of its principles (cite the `PN` otherwise). If there is no ratified constitution, count this criterion as ✅ and note "no constitution".
+- [ ] **Constitution respected**: if `.claude/rules/project-constitution.md` exists with `status: ratified`, the spec violates none of its principles (cite the `PN` otherwise). If it exists with `status: draft`, note any violation **informatively** and count the criterion as ✅. If there is no project constitution, count this criterion as ✅ and note "no constitution".
 
 #### Security criteria
 

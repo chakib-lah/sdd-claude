@@ -13,7 +13,7 @@ sdd-claude/
 ├── core/                   ← Universal reference (Layer 1)
 │   ├── agents/             ← 5 SDD agents (spec-writer, plan-architect...)
 │   ├── commands/           ← 17 universal SDD commands
-│   ├── rules/              ← Methodology + constitution + Git + security
+│   ├── rules/              ← Methodology + Git + security + code quality
 │   ├── templates/          ← spec/plan/tasks/notes + AMOA exports (jira-story, spec-doc)
 ├── skills/                 ← 6 installable skills (Layer 2)
 │   ├── sdd-php-backend/
@@ -44,7 +44,7 @@ sdd-claude/
 ├── install.ps1            ← Windows installer
 ├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
 ├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
-├── VERSION                ← 1.9.0
+├── VERSION                ← 1.10.0
 └── CHANGELOG.md
 ```
 

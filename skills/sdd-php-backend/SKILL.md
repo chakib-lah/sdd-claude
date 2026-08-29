@@ -94,7 +94,6 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/agents/test-generator.md
 .claude/agents/code-reviewer.md
 .claude/rules/00-sdd-framework.md
-.claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/02-git-conventions.md
 .claude/rules/03-security.md
 .claude/rules/04-code-quality.md
@@ -137,12 +136,16 @@ Copy from `reference/` to project's `.claude/`, in this order:
 
 > **CI/CD**: every project keeps its own pipeline. The rules in `.claude/rules/12-quality-gates.md` state what must be green at the quality stage — wire those checks into your existing CI.
 
-### Phase 4 — Adapt to project specifics
+### Phase 4 — Dispose of the detected project facts (Layer 2 stays untouched)
 
-After copying, adapt these files to the project's specifics gathered during Phase 1:
-- `.claude/rules/10-code-conventions.md`: fill in PHP version, autoloader type, naming conventions detected
-- `.claude/rules/11-tests-strategy.md`: indicate if PHPUnit is set up or to be introduced
-- `.claude/rules/12-quality-gates.md`: soft for legacy projects, strict for modernized ones
+The Layer-2 files just deployed are **skill-owned**: immediately after installation the project's Layer 2 is **byte-identical to `reference/`**, and it stays that way — never edit a deployed Layer-2 rule with project findings. Instead, dispose of every Phase 1 finding by ownership:
+
+- **Discoverable on demand — do not persist**: PHP version and autoloader type (`composer.json`), PHPUnit presence/version (`composer.json`/`composer.lock`), quality tooling configuration (`phpstan.neon`, `.php-cs-fixer.php` where present). Commands read these canonical sources when they need them.
+- **Durable project context → Layer 3**: naming conventions and architecture observations that no manifest records — `.claude/rules/project-architecture.md`.
+- **Project policies → Layer 3**: the team's quality stance (e.g. lenient gates while the legacy is modernized, then strict) — `.claude/rules/project-quality.md`; a decision to introduce PHPUnit where absent — `.claude/rules/project-testing.md`.
+- **Diagnostic only**: the Phase 1 stack report (detected versions, gaps and debt) is announced in the chat and not persisted.
+
+Create a Layer-3 file **only if at least one durable fact or policy needs that subject**; when an existing project rule already owns the subject, reuse it — never create empty or placeholder project files, and never create a second owner for the same subject.
 
 ### Phase 5 — Announce completion
 
@@ -169,7 +172,7 @@ Next steps:
 - **Always wait for validation** before deploying.
 - **Brownfield-only files** (`refactoring-guard.md`, `legacy-rules.md`, `extract-class.md`) are skipped in greenfield mode.
 - **Use the `reference/` files as source of truth**. Do not rewrite them from memory.
-- **Adapt content to project specifics** (versions, conventions detected), do not blindly copy.
+- **Never edit a deployed Layer-2 rule with project facts** — Layer 2 stays byte-identical to `reference/` (that is what lets `/sdd-upgrade` keep it in sync with the skill); project truth goes to Layer 3 (Phase 4).
 
 ## What this skill does NOT do
 

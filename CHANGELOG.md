@@ -1,5 +1,23 @@
 # Changelog — SDD Claude
 
+## [1.10.0] — 2026-08-30
+
+Strict framework / skill / project ownership: every deployed rule has exactly one owner, making upgrades deterministic.
+
+### Changed
+
+- **Ownership model** — Layer 1 is the exact canonical rule set (framework-owned, byte-equal to the reference after upgrade); Layer 2 is every other rule or stack command the selected skill ships, resolved by reference membership, never by filename prefix; everything else is Layer 3, project-owned, never byte-replaced. Ownership is distinct from applicability: conditional skill artifacts (e.g. brownfield-only) are evaluated with the skill's own mode detection, and expected absences are never drift.
+- **Active constitution retired** — the project constitution becomes a Layer-3 file, `project-constitution.md`; no skeleton is deployed to new projects, and `/sdd-upgrade` migrates meaningful legacy carriers verbatim.
+- **Effective Git policy** — the universal Git rule declares its invariants, defaults and project-configurable extension points; a single Layer-3 Git rule may configure them, and every command resolves messages and branches through that policy instead of hard-coding formats.
+- **`/sdd-upgrade` rewritten around ownership** — inventory → ownership resolution → divergence triage with typed actions → project truth preserved and verified before any replacement → Layer 2 updated from the selected skill → three exhaustive honest outcomes (`UPDATED`, `UPDATED PARTIALLY`, `UPDATE INCOMPLETE`).
+- **Fresh installation no longer mutates Layer 2** — detected project facts are read on demand, persisted as durable Layer-3 context, or reported as diagnostics; Layer 2 stays byte-identical to the reference.
+
+### Compatibility
+
+Existing projects keep working; the new ownership takes effect at their next `/sdd-upgrade`.
+
+---
+
 ## [1.9.0] — 2026-08-29
 
 Lifecycle hardening: existing gates become stricter so commands can no longer silently consume artifacts whose schema predates the current contract. Not fully backward-compatible for projects carrying legacy artifacts.

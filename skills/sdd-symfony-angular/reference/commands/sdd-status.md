@@ -70,7 +70,7 @@ The active feature = the one whose branch matches the current Git branch. Mark i
   Spec      : approved ✅
   Plan      : approved ✅
   Tasks     : approved | 3/7 done | impl. phases: 1/3 squashed
-  Branch    : feature/<FEATURE-A>-<description>
+  Branch    : <actual branch detected for FEATURE-A>
   Created   : 2026-05-20
 
   <FEATURE-B>-<description>
@@ -78,7 +78,7 @@ The active feature = the one whose branch matches the current Git branch. Mark i
   Spec      : approved ✅
   Plan      : draft ⏳
   Tasks     : —
-  Branch    : feature/<FEATURE-B>-<description>
+  Branch    : <actual branch detected for FEATURE-B>
   Created   : 2026-05-22
 
   ┌────────────────────────────────────────────────────────────┐

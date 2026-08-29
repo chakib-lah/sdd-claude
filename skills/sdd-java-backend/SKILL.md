@@ -101,7 +101,6 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/agents/test-generator.md
 .claude/agents/code-reviewer.md
 .claude/rules/00-sdd-framework.md
-.claude/rules/01-constitution.md          (skeleton — never overwrite an existing one)
 .claude/rules/02-git-conventions.md
 .claude/rules/03-security.md
 .claude/rules/04-code-quality.md
@@ -145,15 +144,16 @@ Copy from `reference/` to project's `.claude/`, in this order:
 
 > **CI/CD**: every project keeps its own pipeline. The rules in `.claude/rules/12-quality-gates.md` state what must be green at the quality stage — wire those checks into your existing CI.
 
-### Phase 4 — Adapt to project specifics
+### Phase 4 — Dispose of the detected project facts (Layer 2 stays untouched)
 
-After copying, fill in:
-- `.claude/rules/10-code-conventions.md`: Java version, Spring Boot version, build tool (Gradle/Maven), architecture detected
-- `.claude/rules/11-tests-strategy.md`: JUnit version, unit/integration split patterns (`*IT` / `*IntTest`), exact Gradle/Maven test commands
-- `.claude/rules/12-quality-gates.md`: Checkstyle/Sonar/JaCoCo configuration, dependency lockfile policy
-- `.claude/rules/jpa-conventions.md`: Hibernate version, Flyway/Liquibase version — note that Flyway 10+ splits the PostgreSQL support into a separate `flyway-database-postgresql` artifact, while Flyway 9 ships it in the single core artifact
+The Layer-2 files just deployed are **skill-owned**: immediately after installation the project's Layer 2 is **byte-identical to `reference/`**, and it stays that way — never edit a deployed Layer-2 rule with project findings. Instead, dispose of every Phase 1 finding by ownership:
 
-Record the versions **as found**: legacy stacks (e.g. Java 17, Spring Boot 3.3, Gradle 7, Flyway 9) are documented as-is — never force an upgrade. Modern recommendations (Java 25 LTS or 21, Spring Boot 4.1.x or 3.5.x) apply only when the project is greenfield.
+- **Discoverable on demand — do not persist**: Java, Spring Boot, JUnit, Hibernate and Flyway/Liquibase versions, the build tool, and the exact Gradle/Maven test commands (`build.gradle`/`build.gradle.kts`/`pom.xml`, `gradle.lockfile`), Checkstyle/Sonar/JaCoCo configuration (their config files). Commands read these canonical sources when they need them. (Diagnostic aid, already stack knowledge in `jpa-conventions.md`: Flyway 10+ splits PostgreSQL support into `flyway-database-postgresql`; Flyway 9 ships it in core.)
+- **Durable project context → Layer 3**: the detected architecture (hexagonal or standard) and the unit/integration naming split the team uses (`*IT` / `*IntTest`) — `.claude/rules/project-architecture.md` / `.claude/rules/project-testing.md`.
+- **Project policies → Layer 3**: the dependency-lockfile policy and quality-gate targets — `.claude/rules/project-quality.md`.
+- **Diagnostic only**: the Phase 1 stack report is announced in the chat and not persisted. Report versions **as found** — never force an upgrade; modern recommendations (Java 25 LTS or 21, Spring Boot 4.1.x or 3.5.x) apply only to greenfield scaffolding.
+
+Create a Layer-3 file **only if at least one durable fact or policy needs that subject**; when an existing project rule already owns the subject, reuse it — never create empty or placeholder project files, and never create a second owner for the same subject.
 
 ### Phase 5 — Announce completion
 
@@ -174,7 +174,7 @@ Next steps:
 - **Never modify the source code** of the project. Only `.claude/` is touched.
 - **Always wait for validation** before deploying.
 - **Use `reference/` files as source of truth**.
-- **Adapt content** to project specifics from Phase 1 findings.
+- **Never edit a deployed Layer-2 rule with project facts** — Layer 2 stays byte-identical to `reference/` (that is what lets `/sdd-upgrade` keep it in sync with the skill); project truth goes to Layer 3 (Phase 4).
 - **Migration-guard** is brownfield-only.
 
 ## What this skill does NOT do

@@ -8,11 +8,11 @@
 
 The toolkit stacks **3 layers**. The boundary is not a feeling — it is a decision test, applied sentence by sentence:
 
-- **Layer 1 — Universal methodology**: true for every project, whatever the technology. **If a sentence names anything stack-dependent — an application framework, a programming language, a package or build tool (`composer install`, `npm audit`, `./gradlew check`) — it is not Layer 1. Naming an SDD command (`/sdd-verify`) or stack-agnostic workflow tooling (`git`) is expected: those ARE Layer 1 vocabulary — the boundary is stack-dependent vs stack-agnostic, not tool vs no tool.** Content: the 17 SDD commands, the 5 SDD agents, the templates and the 5 process rules (`0x-*.md`). Identical everywhere, never adapted.
-- **Layer 2 — Technology**: true for the whole stack, whatever the project. **If a sentence names a branch, a ticket prefix, a host or a project path, it is not Layer 2.** Content: code rules, test strategy, quality gates and scaffolding commands specific to the stack (`1x-*.md` rules and unnumbered stack extras).
+- **Layer 1 — Universal methodology**: true for every project, whatever the technology. **If a sentence names anything stack-dependent — an application framework, a programming language, a package or build tool (`composer install`, `npm audit`, `./gradlew check`) — it is not Layer 1. Naming an SDD command (`/sdd-verify`) or stack-agnostic workflow tooling (`git`) is expected: those ARE Layer 1 vocabulary — the boundary is stack-dependent vs stack-agnostic, not tool vs no tool.** Content: the 17 SDD commands, the 5 SDD agents, the templates and the 4 process rules (`00-sdd-framework.md`, `02-git-conventions.md`, `03-security.md`, `04-code-quality.md`). Identical everywhere, never adapted.
+- **Layer 2 — Technology**: true for the whole stack, whatever the project. **If a sentence names a branch, a ticket prefix, a host or a project path, it is not Layer 2.** Content: code rules, test strategy, quality gates and scaffolding commands specific to the stack — **every rule file the skill ships in `reference/rules/` that is not one of the four canonical Layer-1 files**; some are numbered (`10-…`), some are not (`api-contracts.md`): the name decides nothing, reference membership does.
 - **Layer 3 — Project**: everything else — business skills, house conventions, project-specific code templates (added by the team).
 
-The file-name prefix encodes the answer (see *What is specific to the skill* below): `0x` = Layer 1, `1x` = Layer 2, extras unnumbered = Layer 2 or 3. A rule that fails its layer's test is in the wrong file, whatever its prefix says.
+In a deployed project, **ownership is resolved mechanically, never by filename prefix**: a rule is Layer 1 if it is one of the four canonical files (`00-sdd-framework.md`, `02-git-conventions.md`, `03-security.md`, `04-code-quality.md`); else Layer 2 if the selected skill's `reference/rules/` ships the same relative path; else Layer 3 (project-owned — `/sdd-upgrade` never byte-replaces it). Layer 1 carries no project-override block: project truth lives in Layer 3. A rule that fails its layer's test is in the wrong file, whatever its name says.
 
 A **stack skill** packages Layer 1 **(copied verbatim)** + Layer 2 **(stack-specific)**. Layer 3 is added per project, after installation.
 
@@ -37,8 +37,7 @@ skills/sdd-<stack>/
     │   └── <stack>-entity.md, <stack>-test.md, …   ← stack-specific (Layer 2)
     ├── rules/
     │   ├── 00-sdd-framework.md       ← MASTER (methodology, copied from core)
-    │   ├── 01-constitution.md        ← MASTER (project-principles skeleton, copied from core)
-    │   ├── 02-git-conventions.md     ← MASTER (Git, copied from core)
+        │   ├── 02-git-conventions.md     ← MASTER (Git, copied from core)
     │   ├── 03-security.md            ← MASTER (security baseline, copied from core)
     │   ├── 04-code-quality.md        ← MASTER (code-quality baseline, copied from core)
     │   ├── 10-code-conventions.md    ← stack-specific (Layer 2)
@@ -58,19 +57,19 @@ skills/sdd-<stack>/
 
 This is the most important rule in this guide. Team portability relies on Layer 1 being **rigorously identical** in all skills. A dev who masters one project must find exactly the same commands, agents and templates on another one, byte for byte.
 
-### (a) The 35 masters from `core/` are copied verbatim
+### (a) The 34 masters from `core/` are copied verbatim
 
-When creating a skill, we **copy** — without ever adapting them — the **35 master files** from `core/` to `skills/sdd-<stack>/reference/`:
+When creating a skill, we **copy** — without ever adapting them — the **34 master files** from `core/` to `skills/sdd-<stack>/reference/`:
 
 | Origin (`core/`) | Count | Destination (`reference/`) |
 |---|---|---|
 | `core/commands/*.md` (the 17 SDD commands) | 17 | `commands/` |
 | `core/agents/*.md` **except `test-generator.md`** | 4 | `agents/` |
 | `core/templates/*.md` | 9 | `templates/` |
-| `core/rules/*.md` (`00-sdd-framework`, `01-constitution`, `02-git-conventions`, `03-security`, `04-code-quality`) | 5 | `rules/` |
-| **Total** | **35** | |
+| `core/rules/*.md` (`00-sdd-framework`, `02-git-conventions`, `03-security`, `04-code-quality`) | 4 | `rules/` |
+| **Total** | **34** | |
 
-These 35 files are not to be touched: no renaming, no rephrasing, no "local improvement". Any evolution happens in `core/` and is then **re-propagated** to all skills (see *Synchronization with the core*).
+These 34 files are not to be touched: no renaming, no rephrasing, no "local improvement". Any evolution happens in `core/` and is then **re-propagated** to all skills (see *Synchronization with the core*).
 
 ### (b) Only `test-generator` is adapted to the stack
 
@@ -80,7 +79,7 @@ These 35 files are not to be touched: no renaming, no rephrasing, no "local impr
 
 Everything else — and **only** the rest — is stack-specific:
 
-- The Layer 2 rules: `10-code-conventions.md`, `11-tests-strategy.md`, `12-quality-gates.md`, plus possible stack extras (`doctrine-conventions.md`, `angular-conventions.md`, `node-conventions.md`, `api-contracts.md`, `migration-guard.md`, `legacy-rules.md`, `shared-types.md`, …). Numbering convention: **the first digit is the layer** — `0x` = Layer 1 methodology (never renumber), `1x` = Layer 2 stack rules; extras stay unnumbered.
+- The Layer 2 rules: `10-code-conventions.md`, `11-tests-strategy.md`, `12-quality-gates.md`, plus possible stack extras (`doctrine-conventions.md`, `angular-conventions.md`, `node-conventions.md`, `api-contracts.md`, `migration-guard.md`, `legacy-rules.md`, `shared-types.md`, …). Numbering is a **naming convention for authoring only** (`0x` historically Layer 1, `1x` stack rules, extras unnumbered — never renumber existing files): in a deployed project, ownership is resolved by the canonical Layer-1 list and by reference membership, never by the prefix.
 - The `<stack>-*` **scaffolding commands** (e.g. `symfony-entity`, `angular-component`, `node-endpoint`).
 - The `test-generator` agent (point b).
 
@@ -148,7 +147,7 @@ The **stack-purity vocabulary** below is the canonical, machine-enforced list of
 
 These commands belong to Layer 1. Modifying them breaks team portability across projects.
 
-**Never alter a master** (see *Consistency with the core*): the 35 masters are copied verbatim. The only allowed adaptation on the agents side is `test-generator`.
+**Never alter a master** (see *Consistency with the core*): the 34 masters are copied verbatim. The only allowed adaptation on the agents side is `test-generator`.
 
 **Never pollute the methodology with tech**:
 - No mention of "PHPUnit", "Jest", "JUnit", "Karma", "Jasmine" in `00-sdd-framework.md`.
@@ -204,7 +203,7 @@ A stack skill's `SKILL.md` must:
 1. Declare the scope (when to use it / when not to use it) and the detection triggers (e.g. `composer.json` contains `symfony/framework-bundle`).
 2. Describe the deployment from `reference/` to `.claude/`.
 3. Detect brownfield / greenfield mode and adapt to it.
-4. Check the presence of the 35 masters (otherwise, refuse and point back to the core).
+4. Check the presence of the 34 masters (otherwise, refuse and point back to the core).
 
 Typical skeleton of the installation flow:
 
@@ -240,7 +239,7 @@ Next step: add the project's business skills in .claude/skills/ (Layer 3).
 
 Before publishing a skill, check:
 
-- [ ] The **35 masters** from `core/` are copied verbatim into `reference/` (verified by `audit.sh §6`)
+- [ ] The **34 masters** from `core/` are copied verbatim into `reference/` (verified by `audit.sh §6`)
 - [ ] The **17 universal SDD commands** are neither renamed nor redefined
 - [ ] Only `test-generator` is adapted to the stack; the 4 other SDD agents remain masters
 - [ ] The granularity of the auxiliary commands is consistent with the team's other skills
@@ -265,7 +264,7 @@ Focused questions:
 
 ### Generation (Phase 3) — Layer 2 only
 
-The 35 masters are already copied from `core/`. Only the stack-specific files are generated:
+The 34 masters are already copied from `core/`. Only the stack-specific files are generated:
 
 ```
 reference/rules/
@@ -312,7 +311,7 @@ reference/agents/
 1. `sdd-python-django` — Python / Django projects
 2. `sdd-go` — Go services
 
-For each: copy the 35 masters, write Layer 2 (rules + scaffolding + `test-generator`), wire the installers and `skills/README.md`, then validate with `audit.sh`.
+For each: copy the 34 masters, write Layer 2 (rules + scaffolding + `test-generator`), wire the installers and `skills/README.md`, then validate with `audit.sh`.
 
 ---
 

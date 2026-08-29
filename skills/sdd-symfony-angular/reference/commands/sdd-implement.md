@@ -75,7 +75,7 @@ Wait for the user's explicit confirmation. **Do not start without validation.**
 Before writing any code, load:
 
 - `.claude/rules/00-sdd-framework.md` (methodology)
-- `.claude/rules/01-constitution.md` if present and ratified (durable project principles — binding on every task)
+- `.claude/rules/project-constitution.md` if present and ratified (durable project principles — binding on every task)
 - `.claude/rules/03-security.md` (secure-coding baseline — applies to every task)
 - `.claude/rules/04-code-quality.md` (generic code-quality baseline — applies to every task)
 - `.claude/rules/10-code-conventions.md` if present (stack code conventions)
@@ -170,10 +170,10 @@ If, after step 11, **all the tasks of the current task's implementation phase ar
    git commit   # single phase commit
    ```
 
-4. Message: `<TICKET-ID>: <phase summary in imperative lowercase>` — subject line only, **never a `Co-Authored-By` or any tool-generated trailer**; the squashed tasks stay traceable in `tasks.md`.
+4. Message: resolved through the **effective Git policy** (`02-git-conventions.md` § Effective Git policy resolution; semantic intent: the phase summary, imperative) — subject line only, **never a `Co-Authored-By` or any tool-generated trailer**; the squashed tasks stay traceable in `tasks.md`.
 5. Capture the phase SHA → fill in `**Phase commit SHA**`, and **replace every per-task `Commit SHA` of the phase** with the phase SHA suffixed `*(squashed)*` (the local SHAs become unreachable after the squash).
 
-Note: as for per-task commits, the `tasks.md` bookkeeping edit recording the phase SHA rides in the next commit — or, for the feature's final phase, in a tiny trailing `<TICKET-ID>: update SDD artifacts` commit so the tree is clean for `/sdd-verify`.
+Note: as for per-task commits, the `tasks.md` bookkeeping edit recording the phase SHA rides in the next commit — or, for the feature's final phase, in a tiny trailing SDD-bookkeeping commit (message per the effective Git policy; intent: update the SDD artifacts) so the tree is clean for `/sdd-verify`.
 
 ### 12. Announce in the chat
 

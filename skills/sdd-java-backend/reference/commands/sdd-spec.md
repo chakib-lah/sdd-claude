@@ -50,7 +50,7 @@ Based on the ticket, identify the area of code most likely involved. Read the re
 
 **Load the available rules**:
 - `.claude/rules/00-sdd-framework.md` (methodology)
-- `.claude/rules/01-constitution.md` if ratified (durable project principles — the spec must not violate them)
+- `.claude/rules/project-constitution.md` if present and ratified (durable project principles — the spec must not violate them)
 - `.claude/rules/10-code-conventions.md` if present (technical conventions)
 - `.claude/rules/11-tests-strategy.md` if present (test strategy)
 - Project-specific business rules as applicable

@@ -38,7 +38,7 @@ If the current branch is not the integration branch (default: `develop`, otherwi
 
 ### 2. Create the feature branch
 
-Read the branch convention in `.claude/rules/02-git-conventions.md` (format `<type>/<TICKET>-<description>`). Ask the user for the `<type>`:
+Resolve the **effective feature-branch pattern** through the effective Git policy (`.claude/rules/02-git-conventions.md` § Effective Git policy resolution — universal default: `<type>/<TICKET-ID>-<description>`; a project Git rule may configure it). Under the default, ask the user for the `<type>`:
 
 - `feature`: new business functionality
 - `fix`: bug fix
@@ -52,7 +52,7 @@ Create the branch from the integration branch:
 ```bash
 git checkout <integration-branch>
 git pull
-git checkout -b <type>/<FEATURE-ID>-<description>
+git checkout -b <feature branch per the resolved pattern>
 ```
 
 ### 3. Create the feature folder
@@ -76,7 +76,7 @@ Pre-fill the frontmatter of each artifact with:
 ```
 ✅ Feature initialized: <FEATURE-ID>-<description>
 
-Git branch: <type>/<FEATURE-ID>-<description>
+Git branch: <resolved feature branch>
 Folder: .claude/sdd/<FEATURE-ID>-<description>/
 
 Next step: /sdd-spec to write the spec.

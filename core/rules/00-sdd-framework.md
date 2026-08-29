@@ -157,13 +157,13 @@ Every SDD command identifies the active feature **from the current Git branch**.
 
 ## The project constitution
 
-Alongside the per-feature artifacts, a project may maintain a **constitution** (`.claude/rules/01-constitution.md`): the durable engineering principles that outlive any single feature, numbered `P1…PN` and **ratified by the team** (`status: ratified` — a human act, like every approval in SDD).
+Alongside the per-feature artifacts, a project may maintain a **project constitution** (`.claude/rules/project-constitution.md` — **Layer 3, project-owned**): the durable **project** principles that outlive any single feature, numbered `P1…PN` and **ratified by the team** (`status: ratified` — a human act, like every approval in SDD). Universal engineering invariants do not belong there — they are already owned by the universal rules (`00-sdd-framework.md`, `02-git-conventions.md`, `03-security.md`, `04-code-quality.md`); stack-wide truths belong to the Layer-2 rules of the selected skill.
 
-When a ratified constitution exists:
-- `/sdd-spec-check` verifies the spec violates no principle (scored criterion)
-- `/sdd-review` treats a violation in the diff as a **blocking finding**
+When a project constitution exists:
+- while `status: draft`, `/sdd-spec-check` and `/sdd-review` check its principles **informatively — never blocking**;
+- once `status: ratified`, `/sdd-spec-check` verifies the spec violates no principle (scored criterion) and `/sdd-review` treats a violation in the diff as a **blocking finding**.
 
-Without a ratified constitution, these checks are skipped. The skeleton is deployed with every skill; filling it in is optional but recommended for any team of more than one.
+Without a project constitution, these checks are skipped ("no constitution"). No skeleton is deployed: the team creates the file the day it wants one, and `/sdd-upgrade` migrates a legacy `01-constitution.md` into it, preserving content and ratification metadata.
 
 ---
 
@@ -271,7 +271,7 @@ This is the golden rule. Never chain tasks automatically. Between each task, a h
 
 During development, each task produces **exactly one local commit** (this preserves traceability and human validation between tasks). If the implementation generates several sub-modifications, they go into the same local commit.
 
-When the **last task of an implementation phase** completes, `/sdd-implement` **squashes the phase's task commits into a single commit** — always before the phase's first push. The history presented to reviewers therefore contains **one commit per phase** (plus at most one final `<TICKET-ID>: update SDD artifacts` bookkeeping commit): a small feature (one phase) is reviewed as a single code commit.
+When the **last task of an implementation phase** completes, `/sdd-implement` **squashes the phase's task commits into a single commit** — always before the phase's first push. The history presented to reviewers therefore contains **one commit per phase** (plus at most one final SDD-bookkeeping commit, formatted by the effective Git policy of `02-git-conventions.md`): a small feature (one phase) is reviewed as a single code commit.
 
 ### The commit SHAs are tracked in `tasks.md`
 

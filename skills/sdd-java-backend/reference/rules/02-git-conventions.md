@@ -9,7 +9,7 @@
 
 Default: `develop`.
 
-If the project uses another name (`main`, `master`, `integration`), it is up to Layer 2 or a project override to redefine it.
+If the project uses another name (`main`, `master`, `integration`), the project's Layer-3 Git rule declares it (see *Project-configurable extension points* below).
 
 ## Branch naming
 
@@ -48,9 +48,11 @@ hotfix/PROD-1234-urgent-fix
 - No accents, no uppercase, no special characters
 - 5 words maximum in the description (otherwise shorten)
 
-A project may override this branch model in its own project-level rules (Layer 3): this file states the default, not a mandate.
+A project may configure this branch model through its Layer-3 Git rule (see *Project-configurable extension points* below): this file states the universal defaults, not a mandate.
 
 ## Commit convention
+
+Everything in this section states the **universal default** — the exact commit-message format is a **project-configurable extension point** (see below): a project's Layer-3 Git rule may adopt a different exact format (e.g. Conventional Commits). The *Absolute prohibitions* remain universal invariants under any configured format.
 
 Format: **the ticket, then the subject**.
 
@@ -93,7 +95,7 @@ PROJ-103: extract business validation into a dedicated service
 ```
 Update file.php                              ❌ no ticket
 fix: fix bug                                 ❌ no ticket
-feat(PROJ-101): add csv export endpoint      ❌ type in the message — it belongs to the branch
+feat(PROJ-101): add csv export endpoint      ❌ not the universal default — under it, the type lives in the branch (a project policy may adopt a typed format via the extension point)
 PROJ-101: Fixed the bug.                     ❌ uppercase + period
 PROJ-101: fixing of the bug                  ❌ "fixing of" instead of "fix" (imperative)
 PROJ-101: add a new service that allows managing csv exports of business data   ❌ subject > 72 chars
@@ -121,11 +123,34 @@ The phase commit message follows the standard format — `<TICKET-ID>: <phase su
 
 If a task turns out to be more complex than expected and requires several commits, it is usually a sign that it should have been re-split. Document in `notes.md` for future adjustment of the task breakdown.
 
+## Project-configurable extension points (Layer 3)
+
+This file is framework-owned and identical in every project — it is never edited in place. Project-specific Git configuration lives in **one** project-owned Layer-3 rule (canonical name: `project-git-workflow.md`; an existing equivalent project Git rule counts). That rule may configure **only** the extension points declared here:
+
+- **integration branch** (universal default: `develop`)
+- **production branch** (universal default: `main`)
+- **feature branch pattern** (universal default: `<type>/<TICKET-ID>-<description-kebab-case>`)
+- **ticket prefix** (no universal default — project-defined)
+- **exact commit-message formatting** (universal default: `<TICKET-ID>: imperative lowercase subject, no trailing period`, subject line only; **no-ticket maintenance default** — framework/tooling work without a ticket, e.g. an SDD upgrade — replaces the ticket id with the `sdd` marker: `sdd: <imperative subject>`)
+- **release branch policy**, **hotfix branch policy**, **backport policy**, **tag policy** (universal defaults: the workflows described in this file)
+
+Everything in *Absolute prohibitions* below — the generated-trailer ban included — is a **universal invariant**, never an extension point.
+
+## Effective Git policy resolution
+
+Every command or agent that composes a branch name or a commit message resolves the **effective Git policy** the same way — it never hard-codes its own exact format:
+
+1. read the universal invariants and defaults from this file;
+2. discover **zero or one** applicable Layer-3 project Git rule (canonical: `project-git-workflow.md`, or the project's existing equivalent);
+3. that rule may configure only the extension points declared above — anything else it states is project documentation, not policy;
+4. if no project Git rule exists, the universal defaults apply as-is;
+5. if **several** project Git sources configure the same extension point, or a configured value contradicts a universal invariant: **fail loudly and ask** — never pick a winner silently.
+
 ## Absolute prohibitions
 
 ❌ **Never `git commit --no-verify`**: if a pre-commit hook blocks, there is a quality problem to fix, not to bypass.
 
-❌ **Never `git push --force` on the integration branch or main**. On your own feature branch: allowed after a rebase, but with caution (prefer `--force-with-lease`).
+❌ **Never `git push --force` on the integration or production branch**. On your own feature branch: allowed after a rebase, but with caution (prefer `--force-with-lease`).
 
 ❌ **Never commit directly on the integration branch**. Everything goes through a feature branch and an MR.
 

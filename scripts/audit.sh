@@ -137,6 +137,13 @@ done < <(grep -rnE '^[[:space:]]*-[[:space:]]*``([^`]|$)' core skills --include=
 #     (global existence: avoids false positives on cross-stack examples,
 #      e.g. sdd-upgrade.md which lists Layer 2 rules for illustration)
 for r in $(grep -rhoE "\.claude/rules/[a-z0-9-]+\.md" core skills 2>/dev/null | sed 's|.*/||' | sort -u); do
+  # Layer-3 canonical files are PROJECT-OWNED and never shipped by the framework:
+  # commands legitimately cite them (project-constitution consumers, effective
+  # Git-policy resolution) while no skill ships them. Enumerated allowlist —
+  # extend only for canonical Layer-3 names documented by the architecture.
+  # 01-constitution.md is the retired LEGACY constitution carrier: it ships in no
+  # reference anymore and is cited only by /sdd-upgrade's step 2c migration.
+  case "$r" in project-constitution.md|project-git-workflow.md|project-architecture.md|project-testing.md|project-quality.md|project-security.md|01-constitution.md) continue;; esac
   { [ -f "core/rules/$r" ] || find skills -path "*/reference/rules/$r" 2>/dev/null | grep -q .; } \
     || fail "referenced rule not found anywhere: $r"
 done

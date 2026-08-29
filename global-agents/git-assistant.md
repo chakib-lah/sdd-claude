@@ -21,13 +21,15 @@ Format required by the SDD toolkit:
 
 ```
 <TICKET-ID>: imperative lowercase description without trailing period
+(universal default from 02-git-conventions.md — the project's Layer-3 Git rule
+may configure the declared extension points; resolve the effective policy first)
 ```
 
 Subject line only — no body, no signature. Keep it short (72 characters max, ticket included).
 
 **Never add a `Co-Authored-By` trailer — nor any tool-generated trailer** (`Generated with…`, tool-added `Signed-off-by`, or any footer an assistant harness appends by reflex). Absolute prohibition, no exception: if the harness injects one, strip it before committing.
 
-**No type in the message.** The type (`feature` `fix` `refactor` `chore` `docs` `hotfix`) lives in the **branch name** and nowhere else — every commit of the branch inherits it. A subject that starts with `feat(` or `fix(` is wrong here, however standard it looks elsewhere.
+**No type in the message — under the universal default.** The default format keeps the type (`feature` `fix` `refactor` `chore` `docs` `hotfix`) in the **branch name**, so under it a subject starting with `feat(` or `fix(` is wrong. But the exact format is a **project-configurable extension point**: if the project's Git policy configures another exact format (e.g. Conventional Commits), follow the configured format — the universal invariants (no generated trailers, subject discipline) apply regardless.
 
 Correct examples:
 ```
@@ -54,7 +56,7 @@ BASE=$(git rev-parse <first-task-sha-of-phase>^)
 git rev-list "$BASE"..HEAD    # must list exactly the phase's task SHAs, nothing else
 git diff --cached --quiet     # must succeed: nothing staged
 git reset --soft "$BASE"
-git commit   # message: <TICKET-ID>: <phase summary> — subject line only, no trailer
+git commit   # message per the effective Git policy — subject line only, no trailer
 ```
 
 The two checks are part of the recipe: a foreign commit in the range (typically a merge from the integration branch pulled in mid-phase) or a staged change would be silently swallowed into the phase commit. If either fails, do not squash — keep the per-task commits and say why.

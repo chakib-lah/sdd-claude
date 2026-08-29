@@ -4,7 +4,7 @@ description: SDD hotfix — lightweight SDD workflow for urgent Production fixes
 
 # /sdd-hotfix
 
-**Lightweight workflow** for urgent Production fixes. Initializes an SDD folder with a minimal spec and a `hotfix/` branch.
+**Lightweight workflow** for urgent Production fixes. Initializes an SDD folder with a minimal spec and a hotfix branch created per the effective Git policy (universal default pattern: `hotfix/<TICKET-ID>-<description>`).
 
 > This command is the **only exception** to the "spec.md approved before any code" rule. It enables a lightweight mode, not an absence of discipline.
 
@@ -26,12 +26,12 @@ Example:
 
 ### 1. Create the hotfix branch
 
-Read `.claude/rules/02-git-conventions.md` for the convention. For a hotfix, the branch starts from the production branch (often `main` or `master`, never `develop`):
+Resolve the **effective production branch** and **hotfix branch policy** through the effective Git policy (`.claude/rules/02-git-conventions.md` § Effective Git policy resolution — universal defaults: production `main`, pattern `hotfix/<TICKET-ID>-<description>`). The hotfix branch starts from the **resolved production branch**, never the integration branch — and never guess between `main` and `master`:
 
 ```bash
-git checkout main    # or master depending on the project
+git checkout <production-branch>   # resolved via the effective Git policy
 git pull
-git checkout -b hotfix/<TICKET-ID>-<description>
+git checkout -b <hotfix branch per the resolved policy>
 ```
 
 ### 2. Create the feature folder
@@ -117,7 +117,7 @@ type: hotfix
 ```
 🚨 Hotfix initialized: <TICKET-ID>-<description>
 
-Branch: hotfix/<TICKET-ID>-<description> (from main)
+Branch: <resolved hotfix branch> (from the resolved production branch)
 Mode: lightweight SDD workflow
 
 Hotfix reminders:
@@ -127,7 +127,7 @@ Hotfix reminders:
   3. Write the test that reproduces the bug FIRST (T001)
   4. Fix it (T002) — the test must turn green
   5. Run /sdd-verify
-  6. MR to main AND backport to develop
+  6. MR to the production branch AND backport to the integration branch
 
 After the hotfix: complete spec.md if needed and set it to status: implemented.
 ```
@@ -137,6 +137,6 @@ After the hotfix: complete spec.md if needed and set it to status: implemented.
 - ❌ **Never bypass** with `git commit --no-verify`
 - ✅ **A test reproducing the bug is mandatory** before the fix (T001 before T002)
 - ❌ **No phase squash on a hotfix**: the red-test commit (T001) must stay visible before the fix commit (T002) — the revert unit is the per-task SHAs
-- ✅ **MR to main** (prod branch) + **backport to develop** (so the fix is not lost)
+- ✅ **MR to the production branch** + **backport to the integration branch** (per the effective Git policy — so the fix is not lost)
 - ✅ **Complete spec.md** after the hotfix if the context was incomplete
 - ❌ **Do not take advantage of the hotfix** to refactor or improve — minimal scope
