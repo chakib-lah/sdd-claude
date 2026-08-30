@@ -44,7 +44,7 @@ sdd-claude/
 ├── install.ps1            ← Windows installer
 ├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
 ├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
-├── VERSION                ← 1.11.0
+├── VERSION                ← 1.12.0
 └── CHANGELOG.md
 ```
 

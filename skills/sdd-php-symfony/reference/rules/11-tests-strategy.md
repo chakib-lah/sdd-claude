@@ -6,12 +6,22 @@
 
 ## Tools
 
-- **Test framework**: PHPUnit 11.x or 12.x
-- **Symfony Test Pack**: `composer require --dev symfony/test-pack`
-- **Doctrine fixtures**: `composer require --dev doctrine/doctrine-fixtures-bundle`
+- **Test framework**: **PHPUnit is required** — the canonical test tool of this skill. The installed major is a project fact: read it from `composer.lock`, never pin it in this rule.
+- **Symfony Test Pack**: `composer require --dev symfony/test-pack` (greenfield setup)
+- **Doctrine fixtures**: `composer require --dev doctrine/doctrine-fixtures-bundle` (greenfield setup)
 - **Coverage**: Xdebug or PCOV
 
-## Test organization
+If the project has no working PHPUnit setup at all, that is a **PROJECT_TOOLING_GAP** (see `12-quality-gates.md`): report it, keep the requirement, and close it in a dedicated tooling change — never as a side effect of an unrelated feature, and never by declaring tests optional.
+
+## Test organization — discover the real layout first
+
+Suite names and test directories are **project facts**. Before generating or moving any test:
+
+1. Read the PHPUnit configuration — whichever variant the project uses (`phpunit.xml.dist`, `phpunit.xml` or `phpunit.dist.xml`) — and list the declared `<testsuite>` names and their directories.
+2. Inspect the existing `tests/` tree and follow its conventions (base classes, namespaces, fixtures).
+3. **Brownfield**: never reorganize or rename the existing test tree during an unrelated feature.
+
+**Greenfield default** (only when no test tree exists yet):
 
 ```
 tests/
@@ -36,7 +46,9 @@ tests/
 
 ## Test categories
 
-### Unit tests (`tests/Unit/`)
+The three categories below are universal test **levels**, not directory names: projects name and group their suites differently (different casing, abbreviated names, merged or additional levels). Map each level to the project's discovered suites; the directories in the examples are the greenfield defaults.
+
+### Unit tests
 
 For: business services, validators, value objects, pure logic.
 
@@ -68,7 +80,7 @@ final class UserServiceTest extends TestCase
 }
 ```
 
-### Integration tests (`tests/Integration/`)
+### Integration tests
 
 For: repositories with a real DB, event subscribers, services that depend on the container.
 
@@ -101,7 +113,7 @@ final class UserRepositoryTest extends KernelTestCase
 }
 ```
 
-### Functional tests (`tests/Functional/`)
+### Functional tests
 
 For: controllers, HTTP endpoints, backend-side end-to-end integration.
 
@@ -135,7 +147,7 @@ final class UserControllerTest extends WebTestCase
 
 ### Files
 - `<ClassName>Test.php` for each tested class
-- Placed in the mirror sub-directory: `src/Service/User/UserService.php` → `tests/Unit/Service/User/UserServiceTest.php`
+- Placed in the mirror sub-directory of the appropriate **discovered** suite: `src/Service/User/UserService.php` → `<unit-suite-dir>/Service/User/UserServiceTest.php` (greenfield default: `tests/Unit/Service/User/UserServiceTest.php`)
 
 ### Test methods
 - `test<ActionExpectedResult>`: `testReturnsNullWhenUserNotFound`
@@ -144,7 +156,7 @@ final class UserControllerTest extends WebTestCase
 
 ### Configuration
 
-Recommended `phpunit.dist.xml`:
+An existing project's PHPUnit configuration — whatever its filename and suite names — is authoritative: read it, don't rewrite it to match this rule. **Greenfield default** configuration:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -223,29 +235,29 @@ final class UserFixtures extends Fixture
 }
 ```
 
-## Execution commands
+## Execution commands — discover the project wrapper
 
-To adapt to the project's Makefile:
+How tests run is a **project fact**. Discover the established execution wrapper before running anything — Makefile targets, Composer scripts, or a Docker/compose wrapper — and use the project's own entry points. Fall back to direct binaries only when the project actually runs them directly.
+
+Direct-host examples (projects without a wrapper):
 
 ```bash
 # All tests
 vendor/bin/phpunit
 
-# By category
-vendor/bin/phpunit --testsuite=Unit
-vendor/bin/phpunit --testsuite=Integration
-vendor/bin/phpunit --testsuite=Functional
+# One suite — names come from the discovered PHPUnit configuration
+vendor/bin/phpunit --testsuite=<suite-name>
 
 # With coverage
 vendor/bin/phpunit --coverage-html=coverage/
 
-# Test DB preparation (to adapt)
+# Test DB preparation — use the project's own target/script when one exists
 php bin/console doctrine:database:create --env=test --if-not-exists
 php bin/console doctrine:schema:create --env=test
 php bin/console doctrine:fixtures:load --env=test --no-interaction
 ```
 
-Recommended Makefile targets (to be added to `.claude/rules/12-quality-gates.md` too):
+**Greenfield** recommended Makefile targets (a project that already has its own targets keeps them — never edit a Layer-2 rule to record project targets):
 
 ```makefile
 test:

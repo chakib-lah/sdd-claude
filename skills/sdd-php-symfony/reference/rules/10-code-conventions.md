@@ -4,12 +4,12 @@
 
 ---
 
-## Target versions (to adapt per project)
+## Versions — discovered, never edited into this rule
 
-- **PHP**: 8.4 target — 8.1 minimum (the conventions below require attributes, enums and readonly, all 8.1)
-- **Symfony**: 6.4 LTS or 7.x
-- **Doctrine ORM**: 3.x
-- **PHPUnit**: 11.x or 12.x (12 = current major as of early 2026 — verify before pinning)
+The actual PHP, Symfony, Doctrine and PHPUnit versions are **project facts**: read them from `composer.json`/`composer.lock` when you need them, and generate code against what is actually installed. Never copy a version number into this Layer-2 rule — it stays byte-identical across projects.
+
+- **Skill floor**: the conventions below require PHP **8.1+** language features (attributes, enums, `readonly`). If the discovered PHP version is older, report the gap — do not silently weaken the conventions.
+- **Greenfield default**: start new projects on the current PHP 8.x, a maintained Symfony version (LTS or current), and up-to-date Doctrine and PHPUnit majors.
 
 ## Mandatory rules on all new code
 
@@ -58,9 +58,15 @@ final class UserService
 
 ❌ No setter injection, no service locator, no retrieval via `$container->get()` outside the bootstrap.
 
-## Target architecture
+## Architecture — discover before generating
 
-### Adapted standard Symfony structure
+The project's architecture is a **discovered fact**, not something this rule imposes:
+
+1. **Brownfield**: inspect `src/` and follow the existing, valid structure. Never introduce a new tree (DDD or otherwise) during an unrelated feature.
+2. **Layer 3**: if `.claude/rules/project-architecture.md` records a durable architecture decision, it specializes the layout — it never negates the universal practices in this rule.
+3. **Greenfield only**: when no structure exists yet, use one of the two reference structures below as the starting default.
+
+### Standard Symfony structure (greenfield default)
 
 ```
 src/
@@ -77,7 +83,7 @@ src/
 └── Twig/                       ← Twig extensions (if Twig is used)
 ```
 
-### DDD structure (alternative for large projects)
+### DDD structure (greenfield alternative for large projects)
 
 ```
 src/
@@ -102,7 +108,7 @@ src/
     └── Http/
 ```
 
-To adapt to whatever is already in place in the project.
+On an existing project, the discovered structure wins: these trees are generation defaults for greenfield, never migration targets for brownfield.
 
 ## Naming conventions
 

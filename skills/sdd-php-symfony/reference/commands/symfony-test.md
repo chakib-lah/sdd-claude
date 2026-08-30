@@ -18,22 +18,24 @@ description: Scaffold PHPUnit tests (unit, integration, functional) from a SDD s
 
 Ask for:
 - Path to the class under test (e.g. `src/Service/User/UserService.php`)
-- Test type: `Unit`, `Integration` or `Functional`
+- Test level: unit, integration or functional — then map it to the project's **discovered** suite (see step 2)
 
-Automatic suggestion based on the class:
-- Business service → `Unit` (mocks for repositories)
-- Repository → `Integration` (real test database)
-- Controller → `Functional` (WebTestCase, HTTP requests)
-- Validator / Value Object → `Unit`
-- EventSubscriber → `Integration` (KernelTestCase)
+Automatic level suggestion based on the class:
+- Business service → unit (mocks for repositories)
+- Repository → integration (real test database)
+- Controller → functional (WebTestCase, HTTP requests)
+- Validator / Value Object → unit
+- EventSubscriber → integration (KernelTestCase)
 
 ### 2. Load the conventions
 
 Read `.claude/rules/11-tests-strategy.md` to comply with:
-- Directory structure (`tests/Unit/`, `tests/Integration/`, `tests/Functional/`)
+- The test-level model (unit / integration / functional) and its universal practices
 - File naming (`<ClassName>Test.php`)
 - AAA pattern (Arrange / Act / Assert)
 - Method naming conventions
+
+Then **discover the project's actual test layout**: read the PHPUnit configuration (`phpunit.xml.dist`, `phpunit.xml` or `phpunit.dist.xml`) for suite names and directories, and inspect existing tests for base classes and namespaces. Generate into the **existing** suites — the `tests/Unit|Integration|Functional` paths and `App\Tests\...` namespaces in the skeletons below are the greenfield defaults. If a level has no matching suite, use the closest existing level; if the test infrastructure is missing entirely, report **PROJECT_TOOLING_GAP** (see `12-quality-gates.md`) instead of inventing a layout.
 
 ### 3. Load the SDD context
 
@@ -288,7 +290,7 @@ Before writing:
 
 ### 9. Write the file
 
-Path according to the type:
+Path according to the level, inside the **discovered** suite directory (greenfield defaults shown):
 - `tests/Unit/Service/<Domain>/<Name>ServiceTest.php`
 - `tests/Integration/Repository/<Entity>RepositoryTest.php`
 - `tests/Functional/Controller/<Action>ControllerTest.php`
@@ -296,13 +298,14 @@ Path according to the type:
 ### 10. Verify that the tests are detected
 
 ```bash
-vendor/bin/phpunit tests/<Type>/<path>/<File>Test.php --list-tests
+# Via the project's test wrapper if one exists; direct-host example:
+vendor/bin/phpunit <suite-dir>/<path>/<File>Test.php --list-tests
 ```
 
 ### 11. Announce
 
 ```
-✅ Tests scaffolded: tests/<Type>/<path>/<File>Test.php
+✅ Tests scaffolded: <suite-dir>/<path>/<File>Test.php
 
 Tests generated: N
   - N ACs covered
@@ -311,7 +314,7 @@ Tests generated: N
 
 Next step:
 - Implement the tests via /sdd-implement
-- Run regularly: make test or vendor/bin/phpunit
+- Run regularly, via the project's test wrapper (or vendor/bin/phpunit directly)
 ```
 
 ## Stop rules

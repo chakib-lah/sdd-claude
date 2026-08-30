@@ -38,9 +38,12 @@ Read `.claude/rules/10-code-conventions.md` to comply with:
 - Constructor injection only
 - Strict typing everywhere
 
+Then **discover where business services live in this project**: inspect the existing structure (and `.claude/rules/project-architecture.md` if present) — services may sit in `src/Service/<Domain>/`, a flat directory, a domain/application layer, or another established convention. Follow it. The `src/Service/<Domain>/` paths and namespaces below are the greenfield default.
+
 ### 4. Check for duplicates
 
 ```bash
+# In the discovered service directory (greenfield default shown)
 test -f src/Service/<Domain>/<Name>Service.php && echo "EXISTS" || echo "OK"
 ```
 
@@ -154,6 +157,8 @@ Before writing, display in the chat:
 Ask for confirmation.
 
 ### 11. Write the files
+
+Paths follow the discovered convention (greenfield defaults shown):
 
 - `src/Service/<Domain>/<Name>ServiceInterface.php` (if interface)
 - `src/Service/<Domain>/<Name>Service.php`

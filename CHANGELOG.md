@@ -1,5 +1,18 @@
 # Changelog — SDD Claude
 
+## [1.12.0] — 2026-08-30
+
+PHP/Symfony Layer-2 stabilization, validated on real brownfield migration projects.
+
+### Changed
+
+- **Project parameters are discovered, never edited into Layer 2** — tool versions, layouts, suite names, execution commands, architecture shape and quality levels are project facts read from the repository or durable Layer-3 specializations; the reference files stay byte-identical across projects.
+- **Required capabilities stay required** — PHPUnit, PHPStan, Rector and PHP-CS-Fixer keep a three-state contract: present → discover and enforce; below target → report the gap, tighten only in a dedicated quality change; absent → `PROJECT_TOOLING_GAP`, never a silent install.
+- **Greenfield keeps strong defaults** — recommended structures apply only when no project structure or decision exists.
+- **Layer 3 specializes, never negates** — project rules may specialize paths, levels and context; they cannot cancel a universal requirement.
+
+---
+
 ## [1.11.0] — 2026-08-30
 
 Canonical Layer-1 path normalization with a safe structural migration.

@@ -4,11 +4,17 @@
 
 ---
 
-## Target version
+## Versions — discovered, never edited into this rule
 
-- **Doctrine ORM**: 3.x (Doctrine ORM 2.x acceptable for projects in migration)
-- **Doctrine DBAL**: 4.x
-- **doctrine-bundle**: 2.x
+The installed Doctrine ORM, DBAL and doctrine-bundle versions are **project facts**: read them from `composer.json`/`composer.lock` when you need them, and generate code against what is actually installed. **Greenfield default**: current ORM 3.x / DBAL 4.x majors. Projects still on ORM 2.x are supported as-is — the ORM upgrade is a dedicated evolution, never a feature side effect.
+
+## Discover before generating
+
+- **Mapping style**: inspect existing entities first. New entities use PHP 8 attributes (below); on a brownfield project their shape (base classes, traits, naming) follows the established conventions.
+- **ID strategy**: follow the project's established identifier strategy (auto-increment, sequence, UUID…) unless the spec decides otherwise.
+- **Migrations path and namespace**: read the migrations configuration (`config/packages/doctrine_migrations.yaml`) — never assume a directory; projects commonly use `migrations/` or `src/Migrations/`.
+- **Execution wrapper**: run `doctrine:*` console commands through the project's established wrapper (Make/Docker/Composer) when one exists.
+- **Layer 3**: a project-owned rule may specialize durable Doctrine decisions (naming, mapping policy, migration constraints) — it never weakens the safety rules below.
 
 ## Entities
 
@@ -261,8 +267,10 @@ public function __construct(string $name)
 ### Doctrine Migrations Bundle
 
 ```bash
-composer require doctrine/doctrine-migrations-bundle
+composer require doctrine/doctrine-migrations-bundle   # greenfield setup
 ```
+
+Migrations are generated into the **configured** directory/namespace (see « Discover before generating »).
 
 ### Rules
 

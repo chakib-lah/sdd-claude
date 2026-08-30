@@ -37,6 +37,8 @@ Read `.claude/rules/doctrine-conventions.md` to comply with:
 - No generic public setters
 - Collection initialization
 
+Then **discover the project's actual conventions** (see the rule's « Discover before generating »): entity directory/namespace from existing entities, ID strategy, migrations directory from `config/packages/doctrine_migrations.yaml`, and the execution wrapper (Make/Docker/Composer). The paths and commands below show the greenfield defaults — substitute the discovered values.
+
 ### 4. Check for duplicates
 
 ```bash
@@ -125,10 +127,10 @@ final class <EntityName>Repository extends ServiceEntityRepository
 ### 7. Generate the Doctrine migration
 
 ```bash
-# Automatic mode (Symfony generates the diff)
+# Automatic mode (Symfony generates the diff) — via the project wrapper if one exists
 php bin/console make:migration
 
-# Check the generated file (typically Migrations/Version<YmdHis>.php)
+# Check the generated file, in the configured migrations directory
 ```
 
 Verify that the generated migration contains:
@@ -150,14 +152,14 @@ Ask for confirmation.
 
 ### 9. Write the files
 
-- `src/Entity/<EntityName>.php`
-- `src/Repository/<EntityName>Repository.php`
-- `src/Migrations/Version<YmdHis>.php`
+- `src/Entity/<EntityName>.php` (or the discovered entity directory)
+- `src/Repository/<EntityName>Repository.php` (or the discovered repository directory)
+- `<migrations-dir>/Version<YmdHis>.php` (directory configured in `doctrine_migrations.yaml`)
 
 ### 10. Test the migration
 
 ```bash
-# Locally
+# Locally — via the project wrapper if one exists
 php bin/console doctrine:migrations:migrate --env=dev --no-interaction
 
 # Then test reversibility
@@ -170,7 +172,7 @@ php bin/console doctrine:migrations:migrate --env=dev --no-interaction
 ```
 ✅ Entity created: src/Entity/<EntityName>.php
 ✅ Repository created: src/Repository/<EntityName>Repository.php
-✅ Migration created: src/Migrations/Version<YmdHis>.php
+✅ Migration created: <migrations-dir>/Version<YmdHis>.php
 
 Migration tested:
   - up(): ✅

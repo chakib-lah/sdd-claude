@@ -41,9 +41,12 @@ Read `.claude/rules/10-code-conventions.md` to comply with:
 - Typed DTOs (`readonly`)
 - Uniform error format
 
+Then **discover the project's actual layout**: inspect existing controllers and DTOs (and `.claude/rules/project-architecture.md` if present) for directories, namespaces and route conventions, and follow them. The `src/Controller/` and `App\DTO\...` paths below are the greenfield defaults.
+
 ### 4. Check for duplicates
 
 ```bash
+# In the discovered controller directory (greenfield default shown)
 test -f src/Controller/<Action>Controller.php && echo "EXISTS" || echo "OK"
 ```
 
@@ -215,6 +218,8 @@ Ask for confirmation.
 
 ### 10. Write the files
 
+Paths follow the discovered convention (greenfield defaults shown):
+
 - `src/Controller/<Action>Controller.php`
 - `src/DTO/Request/<Entity>Request.php` (if POST/PUT/PATCH)
 - `src/DTO/Response/<Entity>Response.php`
@@ -222,6 +227,7 @@ Ask for confirmation.
 ### 11. Verify the routing
 
 ```bash
+# Via the project wrapper if one exists
 php bin/console debug:router | grep <entity>
 ```
 
