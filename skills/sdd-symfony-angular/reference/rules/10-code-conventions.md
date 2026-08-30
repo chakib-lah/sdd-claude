@@ -5,19 +5,15 @@
 
 ---
 
-## Target versions (adapt per project)
+## Versions and roots — discovered, never edited into this rule
 
-### Backend
-- **PHP**: 8.4 target — 8.1 minimum (attributes, enums, readonly)
-- **Symfony**: 6.4 LTS or 7.x
-- **Doctrine ORM**: 3.x
-- **PHPUnit**: 11.x or 12.x (12 = current major as of early 2026 — verify before pinning)
+All stack versions and both project roots are **project facts**: read them from the repository when you need them, and never copy them into this Layer-2 rule — it stays byte-identical across projects.
 
-### Frontend
-- **Angular**: 17+ (18+ recommended for stable Signals)
-- **TypeScript**: 5.x
-- **Node**: 20.x LTS (active LTS)
-- **Style/UI**: adapt as needed (Material, PrimeNG, Tailwind, custom)
+- **Roots**: the backend root is where `composer.json` lives; the frontend root is where `package.json`/`angular.json` live. Never assume they are named `backend/` and `frontend/` — discover them. Trees below shown with `backend/`/`frontend/` roots are **greenfield examples**; on an existing project, substitute the discovered roots.
+- **Backend versions**: PHP, Symfony, Doctrine, PHPUnit — from `composer.json`/`composer.lock`. Skill floor: the backend conventions require PHP **8.1+** language features (attributes, enums, `readonly`).
+- **Frontend versions**: Angular, TypeScript, Node — from `package.json`/lockfile, `engines`/`.nvmrc`. The modern Angular practices below apply to the extent the **installed** Angular version supports them.
+- **UI library**: discovered from `package.json` (Material, PrimeNG, Tailwind, custom…) — never prescribed here.
+- **Greenfield defaults**: current PHP 8.x + maintained Symfony (LTS or current); current Angular major, strict TypeScript, active-LTS Node.
 
 ---
 
@@ -58,7 +54,9 @@ final class UserService
 }
 ```
 
-### Recommended structure
+### Structure — discover before generating
+
+**Brownfield**: inspect the existing structure under the discovered backend root and follow it — never introduce a new tree (DDD or otherwise) during an unrelated feature. Layer 3 (`.claude/rules/project-architecture.md`) may record the durable architecture decision. **Greenfield example**:
 
 ```
 backend/
@@ -128,6 +126,8 @@ See `doctrine-conventions.md` for details on entities, repositories and migratio
 
 ## Angular frontend — Mandatory rules
 
+The modern target for **new** Angular code is: standalone, signals, `inject()`, `OnPush`/zoneless-compatible design, strict typing. Discover the current architecture first (standalone vs NgModules, ZoneJS vs zoneless, selector prefix in `angular.json`): existing NgModule/ZoneJS code is a **brownfield migration state** — preserved during unrelated feature work and migrated only in dedicated tasks. New code adopts the practices below where the installed Angular version and the surrounding architecture support them.
+
 ### Standalone components
 
 ```typescript
@@ -147,9 +147,9 @@ export class UserCardComponent {
 }
 ```
 
-- ✅ `standalone: true` by default (Angular 17+)
-- ✅ `ChangeDetectionStrategy.OnPush` everywhere
-- ❌ No more NgModules for new components
+- ✅ `standalone: true` by default for new components (Angular 17+; on 19+ standalone is the default and the flag can be omitted)
+- ✅ `ChangeDetectionStrategy.OnPush` everywhere (zoneless-compatible)
+- ❌ No new NgModules — existing NgModules stay in place until a dedicated migration, never converted wholesale during a feature
 
 ### Services
 
@@ -196,7 +196,7 @@ export class UserListComponent {
 }
 ```
 
-For state shared between components, prefer Signal Store (`@ngrx/signals`) or a service with Signals.
+For state shared between components, discover the project's established strategy first (NgRx, Signal Store, service-based signals, RxJS store, other) and follow it — durable team policy lives in Layer 3. Greenfield default: Signal Store (`@ngrx/signals`) or a service with Signals.
 
 ### Types — interfaces and types
 
@@ -222,7 +222,7 @@ export type OrderStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
 - ✅ `readonly` on immutable properties
 - ❌ Never `any` — use `unknown` if the type is truly unknown
 
-### Recommended structure
+### Structure (greenfield example — an existing project's structure is discovered and followed)
 
 ```
 frontend/
@@ -284,7 +284,9 @@ Angular side: an HttpInterceptor that parses errors.
 | 422 | Validation failed |
 | 500 | Server error (logs on the backend side) |
 
-### Symfony serialization — Groups
+### Serialization — discovered serializer
+
+The serializer is a **project fact** (Symfony Serializer, JMS Serializer, API Platform serialization…). The groups below are the **Symfony Serializer example** — on a JMS-based project, follow the established JMS annotations instead of adding Symfony groups.
 
 ```php
 #[Groups(['user:read', 'user:list'])]

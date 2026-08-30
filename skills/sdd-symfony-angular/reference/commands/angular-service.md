@@ -39,10 +39,13 @@ Read `.claude/rules/angular-conventions.md` and `.claude/rules/api-contracts.md`
 - Explicit types on all requests/responses
 - One responsibility per service
 
+Then **discover the project's frontend state**: the frontend root (where `angular.json` lives — never assume `frontend/`), the existing service organization, the established HTTP conventions, the state-management strategy in place (NgRx, Signal Store, service-based signals, RxJS store…), any generated API contract types, and the configured test runner. The paths below are **greenfield defaults** — follow the discovered conventions; never impose one global state strategy.
+
 ### 4. Check for duplicates
 
 ```bash
-test -f frontend/src/app/features/<feature>/services/<name>.service.ts && echo "EXISTS" || echo "OK"
+# The check consumes the DISCOVERED frontend root (service organization: greenfield layout shown)
+test -f <frontend-root>/src/app/features/<feature>/services/<name>.service.ts && echo "EXISTS" || echo "OK"
 ```
 
 ### 5. Generate an HTTP API service
@@ -169,7 +172,7 @@ export class UserPermissionService {
 If the service uses TypeScript types that do not exist yet, propose creating them in `models/`:
 
 ```typescript
-// frontend/src/app/features/user/models/user.model.ts
+// <frontend-root>/src/app/features/user/models/user.model.ts (greenfield layout)
 
 export interface UserResponse {
   readonly id: number;
@@ -241,14 +244,16 @@ Before writing:
 
 ### 11. Write the files
 
-- `frontend/src/app/features/<feature>/services/<name>.service.ts`
-- `frontend/src/app/features/<feature>/services/<name>.service.spec.ts`
-- `frontend/src/app/features/<feature>/models/<name>.model.ts` (if created)
+Under the discovered frontend root and service organization (greenfield layout shown):
+
+- `<frontend-root>/src/app/features/<feature>/services/<name>.service.ts`
+- `<frontend-root>/src/app/features/<feature>/services/<name>.service.spec.ts`
+- `<frontend-root>/src/app/features/<feature>/models/<name>.model.ts` (if created)
 
 ### 12. Announce
 
 ```
-✅ Service created: frontend/src/app/features/user/services/user-api.service.ts
+✅ Service created: <frontend-root>/src/app/features/user/services/user-api.service.ts
 
 Type: HTTP API service
 Exposed endpoints:
@@ -274,3 +279,4 @@ Next steps:
 - **For State services**: expose state as `readonly` via `.asReadonly()`
 - **For API services**: return `Observable`s, do not systematically convert to Promise
 - **No business logic in an API service**: just the HTTP calls and payload passing
+- **Generated tests must run on the project's configured runner** — no runner-specific APIs in the skeleton

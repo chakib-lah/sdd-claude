@@ -14,7 +14,7 @@ Use when:
 - The user asks to generate / install / scaffold a SDD framework
 - The project uses Symfony backend (`composer.json` contains `symfony/framework-bundle`)
 - The project uses Angular frontend (`package.json` contains `@angular/core`)
-- Typically a `backend/` + `frontend/` structure or similar separation
+- The two roots are **discovered** (where `composer.json` and `angular.json` live) — real projects name them freely, not necessarily `backend/`/`frontend/`
 
 Do NOT use when:
 - Backend is Symfony but no Angular → use `sdd-php-symfony` instead
@@ -68,17 +68,24 @@ style/ui-lib             : [Material / PrimeNG / Tailwind / custom / none]
 state management         : [NgRx / Signal Store / plain RxJS / other]
 ```
 
+- Backend/frontend roots (where `composer.json` and `angular.json` actually live)
 - Standalone components or NgModules?
 - Signals (Angular 17+) or classic RxJS?
-- Tests: Karma+Jasmine or Jest?
-- E2E: Cypress, Playwright?
+- ZoneJS or zoneless?
+- Test runner: Vitest, Karma+Jasmine, Jest? (`angular.json` test builder)
+- Lint: ESLint/angular-eslint, TSLint, or absent?
+- TypeScript `strict` / Angular `strictTemplates` enabled?
+- Formatter configured (Prettier, other, none)?
+- Selector prefix (`angular.json` → `prefix`)
+- E2E: Cypress, Playwright, other?
 
 #### 1.3 — Symfony ↔ Angular integration
 
-- API contracts: OpenAPI/Swagger via `nelmio/api-doc-bundle`?
+- API contracts: which OpenAPI provider owns the contract — `nelmio/api-doc-bundle`, `api-platform`, other, none?
+- Automated Angular type/client generation: generator dependency and script (`package.json`), contract location, output directory?
 - Auth: `lexik/jwt-authentication-bundle`, session, other?
-- CORS: `nelmio/cors-bundle`?
-- Serialization: `symfony/serializer` + groups, `api-platform`?
+- CORS: `nelmio/cors-bundle`, other?
+- Serialization: `symfony/serializer` + groups, JMS, `api-platform`, other?
 
 #### 1.4 — Identified gaps
 
@@ -164,9 +171,9 @@ Copy from `reference/` to project's `.claude/`, in this order:
 
 The Layer-2 files just deployed are **skill-owned**: immediately after installation the project's Layer 2 is **byte-identical to `reference/`**, and it stays that way — never edit a deployed Layer-2 rule with project findings. Instead, dispose of every Phase 1 finding by ownership:
 
-- **Discoverable on demand — do not persist**: PHP, Symfony, Doctrine, Angular, Node and TypeScript versions (`composer.json`/`composer.lock`, `package.json`/lockfile), UI library and state-management packages (`package.json`), test runner in place (`package.json`, `angular.json`). Commands read these canonical sources when they need them.
+- **Discoverable on demand — do not persist**: backend/frontend roots; PHP, Symfony, Doctrine, Angular, Node and TypeScript versions (`composer.json`/`composer.lock`, `package.json`/lockfile); UI library and state-management packages (`package.json`); test runner, lint setup, strictness, formatter and selector prefix (`angular.json`, `tsconfig*.json`, `package.json`); OpenAPI provider and generator (`composer.json`, `package.json` scripts). Commands read these canonical sources when they need them.
 - **Durable project context → Layer 3**: the detected backend architecture (DDD or standard) and frontend structure observations no manifest records — `.claude/rules/project-architecture.md`.
-- **Project policies → Layer 3**: team decisions on state management (e.g. signals-first) or test strategy (e.g. migrate Karma → Jest) — `.claude/rules/project-architecture.md` / `.claude/rules/project-testing.md`.
+- **Project policies → Layer 3**: team decisions on state management (e.g. signals-first) or migration sequencing (e.g. a Karma/Jasmine → Vitest migration plan) — `.claude/rules/project-architecture.md` / `.claude/rules/project-testing.md`.
 - **Diagnostic only**: the Phase 1 stack report is announced in the chat and not persisted.
 
 Create a Layer-3 file **only if at least one durable fact or policy needs that subject**; when an existing project rule already owns the subject, reuse it — never create empty or placeholder project files, and never create a second owner for the same subject.

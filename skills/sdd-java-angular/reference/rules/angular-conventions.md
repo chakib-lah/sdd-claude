@@ -4,14 +4,13 @@
 
 ---
 
-## Target version
+## Versions and project state — discovered, never edited into this rule
 
-- **Angular**: 17+ minimum (20+ recommended — zoneless change detection is stable since 20.2 and the default for new projects since 21)
-- **TypeScript**: 5.x+
-- **Node**: 20.x / 22.x / 24.x LTS (20.x EOL April 2026)
-- **RxJS**: 7.x — signals-first: RxJS to fetch and transform, signals to store and display
+Angular, TypeScript, Node and RxJS versions are **project facts**: read them from `package.json`/lockfile when you need them — never pin them into this Layer-2 rule (it stays byte-identical across projects). The modern practices below apply to the extent the **installed** Angular version supports them (signal-based `input()`/`output()` need 17.1/17.3+; zoneless is stable since 20.2 and the platform default for new apps since 21).
 
-Adapt per project. Legacy projects on NgModules/zone.js are recorded as-is: migrate incrementally (OnPush everywhere → UI state to signals → zoneless), never in one pass.
+Discover the project's current state before writing code: standalone vs NgModules, ZoneJS vs zoneless, the configured test runner, the `angular.json` selector prefix, the lint and strictness configuration. Existing NgModule/zone.js code is a **brownfield migration state**, not the target: keep it operational, migrate incrementally in dedicated tasks (OnPush everywhere → UI state to signals → zoneless), never in one pass and never as a side effect of an unrelated feature. Durable team policy (state management strategy, migration sequencing) lives in Layer 3.
+
+- **RxJS**: signals-first — RxJS to fetch and compose asynchronous streams, signals to store and display synchronous state.
 
 ---
 
@@ -37,9 +36,9 @@ export class UserCardComponent {
 }
 ```
 
-- ✅ `standalone: true` everywhere
-- ✅ `ChangeDetectionStrategy.OnPush` by default
-- ❌ No more NgModules for new components
+- ✅ `standalone: true` for every new component (on Angular 19+ standalone is the default and the flag can be omitted)
+- ✅ `ChangeDetectionStrategy.OnPush` by default (zoneless-compatible)
+- ❌ No new NgModules — existing NgModules stay in place until a dedicated migration, never converted wholesale during a feature; if the surrounding architecture prevents safe incremental standalone adoption, report the concrete blocker instead of performing a hidden migration
 
 ### Inputs and Outputs (signal-based)
 
@@ -68,7 +67,7 @@ The old `@Input()` / `@Output()` syntax is acceptable but should be avoided for 
 
 ### Selectors
 
-- ✅ `app-` prefix for application components
+- ✅ The selector prefix is a **project fact**: discover it from `angular.json` (`prefix`) or existing components — never assume `app-` (it is only the greenfield default used in this rule's examples)
 - ✅ `kebab-case` for elements: `<app-user-card>`
 - ✅ `camelCase` for attribute directives: `appHighlight`
 
@@ -240,7 +239,7 @@ export class UserListComponent {
 ### API models
 
 ```typescript
-// frontend/src/app/features/user/models/user.model.ts
+// <frontend-root>/src/app/features/user/models/user.model.ts (greenfield layout)
 
 export interface UserResponse {
   readonly id: number;
@@ -271,17 +270,17 @@ export type UserStatus = 'active' | 'pending' | 'suspended' | 'deleted';
 export type OrderStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
 ```
 
-### Generation from OpenAPI (recommended)
+### Generation from OpenAPI (target capability)
 
-If the backend exposes an OpenAPI contract via `nelmio/api-doc-bundle`:
+When the backend exposes a machine-readable OpenAPI contract, automated TypeScript type/client generation is the target — hand-written API models drift. The generator, contract location and output directory are **project facts**: discover the existing generator dependency, package script and output path first, and use them. If none exists, that is an automation gap to close in a dedicated tooling task — never `npm install` a generator during an unrelated feature. Greenfield default:
 
 ```bash
-npm install --save-dev @openapitools/openapi-generator-cli
+npm install --save-dev @openapitools/openapi-generator-cli   # greenfield setup
 
 npx openapi-generator-cli generate \
-  -i http://localhost:8000/api/docs.json \
+  -i <openapi-contract-location-or-url> \
   -g typescript-angular \
-  -o src/app/generated
+  -o <generated-output-dir>
 ```
 
 See `api-contracts.md` for details.
@@ -409,10 +408,10 @@ Usage:
 
 ---
 
-## Recommended structure
+## Recommended structure (greenfield example — an existing project's structure is discovered and followed)
 
 ```
-frontend/src/
+<frontend-root>/src/
 ├── app/
 │   ├── core/                            ← Singleton application services
 │   │   ├── auth/
@@ -460,9 +459,9 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-Note: on Angular 21+, new apps are zoneless by default — no change-detection provider is needed at all.
+Note: on Angular 21+, new apps are zoneless by default — no change-detection provider is needed at all. Removing zone.js from an existing application is a dedicated migration task — never a feature side effect; until then, new code stays OnPush/zoneless-compatible.
 
-Legacy variant (zone.js projects only, not yet migrated to zoneless):
+Legacy variant (zone.js projects only, not yet migrated to zoneless — a supported brownfield state, kept operational):
 
 ```typescript
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
@@ -480,10 +479,11 @@ export const appConfig: ApplicationConfig = {
 ## Tests
 
 See `11-tests-strategy.md` for details. In short:
-- Vitest is the default unit-test runner for new projects since Angular 21; Karma is deprecated. On existing projects, keep whichever runner is in place (Karma/Jasmine or Jest) — do not migrate the runner inside a feature
-- TestBed for components
-- HttpTestingController for HTTP services
-- Cypress for E2E
+- **Vitest is the modern Layer-2 target runner** (the Angular CLI default for new projects since Angular 21). The runner in place is a project fact — read the `test` builder in `angular.json` and the tooling in `package.json` first
+- **Karma/Jasmine** is a supported **brownfield migration state**: keep it runnable, generate Jasmine-compatible tests through the project's CLI wrapper, report the migration gap — never migrate the runner inside a feature
+- **Jest** is supported only as the discovered existing runner of a brownfield project — not the modern target; never mix runner APIs
+- TestBed for components, HttpTestingController for HTTP services (runner-agnostic)
+- E2E: discover the project's configured tool (Playwright, Cypress, other)
 
 ---
 

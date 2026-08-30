@@ -6,24 +6,26 @@
 
 ## Overview
 
-| Layer | Tools | Location |
+| Layer | Required capability | Current parameters (discovered) |
 |---|---|---|
-| Backend Unit | PHPUnit | `backend/tests/Unit/` |
-| Backend Integration | PHPUnit + KernelTestCase | `backend/tests/Integration/` |
-| Backend Functional | PHPUnit + WebTestCase | `backend/tests/Functional/` |
-| Frontend Unit | Jest (recommended) or Karma+Jasmine | `frontend/src/**/*.spec.ts` |
-| Frontend E2E | Cypress or Playwright | `frontend/e2e/` |
+| Backend unit / integration / functional | PHPUnit — **required** | suite names, directories, wrapper (PHPUnit config under the discovered backend root) |
+| Frontend unit/component | Automated tests — **required**; **Vitest is the modern target runner** | actual runner (Vitest / Karma+Jasmine / Jest), `angular.json` test builder, project scripts |
+| Frontend E2E | E2E coverage of critical full-stack workflows | configured tool (Playwright, Cypress, other) |
+
+Both roots are discovered (never assumed to be `backend/`/`frontend/`); `<backend-root>`/`<frontend-root>` below stand for the discovered directories.
 
 ---
 
 ## Backend — PHPUnit
 
-### Configuration
+### Discovery first
 
-See also the backend conventions in `sdd-php-symfony`:
-- `tests/Unit/`: unit tests with mocks
-- `tests/Integration/`: tests against a real database (KernelTestCase)
-- `tests/Functional/`: end-to-end HTTP tests (WebTestCase)
+**PHPUnit is required.** Suites, directories and execution wrappers are project facts: read the PHPUnit configuration under the discovered backend root — whichever variant the project uses (`phpunit.xml.dist`, `phpunit.xml` or `phpunit.dist.xml`) — list the declared `<testsuite>` entries, and use the project's established wrapper (Make/Docker/Composer). Never reorganize an existing test tree during an unrelated feature. Missing test infrastructure is a **PROJECT_TOOLING_GAP** (see `12-quality-gates.md`).
+
+The three universal levels map onto the project's discovered suites (names vary — casing, abbreviations, merged levels):
+- **unit**: mocks, no container (greenfield default directory `tests/Unit/`)
+- **integration**: real database, `KernelTestCase` (greenfield default `tests/Integration/`)
+- **functional**: HTTP end-to-end, `WebTestCase` (greenfield default `tests/Functional/`)
 
 ### Unit example
 
@@ -66,45 +68,27 @@ final class GetUserControllerTest extends WebTestCase
 ### Commands
 
 ```bash
-cd backend
-vendor/bin/phpunit                        # all
-vendor/bin/phpunit --testsuite=Unit       # unit
-vendor/bin/phpunit --testsuite=Functional # functional
-make test                                  # via Makefile
+# Direct-host examples — use the project's own wrapper/targets when they exist
+cd <backend-root>
+vendor/bin/phpunit                              # all
+vendor/bin/phpunit --testsuite=<suite-name>     # one discovered suite
+make test                                       # if the project's Makefile defines it
 ```
 
 ---
 
-## Frontend — Jest (recommended) or Karma+Jasmine
+## Frontend — Vitest is the modern target; the current runner is discovered
 
-### Why Jest
+**Automated Angular tests are required.** The modern Layer-2 target runner is **Vitest** (the Angular CLI default for new projects since Angular 21). The runner actually in place is a **project fact**: read the `test` builder in `angular.json` and the test tooling in `package.json` before generating or running anything.
 
-- Faster than Karma
-- No browser required for unit tests
-- Built-in snapshots
-- Simplified configuration with `jest-preset-angular`
+Runner states:
 
-Installation:
+- **Vitest configured** — use the existing Vitest/Angular CLI configuration and project scripts as-is; do not add a custom Vitest config when the CLI builder already owns it.
+- **Karma + Jasmine configured (brownfield)** — a supported **PROJECT_MIGRATION_GAP**, not the target: the current runner stays usable so feature work remains executable; generate Jasmine-compatible tests through the project's CLI wrapper; report the migration gap; never migrate the runner (or install Vitest) as a side effect of an unrelated feature. The Karma/Jasmine → Vitest migration is a dedicated task driven by the project's Angular version, build system and real configuration.
+- **Jest configured (brownfield)** — a supported **discovered existing runner**: honor it, never mix runner APIs, and do not migrate to or away from it during a feature. Jest is not this skill's modern default target; if the project's Layer-3 policy targets Vitest, report the migration status.
+- **No runner configured** — **PROJECT_TOOLING_GAP**: automated tests remain required; setting up the runner is a dedicated tooling change (greenfield default: Vitest via the Angular CLI).
 
-```bash
-npm install --save-dev jest @types/jest jest-preset-angular @angular-builders/jest
-```
-
-`jest.config.js` configuration:
-
-```js
-module.exports = {
-  preset: 'jest-preset-angular',
-  setupFilesAfterEach: ['<rootDir>/src/setup-jest.ts'],
-  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.spec.ts',
-    '!src/main.ts',
-    '!src/environments/**',
-  ],
-};
-```
+The `TestBed` / `HttpTestingController` patterns below are runner-agnostic — they run under Vitest, Jasmine or Jest.
 
 ### Service unit tests
 
@@ -190,23 +174,24 @@ describe('UserCardComponent', () => {
 ### Commands
 
 ```bash
-cd frontend
-npm test                              # all (Jest)
-npm test -- --watch                   # watch mode
-npm test -- --coverage                # with coverage
-npm test -- user-card.component       # a single file
+# Always via the project's configured scripts / CLI target — discover them first
+cd <frontend-root>
+npm test                              # runs whatever runner angular.json wires
+npm test -- --coverage                # if the configured runner/builder supports it
 ```
 
 ---
 
-## E2E — Cypress (recommended) or Playwright
+## E2E — discover the configured tool
 
-### Cypress — Configuration
+E2E coverage of the **critical full-stack workflows** is required at the appropriate level. The tool is a project fact: discover the existing Playwright/Cypress/other setup before writing E2E tests, and never force a project-wide E2E migration. Greenfield default: Playwright or Cypress. The Cypress material below is a **tool-specific example**, not a mandate.
 
-Installation:
+### Cypress — Configuration (tool-specific example)
+
+Greenfield installation:
 
 ```bash
-cd frontend
+cd <frontend-root>
 npm install --save-dev cypress
 ```
 
@@ -248,12 +233,12 @@ describe('User listing', () => {
 ### Commands
 
 ```bash
-cd frontend
+cd <frontend-root>
 npx cypress open                       # interactive mode
 npx cypress run                        # CI mode (headless)
 ```
 
-### Organization
+### Organization (greenfield example)
 
 ```
 frontend/
@@ -307,6 +292,8 @@ Each acceptance criteria (AC) in the spec must have at minimum:
 ---
 
 ## Coverage targets
+
+Review and greenfield targets — the enforced gate is the project's **configured** thresholds (discovered from its coverage/CI configuration), plus no coverage regression on changed code. Never present the table below as a project's current truth.
 
 | Layer | Target |
 |---|---|

@@ -12,15 +12,30 @@ Preferred format: **OpenAPI 3.x** (generated or hand-written, single source of t
 
 ---
 
-## Recommended toolchain
+## Required capability, discovered implementation
+
+A machine-readable API contract with a typed, synchronized Angular boundary is a **required full-stack capability**. Its implementation is a set of **project facts** — discover, never assume:
+
+- **OpenAPI provider**: NelmioApiDocBundle, API Platform, or another real provider already configured. Never mandate Nelmio where API Platform owns the contract, and never mandate API Platform where Nelmio owns it. A valid **project-owned hand-written OpenAPI document** designated as the source of truth is equally acceptable — provider absence alone is never a gap.
+- **Serializer**: Symfony Serializer, JMS Serializer, API Platform serialization, other — never force Symfony Serializer groups into a JMS-based project.
+- **Authentication**: discovered — JWT/Lexik is one common setup, not an assumption; session-based Symfony security is equally valid.
+- **CORS implementation**: discovered — NelmioCorsBundle is the common Symfony example, not a given.
+- **Contract location/URL, frontend generator and output directory**: discovered from the project's configuration, scripts and dependencies.
+- **Roots**: `<backend-root>`/`<frontend-root>` below stand for the discovered directories — never assume `backend/`/`frontend/`.
+
+If the backend exposes no machine-readable contract: **PROJECT_TOOLING_GAP**. If the contract exists but no automated frontend type/client synchronization does: **API_CONTRACT_AUTOMATION_GAP**. Both remain required targets, closed by dedicated tooling/contract tasks — never silently during an unrelated feature. The universal rules of this file (explicit schemas, typed frontend boundary, backend validation, no sensitive-field leakage, documented HTTP statuses, deliberate breaking changes, contract synchronization) apply regardless of providers.
+
+---
+
+## Toolchain (provider-specific examples and greenfield defaults)
 
 ### Symfony backend — Generate the OpenAPI
 
-#### Option A — `nelmio/api-doc-bundle`
+#### Option A — `nelmio/api-doc-bundle` (provider-specific example)
 
 ```bash
-cd backend
-composer require nelmio/api-doc-bundle
+cd <backend-root>
+composer require nelmio/api-doc-bundle   # greenfield setup
 ```
 
 `config/packages/nelmio_api_doc.yaml` configuration:
@@ -52,27 +67,29 @@ use OpenApi\Attributes as OA;
 final class GetUserController { ... }
 ```
 
-Access the docs:
-- HTML: `http://localhost:8000/api/doc`
-- JSON: `http://localhost:8000/api/doc.json`
+Access the docs (URLs are project facts — a local greenfield default shown):
+- HTML: `<backend-base-url>/api/doc`
+- JSON: `<backend-base-url>/api/doc.json`
 
-#### Option B — `api-platform/api-platform`
+#### Option B — `api-platform/api-platform` (provider-specific example)
 
-API Platform generates OpenAPI automatically and offers more features, but it structures the entire backend around its conventions. Worth considering for greenfield projects.
+API Platform generates OpenAPI automatically and offers more features, but it structures the entire backend around its conventions. Worth considering for greenfield projects. On a project where API Platform already owns the contract, use its export — do not install Nelmio alongside it.
 
 ### Angular frontend — Generate the TypeScript types
 
+Discover the existing generator dependency, package script, contract input and output directory first. Greenfield default:
+
 ```bash
-cd frontend
-npm install --save-dev @openapitools/openapi-generator-cli
+cd <frontend-root>
+npm install --save-dev @openapitools/openapi-generator-cli   # greenfield setup
 ```
 
-Script in `package.json`:
+Greenfield script in `package.json` (input/output are project facts):
 
 ```json
 {
   "scripts": {
-    "api:sync": "openapi-generator-cli generate -i http://localhost:8000/api/doc.json -g typescript-angular -o src/app/generated/api --additional-properties=npmName=app-api,supportsES6=true,withInterfaces=true"
+    "api:sync": "openapi-generator-cli generate -i <openapi-contract-location-or-url> -g typescript-angular -o <generated-output-dir> --additional-properties=supportsES6=true,withInterfaces=true"
   }
 }
 ```
@@ -83,7 +100,7 @@ Usage:
 npm run api:sync
 ```
 
-Generates into `src/app/generated/api/`:
+Generates into the configured output directory (greenfield default `src/app/generated/api/`):
 - TypeScript models (interfaces for each DTO)
 - Angular services with typed methods for each endpoint
 
@@ -147,9 +164,11 @@ Every API error returns the same format:
 
 ---
 
-## Symfony serialization — Groups
+## Serialization — discovered serializer
 
-### Group convention
+The serializer is a **project fact**: Symfony Serializer, JMS Serializer, API Platform serialization, or another established one. The groups below are the **Symfony Serializer example** — a JMS-based project follows its established JMS annotations and exclusion policies instead; do not add Symfony groups there. Whatever the serializer, the universal rules hold: fine-grained control over exposure, no sensitive-field leakage, lighter list payloads.
+
+### Group convention (Symfony Serializer example)
 
 ```php
 #[ORM\Entity]
@@ -199,8 +218,8 @@ return new JsonResponse(
 ### When an endpoint changes
 
 1. **Update the SDD spec** first (Design section → Endpoint)
-2. **Update the OpenAPI annotations** on the Symfony side
-3. **Check the generated docs**: `php bin/console api:doc:dump` or visit `/api/doc.json`
+2. **Update the contract metadata via the discovered source mechanism** — Nelmio attributes or API Platform resource/operation metadata (provider-specific examples), or direct edits to the project-owned OpenAPI document
+3. **Check the generated docs**: export the contract via the discovered provider's mechanism (e.g. Nelmio's `api:doc:dump`, API Platform's export) or visit the project's docs endpoint
 4. **Regenerate the types on the Angular side**: `npm run api:sync`
 5. **Update the consuming Angular components**
 6. **Test both sides**
@@ -308,9 +327,9 @@ protected onSubmit(): void {
 
 ### Authentication
 
-Recommended: JWT via `lexik/jwt-authentication-bundle`.
+Authentication is **discovered**, never assumed: JWT via `lexik/jwt-authentication-bundle` is one common setup; session-based Symfony security is equally valid. Follow what the project has.
 
-On the Angular side, an `authInterceptor` adds the token automatically:
+If JWT is in place, an Angular `authInterceptor` adds the token automatically (JWT-specific example):
 
 ```typescript
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -329,7 +348,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 ### CORS
 
-Configure `nelmio/cors-bundle` on the Symfony side:
+The CORS implementation is **discovered**. On Symfony, `nelmio/cors-bundle` is the common example:
 
 ```yaml
 nelmio_cors:
@@ -372,7 +391,7 @@ Configure this via a Symfony EventListener that formats according to the environ
 
 ### Source of truth
 
-The OpenAPI generated by Symfony is the **source of truth**. Any divergence on the Angular side is a bug.
+The source of truth is **discovered**: it is the designated machine-readable contract, whatever its source mode — provider-generated (API Platform, Nelmio, another configured provider) or a project-owned hand-written OpenAPI document. Any divergence on the Angular side from that designated contract is a bug.
 
 ### Enforce the sync in the project's CI
 
@@ -380,13 +399,18 @@ The sync check runs in the project's **existing** pipeline — the toolkit presc
 
 ### Hooks to enforce the sync
 
-Pre-commit on the backend side:
+A pre-commit validation hook is **non-destructive**: it never overwrites or stages the tracked contract as its way of checking freshness — it exports to a temporary candidate and **fails** when the tracked contract is stale, leaving the deliberate update to `/api-contract`. (Provider-generated mode; for a project-owned contract there is no export — validate the document instead.) Same path rules as above (`<repo-root>` resolved once — e.g. `git rev-parse --show-toplevel` on a Git checkout, an implementation example; roots and contract path repository-root-relative at any depth; never `../`, never `cd ..`):
 
 ```bash
-# If controllers change → regenerate the docs and commit them
-if git diff --cached --name-only | grep -q '^backend/src/Controller/'; then
-  cd backend && php bin/console api:doc:dump > ../api-docs/openapi.json
-  git add ../api-docs/openapi.json
+# If controllers change → verify the tracked contract is still in sync (never mutate it here)
+if git diff --cached --name-only | grep -q '^<backend-root>/src/Controller/'; then
+  CANDIDATE=$(mktemp)
+  ( cd "<repo-root>/<backend-root>" && <provider-export-command> > "$CANDIDATE" )
+  if ! diff -q "<repo-root>/<contract-path>" "$CANDIDATE" > /dev/null; then
+    echo "❌ API contract out of sync — run /api-contract to update it deliberately"
+    rm -f "$CANDIDATE"; exit 1
+  fi
+  rm -f "$CANDIDATE"
 fi
 ```
 

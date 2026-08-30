@@ -34,32 +34,35 @@ Read `spec.md` (Design section → Angular Component(s)):
 ### 3. Load the conventions
 
 Read `.claude/rules/angular-conventions.md`:
-- `standalone: true` mandatory
+- Standalone new components (where the installed Angular version supports it)
 - `ChangeDetectionStrategy.OnPush`
 - Signals preferred over local RxJS
-- `app-` prefix for the selector
+- Selector prefix discovered from `angular.json`
+
+Then **discover the project's frontend state**: the frontend root (where `angular.json` lives — never assume `frontend/`), the selector prefix (`angular.json` → `prefix`), the existing feature organization, the current component architecture (standalone vs NgModules) and the configured test runner. The paths, `app-` selectors and layouts below are **greenfield defaults** — follow the discovered conventions. Never migrate neighboring NgModules or rewrite existing modules as part of this command; if the surrounding architecture prevents a safe standalone component, report the concrete blocker.
 
 ### 4. Check for duplicates
 
 ```bash
-test -d frontend/src/app/features/<feature>/<type>/<name>/ && echo "EXISTS" || echo "OK"
+# The check consumes the DISCOVERED frontend root (feature organization: greenfield layout shown)
+test -d <frontend-root>/src/app/features/<feature>/<type>/<name>/ && echo "EXISTS" || echo "OK"
 ```
 
 ### 5. Choose the destination path
 
-Adapt the frontend root to the project's detected structure (see `.claude/rules/angular-conventions.md`): `frontend/` for a Symfony+Angular repo, or the Angular application folder of a Node monorepo. Example:
+Inside the discovered frontend root and existing feature organization. Greenfield example:
 
 ```
-frontend/src/app/features/<feature>/<type>/<name>/
+<frontend-root>/src/app/features/<feature>/<type>/<name>/
 ├── <name>.component.ts
 ├── <name>.component.html
 ├── <name>.component.scss
 └── <name>.component.spec.ts
 ```
 
-Examples:
-- Routed page: `frontend/src/app/features/user/pages/user-list/`
-- Presentation component: `frontend/src/app/features/user/components/user-card/`
+Examples (greenfield layout):
+- Routed page: `<frontend-root>/src/app/features/user/pages/user-list/`
+- Presentation component: `<frontend-root>/src/app/features/user/components/user-card/`
 
 ### 6. Generate the TypeScript component
 
@@ -223,6 +226,8 @@ Use the new control flow syntax (`@if`, `@for`, `@switch`) — Angular 17+.
 
 ### 9. Generate the test skeleton
 
+Runner-agnostic TestBed skeleton — it must run on the project's **configured** runner (Vitest, Jasmine or Jest); never use runner-specific APIs here. If the project is still on Karma/Jasmine, the generated spec runs there as-is while the migration gap is reported separately.
+
 ```typescript
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserCardComponent } from './user-card.component';
@@ -269,7 +274,7 @@ All files in the chosen folder.
 If the component is in `pages/`, update `<feature>.routes.ts`:
 
 ```typescript
-// frontend/src/app/features/user/user.routes.ts
+// <frontend-root>/src/app/features/user/user.routes.ts (greenfield layout)
 import { Routes } from '@angular/router';
 
 export const userRoutes: Routes = [
@@ -284,7 +289,7 @@ export const userRoutes: Routes = [
 ### 13. Announce
 
 ```
-✅ Component created: frontend/src/app/features/user/components/user-card/
+✅ Component created: <frontend-root>/src/app/features/user/components/user-card/
 
 Files:
   - user-card.component.ts
@@ -303,10 +308,12 @@ Next steps:
 ## Stop rules
 
 - **Never overwrite an existing file**
-- **Always `standalone: true`**
+- **New components are standalone** where the installed Angular version supports it — and never convert surrounding NgModules as a side effect
 - **Always `ChangeDetectionStrategy.OnPush`**
-- **Prefer Signals over RxJS** for local component state
+- **Use the discovered selector prefix** (`app-` only as the greenfield default)
+- **Prefer Signals over RxJS** for local component state (where the installed version supports them)
+- **Generated tests must run on the project's configured runner** — no runner-specific APIs in the skeleton
 - **No business logic in the template**
 - **No `any`** in the TypeScript
-- **Prefer the new control flow syntax** (`@if`, `@for`) over `*ngIf`/`*ngFor`
+- **Prefer the new control flow syntax** (`@if`, `@for`) over `*ngIf`/`*ngFor` where supported
 - **`data-test` attributes** for test selectors (no CSS classes for tests)

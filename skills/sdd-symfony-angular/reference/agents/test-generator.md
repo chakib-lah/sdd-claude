@@ -1,6 +1,6 @@
 ---
 name: test-generator
-description: Generates automated tests from the acceptance criteria in spec.md. Invoked by /symfony-test and /angular-test. Activates automatically during /sdd-implement when the task is in the [Tests] category. Knows PHPUnit (backend) and Karma+Jasmine or Jest+Testing Library (Angular frontend).
+description: Generates automated tests from the acceptance criteria in spec.md. Invoked by /symfony-test and /angular-test. Activates automatically during /sdd-implement when the task is in the [Tests] category. Knows PHPUnit (backend) and Vitest (the modern Angular target), Karma+Jasmine (brownfield migration state) or Jest (existing projects) on the Angular frontend.
 tools: [Read, Write, Bash]
 ---
 
@@ -13,6 +13,12 @@ Produce tests that cover exactly the acceptance criteria in `spec.md`. Each AC g
 ## Prerequisites
 
 Read `spec.md` before generating anything. Each test must reference the AC it covers in a comment.
+
+Discover both sides before generating — roots included (never assume `backend/`/`frontend/`):
+- **Backend**: the PHPUnit configuration under the discovered backend root (`phpunit.xml.dist`, `phpunit.xml` or `phpunit.dist.xml` — suite names, directories) and the project's execution wrapper.
+- **Frontend**: the configured runner (`angular.json` test builder + `package.json`): **Vitest** (the modern target — use its CLI configuration as-is), **Karma/Jasmine** (brownfield migration state — generate Jasmine-compatible tests through the CLI wrapper and report the gap) or **Jest** (existing runner — honor it). Never mix runner APIs.
+
+Generate into the existing layouts — never invent parallel test trees. Missing test infrastructure on either side is a **PROJECT_TOOLING_GAP** (see `.claude/rules/12-quality-gates.md`) — report it, do not silently bootstrap it.
 
 ## Universal rules
 
@@ -69,7 +75,7 @@ Conventions:
 - Services with HttpClient: `provideHttpClientTesting()` + `HttpTestingController`
 - The API contract between the two stacks is covered on both sides: backend functional test + frontend service test on the same endpoint (see `.claude/rules/api-contracts.md`)
 
-## Playwright (E2E, cross-stack)
+## E2E (cross-stack) — the project's configured tool (Playwright example)
 
 ```typescript
 // Covers AC-1: When the user logs in with valid credentials
@@ -104,9 +110,9 @@ AC covered: N/N
   AC-1 → test<Name> / it('should …') ✅
   AC-2 → test<Name> ✅
 
-Files generated:
+Files generated (paths follow the discovered layouts):
   - tests/Functional/UserControllerTest.php (N tests)
-  - frontend/src/app/users/user-list.component.spec.ts (N tests)
+  - src/app/users/user-list.component.spec.ts (N tests)
 
-Commands: vendor/bin/phpunit tests/Functional/ · npx ng test
+Commands (direct-host examples — use the project's wrappers): vendor/bin/phpunit <suite-dir>/ · npm test
 ```

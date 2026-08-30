@@ -1,5 +1,18 @@
 # Changelog — SDD Claude
 
+## [1.13.0] — 2026-08-30
+
+Symfony/Angular Layer-2 stabilization following the discovery-aware model.
+
+### Changed
+
+- **Discovery-aware roots and tooling** — roots, versions, suites, wrappers, lint/strictness/formatter configuration and CI topology are project facts read from the repository; Layer 2 stays byte-identical across projects, and workflows never assume a fixed monorepo layout.
+- **Modern Angular target** — standalone components, signals, `inject()`, strict TypeScript; Vitest as the modern target runner with Karma/Jasmine as a supported brownfield state; existing legacy states are preserved migration states with visible gaps, migrated only in dedicated tasks. Async-test guidance follows the discovered runner.
+- **Backend quality baseline** — PHPUnit, PHPStan, Rector and PHP-CS-Fixer remain required capabilities with discovered parameters; missing tooling is a `PROJECT_TOOLING_GAP`.
+- **Provider-neutral API contract model** — a machine-readable OpenAPI 3.x contract with automated Angular type synchronization stays the required full-stack capability; the provider, serializer, contract location and generator are discovered. A valid project-owned hand-written contract is an accepted source of truth; exports go to a temporary candidate compared before any update, and the pre-commit hook fails on staleness instead of overwriting the tracked contract.
+
+---
+
 ## [1.12.0] — 2026-08-30
 
 PHP/Symfony Layer-2 stabilization, validated on real brownfield migration projects.

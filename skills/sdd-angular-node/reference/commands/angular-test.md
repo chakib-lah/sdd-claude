@@ -17,7 +17,7 @@ description: Scaffold Angular tests (component, service, pipe) from a SDD spec
 ### 1. Identify the target
 
 Ask for:
-- Path to the file to test (e.g. `frontend/src/app/features/user/services/user-api.service.ts`)
+- Path to the file to test (e.g. `<frontend-root>/src/app/features/user/services/user-api.service.ts`)
 - Test type: `Component`, `Service`, or `Pipe`
 
 Automatic detection:
@@ -25,13 +25,22 @@ Automatic detection:
 - `.service.ts` suffix → Service
 - `.pipe.ts` suffix → Pipe
 
-### 2. Load the conventions
+### 2. Load the conventions and discover the runner
 
 Read `.claude/rules/11-tests-strategy.md`:
-- Jest (recommended) or Karma+Jasmine
+- **Vitest is the modern target runner; the configured runner is discovered, never assumed**
 - TestBed for components
 - HttpTestingController for HTTP services
 - `data-test` attributes for selectors
+
+Then **discover the actual runner**: read the `test` builder in `angular.json` and the test tooling in `package.json`.
+
+- **Vitest** → generate/run Vitest-compatible tests through the project's CLI target; do not add a custom Vitest config when the CLI builder already owns it
+- **Karma + Jasmine (brownfield)** → generate Jasmine-compatible tests and run them through the project's CLI wrapper; report the migration gap separately; never inject Vitest-only APIs and never migrate the runner from this command
+- **Jest (brownfield)** → honor the existing Jest setup; never mix runner APIs
+- **No runner** → **PROJECT_TOOLING_GAP** (see `12-quality-gates.md`): report it and stop — do not install a runner as part of this command
+
+The skeletons below are runner-agnostic (TestBed / HttpTestingController).
 
 ### 3. Load the SDD context
 
@@ -294,7 +303,7 @@ it('should <description>', () => {
 });
 ```
 
-(`pending()` in Jasmine, or `xit()`/`.todo` in Jest)
+(`pending()` in Jasmine, `it.todo` in Jest/Vitest — use the discovered runner's idiom)
 
 ### 7. Display and validate
 
@@ -313,14 +322,15 @@ Next to the source file, with the `.spec.ts` suffix:
 ### 9. Verify that the tests are detected
 
 ```bash
-cd frontend
-npm test -- --listTests | grep <name>
+# Via the project's configured test script/CLI target — the exact syntax depends on the discovered runner
+cd <frontend-root>
+npm test -- <name>
 ```
 
 ### 10. Announce
 
 ```
-✅ Tests scaffolded: frontend/src/app/features/user/components/user-card/user-card.component.spec.ts
+✅ Tests scaffolded: <frontend-root>/src/app/features/user/components/user-card/user-card.component.spec.ts
 
 Tests generated: N
   - N ACs covered
@@ -328,17 +338,18 @@ Tests generated: N
   - Y `pending` tests to finalize via /sdd-implement
 
 Next step:
-- npm test to verify that the tests pass
+- Run the project's test script to verify that the tests pass
 - /sdd-implement for the next task
 ```
 
 ## Stop rules
 
 - **At least one test per acceptance criterion** (frontend side)
+- **Never mix runner APIs**: the generated file must run on the discovered runner as-is
 - **No `expect(true).toBe(true)`**: use `pending()` or `it.todo`
 - **`data-test` attributes** for selectors (no CSS classes)
 - **`httpMock.verify()`** in `afterEach` for HTTP services (detects outstanding requests)
-- **No unfinished subscribe** in a test (use `done`, `fakeAsync`, or wait for completion)
+- **No unfinished subscribe** in a test (use `done`, `async/await`, or the discovered environment's async facilities — see the timing rule below)
 - **No Angular mocks** (`MockNgZone`, etc.): use `TestBed`
-- **No tests that depend on real timing**: use `fakeAsync` + `tick()` for debounces
+- **No tests that depend on real timing** — use the **discovered runner/environment's** deterministic timing facilities: on Vitest / zoneless-compatible projects prefer native `async/await`, with Vitest fake timers where deterministic timer advancement is needed; Angular ZoneJS utilities (`fakeAsync`/`tick`/`flush`/`waitForAsync`) only where the discovered test environment supports the ZoneJS testing integration and the project already uses that model (e.g. Karma/Jasmine brownfield); Jest projects use Jest's own timer APIs. Never add ZoneJS solely to make a test pattern work
 - **Document each test with the AC** it covers
