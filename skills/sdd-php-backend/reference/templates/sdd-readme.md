@@ -17,6 +17,6 @@
 
 Full workflow: see `.claude/rules/00-sdd-framework.md`.
 
-For Git conventions: see `.claude/rules/02-git-conventions.md`.
+For Git conventions: see `.claude/rules/01-git-conventions.md`.
 
 For stack-specific code conventions: see `.claude/rules/10-code-conventions.md` (added by the stack skill).

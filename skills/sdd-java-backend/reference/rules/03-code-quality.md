@@ -2,7 +2,7 @@
 
 > **Layer 1 — Universal methodology.**
 > These rules are stack-agnostic: true for every project, whatever the technology. They state **principles only** — where a practice needs a tool to be expressed (a linter directive, a suppression annotation, a coverage flag), the principle lives here and the tool's name and syntax belong to the Layer 2 `rules/` of each skill (`10-code-conventions.md`, `12-quality-gates.md`).
-> Security-flavored quality rules are **owned by `03-security.md`** — this file cross-references them and never restates them.
+> Security-flavored quality rules are **owned by `02-security.md`** — this file cross-references them and never restates them.
 
 ---
 
@@ -29,7 +29,7 @@
 - No leftover debug output: print, dump or log statements added while debugging are removed before commit. The stack's concrete debug functions are listed in `10-code-conventions.md`.
 - No commented-out code — history lives in version control, not in comments.
 - `TODO` / `FIXME` only with an associated ticket referenced on the same line. An anonymous `TODO` is a task nobody owns.
-- No hardcoded secret — owned by `03-security.md` § Secrets management; apply it as written there.
+- No hardcoded secret — owned by `02-security.md` § Secrets management; apply it as written there.
 
 ### Readability
 - Explicit naming: a name says what the thing is or does, without needing the surrounding code to decode it.
@@ -41,7 +41,7 @@
 - Never fail silently: a code path that cannot do its job says so (error, log, explicit return), it does not pretend it succeeded.
 
 ### External input
-- Every external input is validated at its entry point — the rules are owned by `03-security.md` § Input validation and § Injection prevention; apply them as written there.
+- Every external input is validated at its entry point — the rules are owned by `02-security.md` § Input validation and § Injection prevention; apply them as written there.
 
 ### Non-regression
 - Any change to an existing behaviour requires a test that attests the new behaviour. No attested behaviour, no change.
@@ -56,7 +56,7 @@
 - A changed public signature requires either updating every caller in the same change, or a documented deprecation path with a removal target.
 
 ### Dependencies
-- No dependency added without justification in `plan.md`, stating the alternative rejected. The audit duty on dependencies is owned by `03-security.md` § Dependencies.
+- No dependency added without justification in `plan.md`, stating the alternative rejected. The audit duty on dependencies is owned by `02-security.md` § Dependencies.
 
 ### No quality bypass
 - Suppression or ignore directives — whatever the tool calls them — are forbidden without a written, dated justification. The concrete directive syntax per tool belongs to Layer 2 (`10-code-conventions.md`, `12-quality-gates.md`).

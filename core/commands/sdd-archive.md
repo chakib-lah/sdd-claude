@@ -57,9 +57,9 @@ mv .claude/sdd/<FEATURE-ID>-<description>/ .claude/sdd/_archive/<FEATURE-ID>-<de
 
 ### 5. Commit
 
-Message resolved through the **effective Git policy** (`02-git-conventions.md` § Effective Git policy resolution; semantic intent: archive the feature's SDD artifacts after merge — universal default shape: ticket id + imperative subject).
+Message resolved through the **effective Git policy** (`01-git-conventions.md` § Effective Git policy resolution; semantic intent: archive the feature's SDD artifacts after merge — universal default shape: ticket id + imperative subject).
 
-Subject line only — never a `Co-Authored-By` or any tool-generated trailer (see `02-git-conventions.md` § Absolute prohibitions).
+Subject line only — never a `Co-Authored-By` or any tool-generated trailer (see `01-git-conventions.md` § Absolute prohibitions).
 
 ### 6. Announce in the chat
 

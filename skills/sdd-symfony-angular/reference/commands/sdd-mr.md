@@ -40,7 +40,7 @@ From `tasks.md`:
 
 ### 4. Determine the target integration branch
 
-Read `.claude/rules/02-git-conventions.md` to identify the target branch (often `develop`).
+Read `.claude/rules/01-git-conventions.md` to identify the target branch (often `develop`).
 
 ### 5. Generate the MR body
 

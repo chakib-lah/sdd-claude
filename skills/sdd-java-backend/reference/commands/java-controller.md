@@ -197,7 +197,7 @@ Every endpoint requires an explicit access-control decision — pick exactly one
 - **Authenticated**: `@PreAuthorize("isAuthenticated()")` — any logged-in user may call it
 - **Deliberately public**: no annotation — allowed only with a one-line justification, echoed in the confirmation step
 
-This choice is never skipped, even when the spec has no security-tagged acceptance criteria: `.claude/rules/03-security.md` treats "no annotation = public" as a bug, so an unannotated endpoint must be a documented decision, not an omission.
+This choice is never skipped, even when the spec has no security-tagged acceptance criteria: `.claude/rules/02-security.md` treats "no annotation = public" as a bug, so an unannotated endpoint must be a documented decision, not an omission.
 
 Example with a specific role:
 

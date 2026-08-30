@@ -1,5 +1,18 @@
 # Changelog — SDD Claude
 
+## [1.11.0] — 2026-08-30
+
+Canonical Layer-1 path normalization with a safe structural migration.
+
+### Changed
+
+- **Final Layer-1 order 00/01/02/03** — the Git, security and code-quality rules close the numbering gap left by the retired constitution slot; all active consumers reference the new canonical paths.
+- **Version-agnostic structural migration** — `/sdd-upgrade` detects legacy Layer-1 shapes structurally, plans renames write-free, preserves project truth before convergence (verification failure stops before any destructive step), and resolves old/new coexistence through one deterministic rule (proven redundancy → converge; project truth → preserve first; ambiguity → user decision).
+- **Constitution safety** — legacy constitution carriers are resolved by a single mutually exclusive and exhaustive decision model before the `01` slot is reused: an empty scaffold is removed, meaningful content migrates verbatim to `project-constitution.md`, any conflict or ambiguity is a user decision — never a merge, never a guess.
+- **Path-only canonical reference repair** — after convergence, eligible preserved active artifacts have dangling old canonical path tokens repaired by exact, byte-verified token substitution; historical feature artifacts, archives and retrospectives are never rewritten, and a stale path inside a freshly installed reference copy is a source defect, never a local patch.
+
+---
+
 ## [1.10.0] — 2026-08-30
 
 Strict framework / skill / project ownership: every deployed rule has exactly one owner, making upgrades deterministic.

@@ -120,7 +120,7 @@ Must display `✅ AUDIT OK`. The audit checks in particular:
 ## Forbidden divergences
 
 - ❌ Do not rename the universal SDD commands (`/sdd-start`, etc.).
-- ❌ Do not modify the Layer 1 masters in the skill (`00-sdd-framework.md`, `02-git-conventions.md`, `03-security.md`, `04-code-quality.md`, `sdd-*.md`, `retro-spec.md`, templates) — the source is `core/`.
+- ❌ Do not modify the Layer 1 masters in the skill (`00-sdd-framework.md`, `01-git-conventions.md`, `02-security.md`, `03-code-quality.md`, `sdd-*.md`, `retro-spec.md`, templates) — the source is `core/`.
 - ❌ Do not mix methodology and technology (no tool name in `00-sdd-framework.md`).
 - ❌ Do not create business skills here (Layer 3, not Layer 2).
 - ❌ Do not change the task naming convention (`T001, T002…`).

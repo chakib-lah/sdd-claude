@@ -21,7 +21,7 @@ Format required by the SDD toolkit:
 
 ```
 <TICKET-ID>: imperative lowercase description without trailing period
-(universal default from 02-git-conventions.md — the project's Layer-3 Git rule
+(universal default from 01-git-conventions.md — the project's Layer-3 Git rule
 may configure the declared extension points; resolve the effective policy first)
 ```
 

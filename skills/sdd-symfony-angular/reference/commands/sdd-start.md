@@ -34,11 +34,11 @@ git status --porcelain
 git branch --show-current
 ```
 
-If the current branch is not the integration branch (default: `develop`, otherwise as defined in `.claude/rules/02-git-conventions.md`), offer to switch.
+If the current branch is not the integration branch (default: `develop`, otherwise as defined in `.claude/rules/01-git-conventions.md`), offer to switch.
 
 ### 2. Create the feature branch
 
-Resolve the **effective feature-branch pattern** through the effective Git policy (`.claude/rules/02-git-conventions.md` § Effective Git policy resolution — universal default: `<type>/<TICKET-ID>-<description>`; a project Git rule may configure it). Under the default, ask the user for the `<type>`:
+Resolve the **effective feature-branch pattern** through the effective Git policy (`.claude/rules/01-git-conventions.md` § Effective Git policy resolution — universal default: `<type>/<TICKET-ID>-<description>`; a project Git rule may configure it). Under the default, ask the user for the `<type>`:
 
 - `feature`: new business functionality
 - `fix`: bug fix

@@ -26,7 +26,7 @@ description: SDD rollback — un-ships a feature (or one of its implementation p
 
 ### 1. Locate the feature and load `tasks.md`
 
-Look in `.claude/sdd/<feature>/` first, then `.claude/sdd/_archive/<feature>/`. Collect the implementation phases and their `Phase commit SHA` (falling back to per-task SHAs for a documented unsquashed phase). The trailing SDD-bookkeeping commit, if any (the artifacts-only commit formatted by the effective Git policy — see `02-git-conventions.md`), touches only SDD artifacts and is **not** part of the revert plan.
+Look in `.claude/sdd/<feature>/` first, then `.claude/sdd/_archive/<feature>/`. Collect the implementation phases and their `Phase commit SHA` (falling back to per-task SHAs for a documented unsquashed phase). The trailing SDD-bookkeeping commit, if any (the artifacts-only commit formatted by the effective Git policy — see `01-git-conventions.md`), touches only SDD artifacts and is **not** part of the revert plan.
 
 ### 2. Verify the SHAs
 

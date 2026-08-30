@@ -8,11 +8,11 @@
 
 The toolkit stacks **3 layers**. The boundary is not a feeling — it is a decision test, applied sentence by sentence:
 
-- **Layer 1 — Universal methodology**: true for every project, whatever the technology. **If a sentence names anything stack-dependent — an application framework, a programming language, a package or build tool (`composer install`, `npm audit`, `./gradlew check`) — it is not Layer 1. Naming an SDD command (`/sdd-verify`) or stack-agnostic workflow tooling (`git`) is expected: those ARE Layer 1 vocabulary — the boundary is stack-dependent vs stack-agnostic, not tool vs no tool.** Content: the 17 SDD commands, the 5 SDD agents, the templates and the 4 process rules (`00-sdd-framework.md`, `02-git-conventions.md`, `03-security.md`, `04-code-quality.md`). Identical everywhere, never adapted.
+- **Layer 1 — Universal methodology**: true for every project, whatever the technology. **If a sentence names anything stack-dependent — an application framework, a programming language, a package or build tool (`composer install`, `npm audit`, `./gradlew check`) — it is not Layer 1. Naming an SDD command (`/sdd-verify`) or stack-agnostic workflow tooling (`git`) is expected: those ARE Layer 1 vocabulary — the boundary is stack-dependent vs stack-agnostic, not tool vs no tool.** Content: the 17 SDD commands, the 5 SDD agents, the templates and the 4 process rules (`00-sdd-framework.md`, `01-git-conventions.md`, `02-security.md`, `03-code-quality.md`). Identical everywhere, never adapted.
 - **Layer 2 — Technology**: true for the whole stack, whatever the project. **If a sentence names a branch, a ticket prefix, a host or a project path, it is not Layer 2.** Content: code rules, test strategy, quality gates and scaffolding commands specific to the stack — **every rule file the skill ships in `reference/rules/` that is not one of the four canonical Layer-1 files**; some are numbered (`10-…`), some are not (`api-contracts.md`): the name decides nothing, reference membership does.
 - **Layer 3 — Project**: everything else — business skills, house conventions, project-specific code templates (added by the team).
 
-In a deployed project, **ownership is resolved mechanically, never by filename prefix**: a rule is Layer 1 if it is one of the four canonical files (`00-sdd-framework.md`, `02-git-conventions.md`, `03-security.md`, `04-code-quality.md`); else Layer 2 if the selected skill's `reference/rules/` ships the same relative path; else Layer 3 (project-owned — `/sdd-upgrade` never byte-replaces it). Layer 1 carries no project-override block: project truth lives in Layer 3. A rule that fails its layer's test is in the wrong file, whatever its name says.
+In a deployed project, **ownership is resolved mechanically, never by filename prefix**: a rule is Layer 1 if it is one of the four canonical files (`00-sdd-framework.md`, `01-git-conventions.md`, `02-security.md`, `03-code-quality.md`); else Layer 2 if the selected skill's `reference/rules/` ships the same relative path; else Layer 3 (project-owned — `/sdd-upgrade` never byte-replaces it). Layer 1 carries no project-override block: project truth lives in Layer 3. A rule that fails its layer's test is in the wrong file, whatever its name says.
 
 A **stack skill** packages Layer 1 **(copied verbatim)** + Layer 2 **(stack-specific)**. Layer 3 is added per project, after installation.
 
@@ -37,9 +37,9 @@ skills/sdd-<stack>/
     │   └── <stack>-entity.md, <stack>-test.md, …   ← stack-specific (Layer 2)
     ├── rules/
     │   ├── 00-sdd-framework.md       ← MASTER (methodology, copied from core)
-        │   ├── 02-git-conventions.md     ← MASTER (Git, copied from core)
-    │   ├── 03-security.md            ← MASTER (security baseline, copied from core)
-    │   ├── 04-code-quality.md        ← MASTER (code-quality baseline, copied from core)
+        │   ├── 01-git-conventions.md     ← MASTER (Git, copied from core)
+    │   ├── 02-security.md            ← MASTER (security baseline, copied from core)
+    │   ├── 03-code-quality.md        ← MASTER (code-quality baseline, copied from core)
     │   ├── 10-code-conventions.md    ← stack-specific (Layer 2)
     │   ├── 11-tests-strategy.md      ← stack-specific (Layer 2)
     │   ├── 12-quality-gates.md       ← stack-specific (Layer 2)
@@ -66,7 +66,7 @@ When creating a skill, we **copy** — without ever adapting them — the **34 m
 | `core/commands/*.md` (the 17 SDD commands) | 17 | `commands/` |
 | `core/agents/*.md` **except `test-generator.md`** | 4 | `agents/` |
 | `core/templates/*.md` | 9 | `templates/` |
-| `core/rules/*.md` (`00-sdd-framework`, `02-git-conventions`, `03-security`, `04-code-quality`) | 4 | `rules/` |
+| `core/rules/*.md` (`00-sdd-framework`, `01-git-conventions`, `02-security`, `03-code-quality`) | 4 | `rules/` |
 | **Total** | **34** | |
 
 These 34 files are not to be touched: no renaming, no rephrasing, no "local improvement". Any evolution happens in `core/` and is then **re-propagated** to all skills (see *Synchronization with the core*).
@@ -129,7 +129,7 @@ The **stack-purity vocabulary** below is the canonical, machine-enforced list of
 | count declarations | the declaration grammar: number + up to two qualifiers (`universal`/`SDD`/`core`/`existing`) + `command(s)`/`commande(s)`, compared to the computed `ls core/commands/*.md \| wc -l` | other phrasings: `Command count: N`, spelled-out numerals (`sixteen commands`) | chasing phrasings is an unwinnable enumeration race; the grammar covers every phrasing that occurs in this repo. Revisit when a doc introduces a new count phrasing the grammar misses — then extend the grammar to it. |
 | version narrative | explicit version tokens (`vX.Y`, `X.Y.Z`) in universal command bodies, `sdd-upgrade.md` §0/§0b excepted | release narrative without a token ("added in the previous release") | narrative detection needs semantics, not a pattern; any regex would flood false positives. Revisit if a tokenless release narrative actually ships in a command. |
 | stack-agnostic | the canonical 19-name `No mention of` list | other framework names (React, Vue, Laravel, pytest…) and names colliding with ordinary English (`Express`), which can never be substring-enforced | the enumeration is finite and covers what can leak from this toolkit's six stacks. Revisit when a new supported stack is added, or when a Layer 1 rule is caught naming an unlisted technology in review. |
-| generated trailers | the canonical `Forbidden trailer` list of `02-git-conventions.md` (4 entries) | a future formatting variant not yet listed | the prose prohibition is open-ended by design; the list is extended as variants are observed. Revisit whenever a new trailer variant is seen in the wild — add it to the list. |
+| generated trailers | the canonical `Forbidden trailer` list of `01-git-conventions.md` (4 entries) | a future formatting variant not yet listed | the prose prohibition is open-ended by design; the list is extended as variants are observed. Revisit whenever a new trailer variant is seen in the wild — add it to the list. |
 | version carriers | the declared carriers (`README.md`, `INSTALL.md`) cite `VERSION` as an exact whole token | whether a NON-carrier may state a current version at all | that is a different rule needing its own marker grammar; today non-carriers state no current version by design. Revisit if a stale current-version claim in a non-carrier actually misleads a consumer — then define the marker and its net. |
 | stack purity | the canonical per-stack test vocabulary above (php/js/java/python) | unknown or future framework names outside the vocabulary | the vocabulary is finite by design; enumerating all frameworks in existence is the race this series ended. Revisit when a new supported stack is added or a new framework appears in a skill's own Layer 2 rules. |
 | CI pipeline exclusion | GitLab-shaped markers (shipped `*.yml`, `stages:`, `# .gitlab-ci.yml`, indented `stage:`) | a GitHub-Actions or Jenkins pipeline embedded in a `.md` | the toolkit was only ever GitLab-oriented, and the boundary is stated next to the net. Revisit if the toolkit targets another CI platform. |
@@ -214,7 +214,7 @@ Typical skeleton of the installation flow:
 
 ## Phase 0 — Common core verification
 Check the presence of the Layer 1 masters:
-- .claude/rules/00-sdd-framework.md, 02-git-conventions.md, 03-security.md, 04-code-quality.md
+- .claude/rules/00-sdd-framework.md, 01-git-conventions.md, 02-security.md, 03-code-quality.md
 - the 17 commands .claude/commands/sdd-*.md (+ retro-spec.md)
 - the templates .claude/sdd/_template/*.md
 If any is missing: refuse and install Layer 1 first.

@@ -124,7 +124,7 @@ for t in sdd-methodology.md 50-team-templates.md; do
 done
 # 3a-ter. rules renamed in v1.3.0: old names may appear ONLY in sdd-upgrade.md
 #         (its migration map documents them); anywhere else is drift
-for t in 05-constitution.md 20-git-conventions.md 50-security.md 30-tests-strategy.md 40-quality-gates.md; do
+for t in 05-constitution.md 20-git-conventions.md 50-security.md 30-tests-strategy.md 40-quality-gates.md 02-git-conventions.md 03-security.md 04-code-quality.md; do
   c=$(grep -rlF -- "$t" core skills 2>/dev/null | grep -v '/sdd-upgrade\.md$' | wc -l)
   [ "$c" -eq 0 ] || fail "renamed rule still cited under its old name: $t ($c files)"
 done
@@ -210,7 +210,7 @@ done < <(grep -rnE "(^|[^0-9])$CMD_DECL" core skills README.md INSTALL.md --incl
 # core/extension-guide.md. EXCEPT: the enumerated migration/version-handling sections of
 # sdd-upgrade.md, which legitimately name versions —
 #   "### 0. Locate the toolkit reference"  (the freshness check)
-#   "### 0b. Apply pending file renames"   (the rename map + .sdd-version marker)
+#   "### 0b. Plan pending file renames"    (the rename map + .sdd-version marker)
 # The exclusion applies to those two sections of that one file only — never the
 # whole file, never another command. Wiring enumeration (the invariant): every
 # universal command master (core/commands/*.md) AND its 6 skill copies (same
@@ -227,7 +227,7 @@ done < <(for c in core/commands/*.md; do
     awk -v FILE="$f" -v UP="$up" '
       /^### /{sec=$0}
       /v[0-9]+\.[0-9]+|[0-9]+\.[0-9]+\.[0-9]+/{
-        if (UP == 1 && (sec ~ /^### 0\. Locate the toolkit reference/ || sec ~ /^### 0b\. Apply pending file renames/)) next
+        if (UP == 1 && (sec ~ /^### 0\. Locate the toolkit reference/ || sec ~ /^### 0b\. Plan pending file renames/)) next
         print FILE ":" FNR
       }' "$f"
   done
@@ -466,7 +466,7 @@ done < <(grep -rnE '^stages:|^# \.gitlab-ci\.yml|^  stage: ' core skills --inclu
 # a line that mentions the trailer without negating it reads as an instruction
 # to add it and fails, naming the file. The RULE owns the trailer list: the
 # families searched are derived from the '- Forbidden trailer: "X"' lines of
-# core/rules/02-git-conventions.md (the master — skill copies are hash-identical
+# core/rules/01-git-conventions.md (the master — skill copies are hash-identical
 # by net 6), never hard-coded here and never parsed from the prose sentence
 # (note: the prose is open-ended; only the canonical list is machine-enforced,
 # and the rule states that boundary itself). Entries are LITERAL markers:
@@ -478,8 +478,8 @@ done < <(grep -rnE '^stages:|^# \.gitlab-ci\.yml|^  stage: ' core skills --inclu
 # must name the strings in order to hunt them. Case-insensitive. The canonical
 # list lines themselves say "Forbidden" and therefore carry their own negation
 # marker — they must not fire the net (explicit false-positive fixture).
-TRAILERS=$(grep '^- Forbidden trailer:' core/rules/02-git-conventions.md | grep -oE '"[^"]+"' | tr -d '"')
-[ -n "$TRAILERS" ] || fail "generated-trailer net: derived canonical trailer list is EMPTY (check 02-git-conventions.md '- Forbidden trailer:' lines)"
+TRAILERS=$(grep '^- Forbidden trailer:' core/rules/01-git-conventions.md | grep -oE '"[^"]+"' | tr -d '"')
+[ -n "$TRAILERS" ] || fail "generated-trailer net: derived canonical trailer list is EMPTY (check 01-git-conventions.md '- Forbidden trailer:' lines)"
 while IFS= read -r t; do
   [ -n "$t" ] || continue
   while IFS= read -r hit; do

@@ -129,7 +129,7 @@ The **3 ✋ MANUAL GATES** (spec → plan → tasks) guarantee that we never bui
 
 ## Security by default
 
-Security is built into the method, not bolted on (see `core/rules/03-security.md`, deployed with every skill):
+Security is built into the method, not bolted on (see `core/rules/02-security.md`, deployed with every skill):
 
 - **Spec phase** — every spec has a **Security considerations** section (data sensitivity, authorization impact, abuse cases); security acceptance criteria are tagged `[SEC]`.
 - **Implementation** — baseline rules always apply: server-side input validation, parameterized queries, contextual output encoding, no secrets in code, explicit access control on every endpoint.
@@ -228,4 +228,4 @@ Framework examples stay neutral (`Order`, `User`, `Payment`, `PROJ-xxx`): replac
 | `skills/README.md` | Skills decision tree |
 | `core/extension-guide.md` | Creating a new stack skill |
 
-Version 1.10.0 — August 2026.
+Version 1.11.0 — August 2026.

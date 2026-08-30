@@ -101,9 +101,9 @@ Copy from `reference/` to project's `.claude/`, in this order:
 .claude/agents/test-generator.md
 .claude/agents/code-reviewer.md
 .claude/rules/00-sdd-framework.md
-.claude/rules/02-git-conventions.md
-.claude/rules/03-security.md
-.claude/rules/04-code-quality.md
+.claude/rules/01-git-conventions.md
+.claude/rules/02-security.md
+.claude/rules/03-code-quality.md
 .claude/rules/10-code-conventions.md
 .claude/rules/11-tests-strategy.md
 .claude/rules/12-quality-gates.md
