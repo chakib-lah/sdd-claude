@@ -8,7 +8,7 @@
 
 - **Java**: 25 LTS recommended (21 LTS common, 17 LTS minimum for legacy)
 - **Spring Boot**: 4.1.x recommended for new projects (Spring Framework 7), 3.5.x for maintenance, 3.3.x legacy
-- **Build tool**: Gradle 9+ (wrapper committed) with `dependencyLocking` enabled and `gradle.lockfile` committed — OR Maven 3.9+
+- **Build tool**: Gradle 9+ (wrapper committed) with `dependencyLocking` enabled and `gradle.lockfile` committed (greenfield recommendation — whether locking is enabled is a discovered project fact) — OR Maven 3.9+
 - **Hibernate ORM**: 6.6+
 - **Mapping / boilerplate**: MapStruct + Lombok
 - **API documentation**: springdoc-openapi 2.x (Spring Boot 3.x) / 3.x (Spring Boot 4.x)
@@ -312,7 +312,9 @@ Spring Boot parent resolves it:
 </properties>
 ```
 
-### Dependency locking (Gradle)
+### Dependency locking (Gradle — greenfield recommendation, discovered state)
+
+Whether locking is enabled is a **project fact** (`dependencyLocking` in the build, `gradle.lockfile` present) — never enable it silently during unrelated work. Greenfield setup:
 
 ```groovy
 dependencyLocking {
@@ -320,6 +322,7 @@ dependencyLocking {
 }
 ```
 
+**Where locking is enabled**:
 - `gradle.lockfile` is committed and regenerated with `./gradlew dependencies --write-locks`
 - Never edit `gradle.lockfile` by hand (see `.claude/rules/12-quality-gates.md`)
 

@@ -4,14 +4,25 @@
 
 ---
 
-## Tools
+## Tools — required capability, discovered parameters
 
-- **Test framework**: JUnit 5 (Jupiter)
+- **Test framework**: JUnit 5 (Jupiter) — **required**
 - **Mocking**: Mockito (`@ExtendWith(MockitoExtension.class)`)
 - **Assertions**: AssertJ (`assertThat(...)`) — not Hamcrest, not bare JUnit asserts
 - **Spring support**: `spring-boot-starter-test` (includes all of the above)
-- **Integration DB**: Testcontainers (PostgreSQL) OR embedded PostgreSQL (Zonky)
-- **Coverage**: JaCoCo
+- **Integration DB**: the project's **discovered strategy** — integration tests exercise a real or representative database engine when database-specific behavior matters. Testcontainers with the **production engine's** image is the common example; an established embedded setup (e.g. an embedded PostgreSQL such as Zonky on a PostgreSQL project) is equally valid — follow the strategy in place, never introduce a second one, and never impose PostgreSQL infrastructure on a project whose production database is another engine
+- **Coverage**: the configured tool (JaCoCo is the common example — see `.claude/rules/12-quality-gates.md`)
+
+## Discovery first
+
+**JUnit 5 automated tests are required.** How the project splits and runs them is a set of **project facts** — read the build configuration under the discovered backend root (which may be the repository root) before generating or running anything:
+
+- **Build tool and wrapper**: Gradle (`./gradlew` at its actual location, `build.gradle` or `build.gradle.kts`) or Maven (`./mvnw`/`mvn`, `pom.xml`) — never assume the wrapper sits in a fixed subdirectory.
+- **Test tasks/goals**: list what the build defines (`./gradlew tasks`, or the POM's surefire/failsafe configuration). Custom `unitTest`/`integrationTest` tasks are a common convention — often declared in an included build script — but they are **not built-in Gradle facts**; a project may only have the default `test` task.
+- **Suite/naming convention**: name-pattern splits (`*Test` vs `*IT` / `*IntTest` / `*IntegrationTest`), dedicated source sets (`src/integrationTest/java`), or tag-based splits are all valid established conventions — discover the one in place and follow it; never introduce a second incompatible convention.
+- **Database strategy**: Testcontainers, an existing embedded database setup, or a CI database service — follow the existing setup.
+
+Missing test infrastructure is a **PROJECT_TOOLING_GAP** (see `.claude/rules/12-quality-gates.md`).
 
 ## Test organization
 
@@ -28,12 +39,14 @@ src/test/java/com/example/app/
 └── UserApiIT.java                      ← full integration (random port)
 ```
 
-### Unit / integration split by class-name pattern
+### Unit / integration split (greenfield default: class-name pattern)
+
+The split below is the **greenfield default** — an existing project's discovered convention (another suffix, dedicated source sets, tags) takes precedence:
 
 - `*Test` → no full Spring context and no real database: pure unit tests AND web slices (`@WebMvcTest`)
-- `*IT` (or `*IntTest`, Gradle-only) → full context (`@SpringBootTest`) or real database (`@DataJpaTest` with embedded PostgreSQL/Testcontainers)
+- `*IT` (or `*IntTest`, Gradle-only) → full context (`@SpringBootTest`) or real database (`@DataJpaTest` with the project's discovered DB strategy)
 
-Gradle task split:
+Gradle task split (**greenfield example** — `unitTest`/`integrationTest` are not built-in Gradle tasks; existing projects often declare the same split in a dedicated build script — discover theirs instead of re-declaring):
 
 ```groovy
 tasks.register('unitTest', Test) {
@@ -63,8 +76,8 @@ into `check`, exclude the default task from it (`check.dependsOn.remove(tasks.na
 
 Maven equivalent: Surefire runs `*Test` during `test`, Failsafe runs `*IT` during
 `verify` (declare the `maven-failsafe-plugin` with the `integration-test` and `verify`
-goals). Only the `*IT` suffix is picked up by Failsafe defaults; `*IntTest` requires
-explicit `<includes>` configuration — treat `*IntTest` as a Gradle-only convention.
+goals). Only the `*IT` suffix is picked up by Failsafe defaults; other suffixes
+(`*IntTest`, `*IntegrationTest`…) require explicit `<includes>` configuration.
 
 ## Test categories
 
@@ -115,12 +128,12 @@ class UserServiceImplTest {
 
 ### Repository slice tests (`*IT`, `@DataJpaTest`)
 
-For: Spring Data repositories, custom queries, JPA mappings — against a real PostgreSQL.
+For: Spring Data repositories, custom queries, JPA mappings — against a real or representative instance of the **project's database engine**, via the discovered strategy.
 
 ```java
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@AutoConfigureEmbeddedDatabase(provider = ZONKY)   // or a Testcontainers @ServiceConnection
+@AutoConfigureEmbeddedDatabase(provider = ZONKY)   // PostgreSQL-project example — or a Testcontainers @ServiceConnection with the production engine's image
 class UserRepositoryIT {
 
     @Autowired
@@ -216,7 +229,7 @@ class UserApiIT {
 
 ### Files
 
-- `<ClassName>Test.java` for unit/slice tests, `<ClassName>IT.java` for integration
+- Suffix and location follow the **discovered** suite convention (greenfield defaults: `<ClassName>Test.java` for unit/slice tests, `<ClassName>IT.java` for integration — a project on `*IntTest`, `*IntegrationTest` or a dedicated source set keeps its own)
 - Placed in the mirror package: `main/.../UserServiceImpl.java` → `test/.../UserServiceImplTest.java`
 
 ### Test methods
@@ -269,26 +282,28 @@ Inject a `java.time.Clock` bean and use `Clock.fixed(...)` in tests. Never call
 
 ## Execution commands
 
-Read by `/sdd-implement` and `/sdd-verify` — keep them exact (adapt to the project's wrapper):
+`/sdd-implement` and `/sdd-verify` run the **discovered** commands — resolve them once from the build configuration and reuse them consistently. A resolved command is a **complete invocation**, not a working directory plus a task name: it encodes the discovered wrapper executable **at its actual location**, the invocation working directory, the module/project selector where the build is multi-module/multi-project, the task/goal and any configured options. The wrapper location and the backend root are **independent discovered facts** — a repository-root wrapper may drive a nested module just as validly as a wrapper living inside the backend root; never assume the wrapper sits in the backend root.
 
 ```bash
-# All tests
-./gradlew test
+# Discovered complete invocations — resolve once, reuse; invoke only tasks/goals the build defines
+<backend-test-command>               # the whole suite (Gradle default `test` / Maven `verify`)
+<backend-unit-test-command>          # the discovered fast suite (greenfield default task: unitTest)
+<backend-integration-test-command>   # the discovered integration suite (greenfield default task: integrationTest)
+<backend-coverage-command>           # e.g. resolves to the configured jacocoTestReport — only if configured
 
-# By category
-./gradlew unitTest
-./gradlew integrationTest
-
-# Coverage report
-./gradlew jacocoTestReport
-
-# Maven equivalents
-mvn test                        # unit tests (Surefire, *Test)
-mvn verify                      # unit + integration (Failsafe, *IT)
-mvn -Dtest=ClassName test       # a single test class
+# Example resolutions (valid shapes, NOT universal syntax):
+#   <repo-root>/gradlew :apps:backend:test        — root wrapper + nested Gradle module selector
+#   cd <backend-root> && ./gradlew test           — wrapper inside the backend root
+#   <repo-root>/mvnw -pl <module> test            — root Maven wrapper + module targeting
+#   cd <backend-root> && ./mvnw verify            — wrapper inside the Maven module
+#   <maven-invocation> -Dtest=ClassName test      — a single test class via Surefire
 ```
 
+Never invoke a task/goal the build does not define — a project without a split only has `test`/`verify`.
+
 ## Target coverage
+
+Review and greenfield targets — the enforced gate is the project's **configured** thresholds (see `.claude/rules/12-quality-gates.md`), plus no coverage regression on changed code. Never present this table as a project's current truth.
 
 | Code type | Target coverage |
 |---|---|

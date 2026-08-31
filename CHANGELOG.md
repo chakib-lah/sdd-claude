@@ -1,5 +1,20 @@
 # Changelog — SDD Claude
 
+## [1.15.0] — 2026-08-31
+
+Java backend Layer-2 stabilization: `sdd-java-backend` adopts the discovery-aware ownership architecture.
+
+### Changed
+
+- **Root/build/wrapper discovery** — the repository root, backend/build root (nested or top-level, multi-module included), the Gradle/Maven wrapper location and the configured tasks/goals are discovered project facts; operational commands are complete discovered invocations (wrapper location, working directory, module selector, options), and a Maven project never receives a Gradle command.
+- **Quality capability vs implementation** — tests, static/style quality, formatting, coverage, build verification and dependency quality remain required capabilities while their implementations are discovered from the build; absences are explicit `PROJECT_TOOLING_GAP`s, and no strictness profile can turn a required capability off.
+- **Test-suite discovery** — build tool, real test tasks/goals and suite/naming conventions are discovered; standard single-task projects and alternate integration-test conventions work without invented tasks.
+- **Engine-neutral integration testing** — integration tests exercise a real or representative instance of the project's database engine via the discovered strategy; no specific database infrastructure is imposed universally.
+- **Conditional dependency locking** — locking is a discovered project state and a greenfield recommendation; it is never enabled silently during unrelated work.
+- **REST-aware API-contract gaps** — a REST backend without a machine-readable contract mechanism is an explicit gap; non-REST backends (batch, workers, consumers) are contract-capability not-applicable — no false gap, no forced tooling.
+
+---
+
 ## [1.14.0] — 2026-08-31
 
 Java/Angular Layer-2 stabilization: `sdd-java-angular` adopts the discovery-aware architecture, verified against real Gradle/Spring/Angular project shapes.

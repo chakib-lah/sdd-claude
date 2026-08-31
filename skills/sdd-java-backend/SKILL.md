@@ -44,15 +44,18 @@ Analyze and report on:
 
 **Stack detected**
 ```
-build tool               : Gradle x.x (wrapper) / Maven x.x — gradle.lockfile: [yes/no]
+backend/build root       : [discovered directory — may be the repo root; multi-module structure if any]
+build tool               : Gradle x.x / Maven x.x — wrapper location: [path] (`build.gradle`/`build.gradle.kts`/`pom.xml`)
+dependency locking       : [enabled + gradle.lockfile / not enabled]
 java                     : x
 spring-boot              : x.x.x
 hibernate                : x.x.x
 flyway / liquibase       : x.x.x
 mapstruct / lombok       : x.x.x / x.x.x
-springdoc-openapi        : x.x.x
+REST API                 : [present (controllers/endpoints found) / absent (batch, scheduled worker, message consumer, event processor…)]
+API contract source      : [N/A — no REST API / springdoc x.x.x / another provider or export mechanism / project-owned OpenAPI document / none]
 junit / mockito          : x.x.x / x.x.x
-testcontainers / emb. DB : [testcontainers x.x.x / embedded PostgreSQL / none]
+testcontainers / emb. DB : [testcontainers x.x.x (engine image) / embedded DB setup / none]
 ```
 
 **Backend architecture**
@@ -63,7 +66,7 @@ testcontainers / emb. DB : [testcontainers x.x.x / embedded PostgreSQL / none]
 - DTOs: records, Lombok classes, validation annotations?
 
 **Existing tests**
-- Unit/integration split: naming pattern (`*IT`, `*IntTest`), separate source set or Gradle/Maven task?
+- Unit/integration split: naming pattern (`*IT`, `*IntTest`, `*IntegrationTest`…), dedicated source set, tags, or Gradle/Maven task — which tasks/goals does the build actually define?
 - Test directories and naming conventions (`*Test.java`)
 - Coverage tooling (JaCoCo) and estimated coverage
 
@@ -74,8 +77,8 @@ testcontainers / emb. DB : [testcontainers x.x.x / embedded PostgreSQL / none]
 
 **Gaps and debt**
 - Entities or services without tests
-- No committed dependency lockfile
-- Endpoints without springdoc annotations
+- Dependency locking enabled but `gradle.lockfile` stale or untracked (a project without locking is a valid state — adopting it is a dedicated decision, greenfield recommendation)
+- Where the backend **exposes a REST API**: no machine-readable API contract mechanism at all (**PROJECT_TOOLING_GAP** — see `.claude/rules/12-quality-gates.md`); where a discovered provider owns the contract and the project convention applies its metadata (e.g. springdoc annotations), endpoints missing that metadata — never a springdoc requirement on projects whose contract source is not springdoc. Where the backend exposes **no REST API** (batch, scheduled worker, message consumer, event processor…), the contract capability is **not applicable**: no gap, no provider installation, no OpenAPI document created
 - Migrations off naming convention or without documented rollback path
 
 Then ask 4 clarification questions:
@@ -148,8 +151,8 @@ Copy from `reference/` to project's `.claude/`, in this order:
 
 The Layer-2 files just deployed are **skill-owned**: immediately after installation the project's Layer 2 is **byte-identical to `reference/`**, and it stays that way — never edit a deployed Layer-2 rule with project findings. Instead, dispose of every Phase 1 finding by ownership:
 
-- **Discoverable on demand — do not persist**: Java, Spring Boot, JUnit, Hibernate and Flyway/Liquibase versions, the build tool, and the exact Gradle/Maven test commands (`build.gradle`/`build.gradle.kts`/`pom.xml`, `gradle.lockfile`), Checkstyle/Sonar/JaCoCo configuration (their config files). Commands read these canonical sources when they need them. (Diagnostic aid, already stack knowledge in `jpa-conventions.md`: Flyway 10+ splits PostgreSQL support into `flyway-database-postgresql`; Flyway 9 ships it in core.)
-- **Durable project context → Layer 3**: the detected architecture (hexagonal or standard) and the unit/integration naming split the team uses (`*IT` / `*IntTest`) — `.claude/rules/project-architecture.md` / `.claude/rules/project-testing.md`.
+- **Discoverable on demand — do not persist**: the backend/build root and wrapper location, Java, Spring Boot, JUnit, Hibernate and Flyway/Liquibase versions, the build tool, the actual test tasks/goals and the exact Gradle/Maven test commands (`build.gradle`/`build.gradle.kts`/`pom.xml`, `gradle.lockfile` where locking is enabled), configured quality tools (Checkstyle/Spotless/Sonar/JaCoCo or equivalents — their config files), the dependency-locking state, and the API contract source/provider and export mechanism (build files, `application.yml`). Commands read these canonical sources when they need them. (Diagnostic aid, already stack knowledge in `jpa-conventions.md`: Flyway 10+ splits PostgreSQL support into `flyway-database-postgresql`; Flyway 9 ships it in core.)
+- **Durable project context → Layer 3**: the detected architecture (hexagonal or standard) and the unit/integration suite convention the team has decided on (`*IT` / `*IntTest` / `*IntegrationTest` / dedicated source set…) where it is a durable team policy — `.claude/rules/project-architecture.md` / `.claude/rules/project-testing.md`.
 - **Project policies → Layer 3**: the dependency-lockfile policy and quality-gate targets — `.claude/rules/project-quality.md`.
 - **Diagnostic only**: the Phase 1 stack report is announced in the chat and not persisted. Report versions **as found** — never force an upgrade; modern recommendations (Java 25 LTS or 21, Spring Boot 4.1.x or 3.5.x) apply only to greenfield scaffolding.
 
