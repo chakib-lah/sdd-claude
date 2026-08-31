@@ -6,27 +6,33 @@
 
 ## Overview
 
-| Layer | Tools | Location |
+| Layer | Required capability | Current parameters (discovered) |
 |---|---|---|
-| Backend Unit | JUnit 5 + Mockito + AssertJ | `backend/src/test/java/**/*Test.java` |
-| Backend Integration | JUnit 5 + Spring Test (`*IT`) | `backend/src/test/java/**/*IT.java` |
-| Frontend Unit | Karma+Jasmine (CLI default) or Jest | `frontend/src/**/*.spec.ts` |
-| Frontend E2E (optional) | Cypress or Playwright | `frontend/e2e/` or `frontend/cypress/` |
+| Backend unit / slice / integration | JUnit 5 — **required** | build tool, wrapper location, actual test tasks/goals, suite/naming convention, DB strategy |
+| Frontend unit/component | Automated tests — **required**; **Vitest is the modern target runner** | actual runner (Vitest / Karma+Jasmine / Jest), `angular.json` test builder, project scripts |
+| Frontend E2E | E2E coverage of critical full-stack workflows | configured tool (Cypress, Playwright, other) |
+
+Both roots are discovered (never assumed to be `backend/`/`frontend/`; the backend root — and the Gradle/Maven wrapper — may live at the repository root); `<backend-root>`/`<frontend-root>` below stand for the discovered directories.
 
 ---
 
 ## Backend — JUnit 5 / Mockito / AssertJ
 
-> The backend testing rules below are self-contained. (The `sdd-java-backend` skill
-> covers the same ground in more depth for backend-only projects, but nothing there
-> is required to apply this file.)
+### Discovery first
 
-### Organization
+**JUnit 5 automated tests are required.** How the project splits and runs them is a set of **project facts** — read the build configuration under the discovered backend root before generating or running anything:
 
-`src/test/java` mirrors `src/main/java` package for package. Split by class-name pattern:
+- **Build tool and wrapper**: Gradle (`./gradlew` at its actual location) or Maven — never assume the wrapper sits in a `backend/` subdirectory.
+- **Test tasks/goals**: list what the build defines (`./gradlew tasks`, or the POM's surefire/failsafe configuration). Custom `unitTest`/`integrationTest` tasks are a common convention — often declared in an included build script — but they are **not built-in Gradle facts**; a project may only have the default `test` task.
+- **Suite/naming convention**: name-pattern splits (`*Test` vs `*IT` / `*IntTest` / `*IntegrationTest`), dedicated source sets (`src/integrationTest/java`), or tag-based splits are all valid established conventions — discover the one in place and follow it; never introduce a second incompatible convention.
+- **Database strategy**: Testcontainers, an existing embedded PostgreSQL setup, or a CI database service — follow the existing setup.
+
+Missing test infrastructure is a **PROJECT_TOOLING_GAP** (see `12-quality-gates.md`).
+
+The universal levels map onto the project's discovered suites (greenfield defaults shown):
 
 - `*Test` → unit or slice test (no full context, no real DB unless a slice needs one)
-- `*IT` or `*IntTest` → integration test (Spring context and/or real database)
+- `*IT` → integration test (Spring context and/or real database)
 
 Assertions with AssertJ (`assertThat(...)`) — not Hamcrest, not bare JUnit asserts.
 
@@ -79,13 +85,13 @@ class UserControllerTest {
 ```
 
 Repository slices use `@DataJpaTest` against a real PostgreSQL (Testcontainers or
-embedded); full flows use `@SpringBootTest(webEnvironment = RANDOM_PORT)` and are
-named `*IT`. On Spring Boot 4 projects, prefer `RestTestClient` for web tests.
+embedded — follow the existing setup); full flows use
+`@SpringBootTest(webEnvironment = RANDOM_PORT)` and belong to the integration suite.
+On Spring Boot 4 projects, prefer `RestTestClient` for web tests.
 
-### Gradle task split
+### Gradle task split (greenfield example)
 
-The `unitTest` / `integrationTest` tasks used below are **not built-in Gradle tasks** —
-declare them in `backend/build.gradle`:
+`unitTest` / `integrationTest` are **not built-in Gradle tasks** — a greenfield project declares them (existing projects often declare the same split in a dedicated build script; discover theirs instead of re-declaring):
 
 ```groovy
 tasks.register('unitTest', Test) {
@@ -115,46 +121,50 @@ into `check`, exclude the default task from it (`check.dependsOn.remove(tasks.na
 
 Maven equivalent: Surefire runs `*Test` during `test`, Failsafe runs `*IT` during
 `verify` (declare the `maven-failsafe-plugin` with the `integration-test` and `verify`
-goals). Only the `*IT` suffix is picked up by Failsafe defaults; `*IntTest` requires
-explicit `<includes>` configuration — treat `*IntTest` as a Gradle-only convention.
+goals). Only the `*IT` suffix is picked up by Failsafe defaults; other suffixes require
+explicit `<includes>` configuration.
 
 ### Commands
 
 ```bash
-cd backend
-./gradlew test                  # all tests
-./gradlew unitTest              # unit only (*Test)
-./gradlew integrationTest       # integration only (*IT)
-./gradlew jacocoTestReport      # coverage report
+# Via the project wrapper at its discovered location — invoke the DISCOVERED tasks
+cd <repo-root>/<backend-root>
+./gradlew test                        # always valid: the default task runs everything
+./gradlew <unit-test-task>            # the discovered fast suite (greenfield default: unitTest)
+./gradlew <integration-test-task>     # the discovered integration suite (greenfield default: integrationTest)
 
 # Maven equivalents
-mvn test                        # unit tests (Surefire, *Test)
-mvn verify                      # unit + integration (Failsafe, *IT)
+mvn test                              # unit tests (Surefire)
+mvn verify                            # unit + integration (Failsafe)
 ```
 
-Keep these commands exact — `/sdd-implement` and `/sdd-verify` read them.
+`/sdd-implement` and `/sdd-verify` run the **discovered** commands — resolve them once from the build configuration and reuse them consistently.
 
 ---
 
-## Frontend — Karma/Jasmine or Jest
+## Frontend — Vitest is the modern target; the current runner is discovered
 
-The Angular CLI ships Karma+Jasmine by default on older versions; **since Angular 21,
-Vitest is the default runner for new projects** (Karma is deprecated). Jest (via
-`jest-preset-angular`) is a valid alternative on projects that already adopted it.
-**Keep whichever runner the project uses** — do not migrate as a side effect of a
-feature.
+**Automated Angular tests are required.** The modern Layer-2 target runner is **Vitest** (the Angular CLI default for new projects since Angular 21; Karma is deprecated). The runner actually in place is a **project fact**: read the `test` builder in `angular.json` and the test tooling in `package.json` before generating or running anything.
+
+Runner states:
+
+- **Vitest configured** — use the existing Vitest/Angular CLI configuration and project scripts as-is; do not add a custom Vitest config when the CLI builder already owns it.
+- **Karma + Jasmine configured (brownfield)** — a supported **PROJECT_MIGRATION_GAP**, not the target: the current runner stays usable so feature work remains executable; generate Jasmine-compatible tests through the project's CLI wrapper; report the migration gap; never migrate the runner (or install Vitest) as a side effect of an unrelated feature.
+- **Jest configured (brownfield)** — a supported **discovered existing runner**: honor it, never mix runner APIs, and do not migrate to or away from it during a feature.
+- **No runner configured** — **PROJECT_TOOLING_GAP**: automated tests remain required; setting up the runner is a dedicated tooling change (greenfield default: Vitest via the Angular CLI).
+
+The `TestBed` / `HttpTestingController` patterns below are runner-agnostic — they run under Vitest, Jasmine or Jest.
 
 ### Commands
 
 ```bash
-cd frontend
-ng test --watch=false --browsers=ChromeHeadless    # CI mode (Karma)
-ng test                                            # watch mode (local dev)
-ng test --watch=false --code-coverage              # with coverage
-
-# Jest projects
-npm test -- --coverage --watchAll=false
+# Always via the project's configured scripts / CLI target — discover them first
+cd <repo-root>/<frontend-root>
+npm test                              # runs whatever runner angular.json wires
+npm test -- --coverage                # if the configured runner/builder supports it
 ```
+
+Runner-specific flags (Karma's `--browsers=ChromeHeadless --watch=false`, Jest's `--watchAll=false`) belong to the **discovered** runner — never emit them universally.
 
 ### Service unit tests (HTTP)
 
@@ -229,7 +239,7 @@ describe('UserCardComponent', () => {
     component.users.set([{ id: 1, email: 'a@x.io' }, { id: 2, email: 'b@y.io' }]);
     component.searchTerm.set('a@');
 
-    expect(component.filteredUsers()).toHaveSize(1); // Jasmine (Jest: toHaveLength)
+    expect(component.filteredUsers().length).toBe(1); // assertion style per the discovered runner
   });
 });
 ```
@@ -243,11 +253,10 @@ describe('UserCardComponent', () => {
 
 ## E2E — optional smoke on the main flows
 
-E2E is **optional** on this stack: add Cypress or Playwright smoke tests only for
-the main user flows (login, primary CRUD journey), not for UI details.
+E2E is **optional** on this stack: smoke tests only for the main user flows (login, primary CRUD journey), not for UI details. The tool is a project fact — discover the existing Cypress/Playwright/other setup before writing E2E tests, and never force a project-wide E2E migration.
 
 ```typescript
-// cypress/e2e/user-listing.cy.ts
+// cypress/e2e/user-listing.cy.ts — tool-specific example
 describe('User listing', () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/users', { fixture: 'users.json' }).as('getUsers');
@@ -262,8 +271,8 @@ describe('User listing', () => {
 ```
 
 ```bash
-cd frontend
-npx cypress run          # CI mode (headless)
+cd <repo-root>/<frontend-root>
+npx cypress run          # CI mode (headless) — Cypress example
 npx playwright test      # Playwright equivalent
 ```
 
@@ -295,18 +304,20 @@ Tag the covering test with a `// Covers AC-n` comment on both sides.
 For tests that depend on API payloads, keep one canonical JSON example per DTO
 (from the OpenAPI contract, see `api-contracts.md`) and reuse it:
 - Backend: as the expected body in `@WebMvcTest` assertions
-- Frontend: as the `req.flush(...)` payload and Cypress fixture
+- Frontend: as the `req.flush(...)` payload and E2E fixture
 
 This catches contract drift in unit tests before it reaches E2E.
 
 ### Time-dependent code
 
 Backend: inject a `java.time.Clock` bean, use `Clock.fixed(...)` in tests.
-Frontend: use `jasmine.clock()` / `jest.useFakeTimers()` — never real `setTimeout` waits.
+Frontend: use the discovered runner's fake-timer facilities — never real `setTimeout` waits.
 
 ---
 
 ## Coverage targets
+
+Review and greenfield targets — the enforced gate is the project's **configured** thresholds (discovered from its coverage/CI configuration), plus no coverage regression on changed code. Never present the table below as a project's current truth.
 
 | Layer | Target |
 |---|---|
@@ -322,15 +333,15 @@ Frontend: use `jasmine.clock()` / `jest.useFakeTimers()` — never real `setTime
 
 | Side | Commands |
 |---|---|
-| Backend | `./gradlew unitTest integrationTest` (or `mvn verify`) + `./gradlew jacocoTestCoverageVerification` |
-| Frontend | `ng test --watch=false --browsers=ChromeHeadless` (or `npm test -- --watchAll=false`) |
-| E2E (if present) | `npx cypress run` or `npx playwright test` — only when the task touched a covered flow |
+| Backend | the discovered test tasks/goals via the project wrapper (greenfield defaults: `./gradlew unitTest integrationTest`, or `mvn verify`) + the configured coverage verification where one exists |
+| Frontend | the project's configured test script (`npm test` through the discovered runner) |
+| E2E (if present) | the configured E2E tool — only when the task touched a covered flow |
 
 ---
 
 ## In the project's CI
 
-The suites above run in the project's **existing** pipeline — the toolkit prescribes what must be green (backend `unitTest` then `integrationTest` with their database, frontend unit, E2E on the assembled stack), never how the pipeline is wired.
+The suites above run in the project's **existing** pipeline — the toolkit prescribes what must be green (backend unit then integration suites with their database, frontend unit through the discovered runner, E2E on the assembled stack), never how the pipeline is wired.
 
 ## Anti-patterns
 
@@ -342,3 +353,4 @@ The suites above run in the project's **existing** pipeline — the toolkit pres
 - ❌ Assertion-free tests or `expect(true).toBeTrue()`
 - ❌ Order-dependent tests sharing mutable state
 - ❌ Testing an AC on only one side when the logic spans both (backend validation + frontend display)
+- ❌ Running or generating against assumed test tasks or runner flags instead of the discovered ones

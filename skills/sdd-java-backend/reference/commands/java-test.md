@@ -27,17 +27,19 @@ Automatic suggestion based on the class:
 - Full user flow across layers → `Integration` (`@SpringBootTest(webEnvironment = RANDOM_PORT)`)
 - Value object / validator / mapper → `Unit`
 
-### 2. Load the conventions
+### 2. Load the conventions and discover the project's test setup
 
 Read `.claude/rules/11-tests-strategy.md` to comply with:
 - Directory structure (`src/test/java`, mirrored packages)
 - AAA pattern (Arrange / Act / Assert)
 - AssertJ for all assertions
 - **Test method naming**: `should<Action>When<Condition>` (e.g. `shouldReturn404WhenUserDoesNotExist`)
-- **Naming decides the suite**:
-  - `<Class>Test` → unit suite (no full Spring context and no real database: pure Mockito, and web slices via `@WebMvcTest`)
-  - `<Class>IT` → integration suite (full context via `@SpringBootTest`, or a real database via `@DataJpaTest` with embedded PostgreSQL/Testcontainers)
-- Gradle: `unitTest` / `integrationTest` tasks; Maven: surefire (`*Test`) / failsafe (`*IT`)
+
+Then **discover the project's suite convention** — read the build configuration (Gradle build files/included scripts, or the POM's surefire/failsafe setup) and the wrapper location (which may be the repository root) before generating or running anything:
+
+- **How the suites split**: name patterns (`*Test` vs `*IT` / `*IntTest` / `*IntegrationTest`), dedicated source sets (`src/integrationTest/java`), or tags — all valid; follow the one in place, never introduce a second incompatible convention.
+- **Which tasks/goals run them**: custom Gradle tasks like `unitTest` / `integrationTest` are a common convention but **not built-in** — a project may only define the default `test` task. Maven: surefire (`test`) / failsafe (`verify`).
+- Greenfield defaults when nothing is established: `<Class>Test` → unit suite (no full Spring context and no real database: pure Mockito, and web slices via `@WebMvcTest`); `<Class>IT` → integration suite (full context via `@SpringBootTest`, or a real database via `@DataJpaTest` with embedded PostgreSQL/Testcontainers)
 
 ### 3. Load the SDD context
 
@@ -290,30 +292,36 @@ Before writing:
 
 ### 9. Write the file
 
-Path mirrors the class under test, suffix according to the suite:
+Path mirrors the class under test; suffix and location follow the **discovered** suite convention (greenfield defaults shown):
 - `src/test/java/.../UserServiceImplTest.java` (unit)
 - `src/test/java/.../UserRepositoryIT.java` (repository slice)
 - `src/test/java/.../UserControllerTest.java` (web slice — no full context, no real database)
 - `src/test/java/.../CreateUserFlowIT.java` (integration)
 
+On a project with a dedicated integration source set or another suffix (`*IntTest`, `*IntegrationTest`…), place and name the file so the existing build picks it up.
+
 ### 10. Verify that the tests run in the right suite
 
-```bash
-# Gradle
-./gradlew unitTest --tests '<Class>Test'
-./gradlew integrationTest --tests '<Class>IT'
+Run the **discovered** tasks/goals via the project wrapper, from the discovered backend root (which may be the repository root). The class name passed to the filter is the **actual generated test class** — whatever name the discovered convention produced (`UserServiceTest`, `UserServiceIT`, `UserServiceIntTest`, `UserServiceIntegrationTest`, a dedicated-source-set class…) — never a suffix assumed at execution time:
 
-# Maven
-mvn -Dtest=<Class>Test test
-mvn -Dit.test=<Class>IT verify
+```bash
+# Gradle — the project's own tasks (greenfield defaults: unitTest / integrationTest —
+# invoke a task only if the build defines it; a project without a split only has
+# `test` — use it, with its supported filtering syntax where appropriate)
+./gradlew <discovered-unit-test-task> --tests '<generated-unit-test-class>'
+./gradlew <discovered-integration-test-task> --tests '<generated-integration-test-class>'
+
+# Maven — through the project's established Surefire/Failsafe configuration
+mvn -Dtest=<generated-unit-test-class> test
+mvn -Dit.test=<generated-integration-test-class> verify
 ```
 
-A `*Test` class that boots a full Spring context or touches a real database is in the wrong suite: rename it `*IT`. Web slices (`@WebMvcTest`) stay in the `*Test` suite.
+A unit-suite class that boots a full Spring context or touches a real database is in the wrong suite: move/rename it per the discovered integration convention. Web slices (`@WebMvcTest`) stay in the unit suite.
 
 ### 11. Announce
 
 ```
-✅ Tests scaffolded: src/test/java/.../<Class>Test.java (or <Class>IT.java)
+✅ Tests scaffolded: <path to the generated test class, named per the discovered suite convention>
 
 Tests generated: N
   - N ACs covered
@@ -322,7 +330,7 @@ Tests generated: N
 
 Next step:
 - Implement the tests via /sdd-implement
-- Run regularly: ./gradlew unitTest (fast) and ./gradlew integrationTest (before push)
+- Run regularly: the discovered unit suite (fast) and integration suite (before push)
 ```
 
 ## Stop rules
@@ -333,7 +341,7 @@ Next step:
 - **No mocking of the class under test**: only dependencies are mocked
 - **No business logic in the tests**: if you write an `if`, split into several tests
 - **No required execution order** between tests
-- **Naming decides the suite**: `<Class>Test` must not boot a full Spring context or a real database (web slices `@WebMvcTest` are fine); anything that does is a `<Class>IT`
+- **Suite membership follows the discovered project convention**: a unit-suite class must not boot a full Spring context or a real database (web slices `@WebMvcTest` are fine); anything that does belongs to the integration suite (greenfield default: rename `<Class>Test` → `<Class>IT`)
 - **For slice and integration tests**: clean database state (`@DataJpaTest` rollback, or explicit cleanup in `@AfterEach`)
 - **No tests that depend on the clock** without an injectable `Clock`
 - **Document each test with the AC it covers** (`// Covers AC-n` comment)

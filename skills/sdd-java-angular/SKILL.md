@@ -1,6 +1,6 @@
 ---
 name: sdd-java-angular
-description: Generates a Spec-Driven Development framework for a full-stack project combining Java/Spring Boot backend AND Angular frontend. Use this skill when the user requests a SDD framework, .claude/ scaffold, or process tooling for a project where the backend uses Spring Boot (build.gradle or pom.xml contains org.springframework.boot) AND the frontend uses Angular (package.json has @angular/core). Triggers include "generate the SDD framework", "install SDD", "setup SDD", "scaffold SDD", "create SDD framework", "génère le framework SDD", "installe SDD" when applied to a Spring Boot + Angular full-stack project. Detects brownfield/greenfield. Provides fine-grained auxiliary commands for both backend (java-entity, java-service, java-controller, java-test) and frontend (angular-component, angular-service, angular-test) plus api-contract for OpenAPI sync via springdoc. Adds migration-guard for brownfield.
+description: Generates a Spec-Driven Development framework for a full-stack project combining Java/Spring Boot backend AND Angular frontend. Use this skill when the user requests a SDD framework, .claude/ scaffold, or process tooling for a project where the backend uses Spring Boot (build.gradle or pom.xml contains org.springframework.boot) AND the frontend uses Angular (package.json has @angular/core). Triggers include "generate the SDD framework", "install SDD", "setup SDD", "scaffold SDD", "create SDD framework", "génère le framework SDD", "installe SDD" when applied to a Spring Boot + Angular full-stack project. Detects brownfield/greenfield. Provides fine-grained auxiliary commands for both backend (java-entity, java-service, java-controller, java-test) and frontend (angular-component, angular-service, angular-test) plus api-contract for OpenAPI contract sync. Adds migration-guard for brownfield.
 license: MIT
 ---
 
@@ -14,7 +14,7 @@ Use when:
 - The user asks to generate / install / scaffold a SDD framework
 - The project uses a Spring Boot backend (`build.gradle` or `pom.xml` contains `org.springframework.boot`)
 - The project uses an Angular frontend (`package.json` contains `@angular/core`)
-- Typically a `backend/` + `frontend/` structure or similar separation
+- The two roots are **discovered** (where the Gradle/Maven build and `angular.json` live) — real projects name them freely (`back/`, `server/`, `apps/web/`…), and the backend may even sit at the repository root
 
 Do NOT use when:
 - Backend is Spring Boot but no Angular → use `sdd-java-backend` instead
@@ -27,7 +27,7 @@ Do NOT use when:
 
 ### Phase 0 — Detect mode
 
-Inspect the project root (usually two sides: `backend/` + `frontend/` directories or equivalents):
+Inspect the repository and **discover both roots** — where `build.gradle`/`pom.xml` and `angular.json` actually live (never assume `backend/`/`frontend/`; the backend root may be the repository root itself):
 
 - **Greenfield**: minimal code, no `build/` or `target/`, no `node_modules/`
 - **Brownfield**: existing backend + frontend in place
@@ -46,24 +46,29 @@ Reason: [observations]
 #### 1.1 — Java/Spring Boot backend
 
 ```
-build tool               : Gradle x.x (wrapper) / Maven x.x — lockfile: [yes/no]
+backend root             : [discovered directory — may be the repo root]
+build tool               : Gradle x.x / Maven x.x — wrapper location: [path]
+module structure         : [single project / multi-module]
+dependency locking       : [enabled + gradle.lockfile / not enabled]
 java                     : x
 spring-boot              : x.x.x
 hibernate                : x.x.x
 flyway / liquibase       : x.x.x
 mapstruct / lombok       : x.x.x / x.x.x
-springdoc-openapi        : x.x.x
 junit / mockito          : x.x.x / x.x.x
 ```
 
 - Package structure: layered (`controller/service/repository`) or hexagonal?
 - Controllers thin and delegating, or business logic embedded?
 - Mapping: MapStruct, manual, or entities exposed directly?
-- Existing tests and unit/integration split (`*IT` / `*IntTest`)
+- Test tasks/goals actually defined (`./gradlew tasks`, surefire/failsafe config) and suite convention (`*Test` / `*IT` / `*IntTest` / `*IntegrationTest` / dedicated source sets)?
+- Database strategy in tests: Testcontainers, embedded PostgreSQL, CI service?
+- Quality tools actually configured: JaCoCo, Sonar, Checkstyle, Spotless, other equivalents?
 
 #### 1.2 — Angular frontend
 
 ```
+frontend root            : [discovered directory where angular.json lives]
 angular/core/version     : x.x.x
 node/version             : x.x.x (from package.json engines or .nvmrc)
 typescript/version       : x.x.x
@@ -74,21 +79,30 @@ state management         : [Signals / NgRx / plain RxJS / other]
 - Standalone components or NgModules?
 - zone.js or zoneless change detection?
 - Signals (Angular 17+) or classic RxJS?
-- Tests: Karma+Jasmine or Jest?
-- E2E: Cypress, Playwright?
+- Test runner: Vitest, Karma+Jasmine, Jest? (`angular.json` test builder + project scripts)
+- Lint: ESLint/angular-eslint, other, or absent — and is it actually enforced (blocking) or configured-but-broken?
+- TypeScript `strict` / Angular `strictTemplates` enabled?
+- Formatter configured (Prettier, other, none)?
+- Selector prefix (`angular.json` → `prefix`)
+- E2E: Cypress, Playwright, other?
 - Runtime config: `assets/config.json` or `environments/`? `proxy.conf.json` present?
 
 #### 1.3 — Spring Boot ↔ Angular integration
 
-- API contracts: springdoc-openapi installed? Contract generated?
-- Frontend types: hand-written or generated from OpenAPI?
-- Auth: JWT, session, SSO?
-- CORS: `@CrossOrigin`, `WebMvcConfigurer`, gateway-level?
+- API contract source mode: which provider owns the contract (springdoc-openapi, another export mechanism), a project-owned hand-written OpenAPI document, or none?
+- Provider export mechanism (MODE A): runtime endpoint (URL/path from configuration), build-time export plugin (task name + generated artifact location), or project script? Does the export need a live/startable app?
+- Tracked contract snapshot: is a generated OpenAPI file versioned in Git (path), or is the contract a build artifact only? (Both are valid — a project fact.)
+- Project-owned contract (MODE B): document path and format (JSON/YAML)?
+- Automated Angular type/client generation: generator dependency, package script, contract input, output directory?
+- Frontend types today: generated, or hand-written models/services maintained manually?
+- Auth: actual mechanism — Spring Security OAuth2/JWT, session, Basic Auth/custom filter, SSO/gateway identity? Authorization convention (`@PreAuthorize`, other)?
+- CORS: `CorsConfigurationSource` bean, `@CrossOrigin`, gateway-level?
 - Uniform API error format across endpoints?
 
 #### 1.4 — Identified gaps
 
-- Endpoints without springdoc annotations
+- No machine-readable contract source at all (no provider, no project-owned document) → PROJECT_TOOLING_GAP
+- Valid contract source but no automated frontend type/client generation → API_CONTRACT_AUTOMATION_GAP
 - Hand-written TypeScript types drifting from the backend DTOs
 - Angular components without spec
 - Naming inconsistencies between backend and frontend
@@ -170,7 +184,7 @@ Copy from `reference/` to project's `.claude/`, in this order:
 
 The Layer-2 files just deployed are **skill-owned**: immediately after installation the project's Layer 2 is **byte-identical to `reference/`**, and it stays that way — never edit a deployed Layer-2 rule with project findings. Instead, dispose of every Phase 1 finding by ownership:
 
-- **Discoverable on demand — do not persist**: backend versions and build tool (`build.gradle`/`pom.xml`), frontend versions, zoneless vs zone.js, test runner and UI library (`package.json`, `angular.json`, `main.ts`), springdoc configuration (`application.yml`, build files). Commands read these canonical sources when they need them. (Diagnostic aid, already stack knowledge in `jpa-conventions.md`: Flyway 10+ splits PostgreSQL support into `flyway-database-postgresql`; Flyway 9 ships it in core.)
+- **Discoverable on demand — do not persist**: backend/frontend roots, backend versions, build tool and wrapper location (`build.gradle`/`pom.xml`), test tasks and quality tools (build configuration), frontend versions, zoneless vs zone.js, test runner, lint/strictness/formatter/selector prefix and UI library (`package.json`, `angular.json`, `tsconfig*.json`, `main.ts`), API contract source/provider and export mechanism (`application.yml`, build files, `package.json` scripts). Commands read these canonical sources when they need them. (Diagnostic aid, already stack knowledge in `jpa-conventions.md`: Flyway 10+ splits PostgreSQL support into `flyway-database-postgresql`; Flyway 9 ships it in core.)
 - **Durable project context → Layer 3**: the backend↔frontend integration wiring (generated-client path for frontend types) and architecture observations — `.claude/rules/project-architecture.md`.
 - **Project policies → Layer 3**: team decisions on test strategy or state management — `.claude/rules/project-testing.md` / `.claude/rules/project-architecture.md`.
 - **Diagnostic only**: the Phase 1 stack report is announced in the chat and not persisted. Report versions **as found** — never force an upgrade; modern recommendations (Java 25 LTS or 21, Spring Boot 4.1.x or 3.5.x, Angular 20+ zoneless) apply only to greenfield scaffolding.

@@ -228,4 +228,4 @@ Framework examples stay neutral (`Order`, `User`, `Payment`, `PROJ-xxx`): replac
 | `skills/README.md` | Skills decision tree |
 | `core/extension-guide.md` | Creating a new stack skill |
 
-Version 1.13.0 — August 2026.
+Version 1.14.0 — August 2026.

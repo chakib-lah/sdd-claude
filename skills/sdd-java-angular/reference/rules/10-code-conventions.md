@@ -10,7 +10,7 @@
 ### Backend
 - **Java**: 25 LTS recommended (21 LTS common, 17 LTS minimum for legacy)
 - **Spring Boot**: 4.1.x recommended for new projects (Spring Framework 7), 3.5.x for maintenance, 3.3.x legacy
-- **Build tool**: Gradle 9+ (wrapper committed) with `dependencyLocking` enabled and `gradle.lockfile` committed — OR Maven 3.9+
+- **Build tool**: Gradle 9+ (wrapper committed) — greenfield default: `dependencyLocking` enabled and `gradle.lockfile` committed — OR Maven 3.9+. Whether an existing project uses locking is a discovered fact, not an assumption
 - **Hibernate ORM**: 6.6+
 - **Mapping / boilerplate**: MapStruct + Lombok
 - **API documentation**: springdoc-openapi 2.x (Spring Boot 3.x) / 3.x (Spring Boot 4.x)
@@ -147,8 +147,9 @@ configurations.all {
 }
 ```
 
-`gradle.lockfile` is committed and regenerated with `./gradlew dependencies --write-locks`
-after any build-file change — never edited by hand.
+Where dependency locking is enabled (the greenfield default — not every valid Gradle
+project uses it), `gradle.lockfile` is committed and regenerated with
+`./gradlew dependencies --write-locks` after any build-file change — never edited by hand.
 
 See `jpa-conventions.md` for details on entities, repositories and migrations.
 
@@ -312,7 +313,7 @@ application error.
 | 422 | Semantically invalid request (business rule) |
 | 500 | Server error (details in backend logs only) |
 
-See `api-contracts.md` for the OpenAPI contract workflow (springdoc export, type sync).
+See `api-contracts.md` for the OpenAPI contract workflow (contract source discovery, type sync).
 
 ---
 

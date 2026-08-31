@@ -1,5 +1,19 @@
 # Changelog — SDD Claude
 
+## [1.14.0] — 2026-08-31
+
+Java/Angular Layer-2 stabilization: `sdd-java-angular` adopts the discovery-aware architecture, verified against real Gradle/Spring/Angular project shapes.
+
+### Changed
+
+- **Root/build/test discovery** — backend and frontend roots, wrapper location, module structure, actual test tasks and suite conventions are discovered; commands, gates and hooks use a repository-root-based coordinate system, and change predicates handle both nested roots and a backend at the repository root.
+- **Java quality capability discovery** — required capabilities with discovered implementations; only configured checks are invoked, absences are explicit gaps.
+- **Angular runner alignment** — Vitest is the modern target runner, Karma/Jasmine a supported brownfield state, Jest honored where configured; test and gate commands go through the project's discovered scripts.
+- **Provider-neutral API contract workflow** — provider-generated and project-owned OpenAPI contracts are both valid sources; `/api-contract` discovers the provider, exports candidate-first, keeps check mode non-destructive, and never installs tooling silently. Whether the generated contract is tracked in Git is a project fact, never a forced snapshot.
+- **Shared Java scaffolding** — controller scaffolding follows the project's discovered contract mechanism; test scaffolding discovers wrapper, tasks and suite convention before generating or running anything, and executes exactly the class it generated.
+
+---
+
 ## [1.13.0] — 2026-08-30
 
 Symfony/Angular Layer-2 stabilization following the discovery-aware model.

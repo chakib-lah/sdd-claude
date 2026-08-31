@@ -4,7 +4,7 @@ description: Scaffold a Spring REST controller with route, request DTO, and resp
 
 # /java-controller
 
-**Auxiliary scaffolding command**: create a `@RestController` with its route, request record and response record, documented for OpenAPI.
+**Auxiliary scaffolding command**: create a `@RestController` with its route, request record and response record, kept in sync with the project's API contract mechanism.
 
 ## Blocking prerequisites
 
@@ -38,7 +38,7 @@ Read `.claude/rules/10-code-conventions.md` to comply with:
 - Thin controllers (no business logic)
 - Java records for request/response DTOs
 - Bean Validation on every inbound payload
-- springdoc annotations on every endpoint
+- Contract metadata per the project's discovered API contract mechanism (see step 7)
 - Uniform error format via the shared advice
 
 ### 4. Check for duplicates
@@ -96,9 +96,14 @@ If a MapStruct mapper already exists for this resource, map through it instead o
 
 ### 7. Generate the controller
 
-springdoc annotations (`@Tag`, `@Operation`, `@ApiResponse`) are REQUIRED on every endpoint so the OpenAPI contract stays complete.
+**Discover the project's API contract mechanism first** — it decides what contract metadata the new endpoint needs:
 
-Typical skeleton for a GET:
+- **springdoc owns the contract** (dependency present in the build): follow the project's annotation convention — where it applies `@Tag` / `@Operation` / `@ApiResponse`, apply them here too so the generated contract stays complete (springdoc also infers a lot from signatures and records).
+- **Another provider/export mechanism owns the contract**: follow that mechanism's metadata convention instead.
+- **Project-owned hand-written OpenAPI document** (no provider): do **NOT** import springdoc annotations — they would not even compile without the dependency; update the OpenAPI document itself so the new endpoint is represented.
+- **No contract mechanism at all**: report the gap (see `.claude/rules/12-quality-gates.md`) — never install a provider from this command.
+
+Typical skeleton for a GET (shown with the springdoc-provider convention — drop the springdoc imports/annotations on projects using another mechanism):
 
 ```java
 package com.example.app.<domain>.api;
@@ -232,13 +237,13 @@ Ask for confirmation.
 
 ### 12. Verify the route
 
-With the application running, confirm the route appears in the OpenAPI contract:
+Confirm the route is represented in the project's machine-readable contract, via the **discovered mechanism**: the provider's export or runtime docs endpoint at its configured URL/path (springdoc example below — base URL and path are project facts), or the project-owned OpenAPI document directly:
 
 ```bash
-curl -s http://localhost:8080/v3/api-docs | jq '.paths | keys'
+curl -s <backend-base-url><api-docs-path> | jq '.paths | keys'   # provider runtime example
 ```
 
-If the application cannot be started here, the route must instead be covered by a `@WebMvcTest` (scaffolded via `/java-test`).
+If the contract cannot be produced here (application not startable, no provider), the route must instead be covered by a `@WebMvcTest` (scaffolded via `/java-test`).
 
 ### 13. Announce
 
@@ -248,7 +253,7 @@ If the application cannot be started here, the route must instead be covered by 
 ✅ Response record: src/main/java/.../<Resource>Response.java
 
 Route registered:
-  <METHOD> <route> → visible in /v3/api-docs (or covered by @WebMvcTest)
+  <METHOD> <route> → represented in the API contract (or covered by @WebMvcTest)
 
 Next steps:
 - /java-test to scaffold the web slice tests
@@ -262,6 +267,6 @@ Next steps:
 - **Never expose entities directly**: request and response are records only
 - **Never try/catch in the controller**: uniform error format via the shared `@RestControllerAdvice` and `ProblemDetail`
 - **Always `@Valid`** on payload parameters, with constraints declared on the record
-- **Always the springdoc annotations** (`@Tag`, `@Operation`, `@ApiResponse`): an undocumented endpoint breaks the OpenAPI contract
-- **Always specify explicit status codes** (`@ResponseStatus(HttpStatus.CREATED)`, documented `@ApiResponse`)
+- **Keep the contract metadata complete via the project's discovered mechanism**: springdoc annotations (`@Tag`, `@Operation`, `@ApiResponse`) where springdoc owns the contract and the project applies them, another provider's metadata as configured, or a direct update to the project-owned OpenAPI document — an endpoint absent from the contract breaks it. Never import springdoc annotations on a project whose contract source is not springdoc
+- **Always specify explicit status codes** (`@ResponseStatus(HttpStatus.CREATED)`, documented in the contract)
 - **Never generate an endpoint without an explicit access-control decision**: specific role, authenticated, or deliberately public — and "deliberately public" must be justified in one line
