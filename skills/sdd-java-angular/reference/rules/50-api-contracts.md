@@ -179,7 +179,7 @@ The `violations` array is a custom extension property, added via `problemDetail.
 
 ### Never serialize entities
 
-JPA entities must **never** reach the JSON layer. Serializing them leaks internal fields, triggers lazy-loading surprises, and couples the API contract to the database schema (see `.claude/rules/jpa-conventions.md`).
+JPA entities must **never** reach the JSON layer. Serializing them leaks internal fields, triggers lazy-loading surprises, and couples the API contract to the database schema (see `.claude/rules/30-jpa-conventions.md`).
 
 ### One record per view
 

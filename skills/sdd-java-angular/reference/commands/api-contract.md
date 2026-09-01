@@ -11,7 +11,7 @@ description: Generate or synchronize the OpenAPI contract between Spring Boot ba
 - Active SDD feature (except in global sync mode without a feature)
 - A machine-readable OpenAPI contract source on the backend side — either a **discovered provider** (springdoc is the common Spring example; another export mechanism is equally valid) or a valid **project-owned hand-written contract** designated as the source of truth
 - An automated TypeScript generator on the frontend — **discovered** from `package.json`/scripts
-- Available conventions: `.claude/rules/api-contracts.md`
+- Available conventions: `.claude/rules/50-api-contracts.md`
 
 Both roots, the contract source/URL, the optional tracked contract path and the generated output directory are **project facts** — discover them first; the `<backend-root>`, `<frontend-root>`, `<openapi-contract-url>`, `<contract-path>` and `<generated-output-dir>` placeholders below stand for the discovered values.
 
@@ -89,7 +89,7 @@ Discover the existing generator dependency, its package script (e.g. `api:sync`)
 
 ### 2. Load the conventions
 
-Read `.claude/rules/api-contracts.md`:
+Read `.claude/rules/50-api-contracts.md`:
 - Uniform error format (`ProblemDetail`)
 - Standard HTTP codes
 - DTO exposure (response records, never entities)
@@ -149,7 +149,7 @@ python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$CANDIDATE" 2>/dev/n
 diff "<repo-root>/<contract-path>" "$CANDIDATE" || echo "Changes detected"
 ```
 
-Run the project's configured contract-diff / breaking-change mechanism if one exists; otherwise analyze the diff per `.claude/rules/api-contracts.md` (breaking-change workflow). Only **after** this comparison and analysis, update the tracked snapshot and drop the candidate (it is temporary — never committed):
+Run the project's configured contract-diff / breaking-change mechanism if one exists; otherwise analyze the diff per `.claude/rules/50-api-contracts.md` (breaking-change workflow). Only **after** this comparison and analysis, update the tracked snapshot and drop the candidate (it is temporary — never committed):
 
 ```bash
 cp "$CANDIDATE" "<repo-root>/<contract-path>"

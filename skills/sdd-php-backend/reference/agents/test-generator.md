@@ -66,7 +66,7 @@ public function testFindUserReturnsRecordWhenUserExists(): void
 Integration conventions:
 - Dedicated test database (`test_db`), reset between tests (transaction rollback or truncation)
 - No test against the production or development database, ever
-- Characterization tests first when touching legacy code (see `.claude/rules/refactoring-guard.md`)
+- Characterization tests first when touching legacy code (see `.claude/rules/60-refactoring-guard.md`)
 
 ## Bash restrictions
 

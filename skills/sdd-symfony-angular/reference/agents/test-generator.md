@@ -73,7 +73,7 @@ it('should display empty state when user list is empty', async () => {
 Conventions:
 - Query by role/label or `data-test` attributes — never by CSS classes
 - Services with HttpClient: `provideHttpClientTesting()` + `HttpTestingController`
-- The API contract between the two stacks is covered on both sides: backend functional test + frontend service test on the same endpoint (see `.claude/rules/api-contracts.md`)
+- The API contract between the two stacks is covered on both sides: backend functional test + frontend service test on the same endpoint (see `.claude/rules/50-api-contracts.md`)
 
 ## E2E (cross-stack) — the project's configured tool (Playwright example)
 

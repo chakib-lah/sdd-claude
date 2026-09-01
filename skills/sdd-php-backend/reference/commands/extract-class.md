@@ -12,7 +12,7 @@ This command produces **a spec and a plan**, not the code directly. The code is 
 
 - Brownfield mode
 - Identified legacy source code (file or directory)
-- Rules available: `refactoring-guard.md`, `legacy-rules.md`
+- Rules available: `60-refactoring-guard.md`, `61-legacy-rules.md`
 
 ## Usage
 

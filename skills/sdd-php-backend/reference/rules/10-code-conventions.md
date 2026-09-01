@@ -2,7 +2,7 @@
 
 > **Layer 2 — Specific to the PHP stack (no framework).**  
 > These conventions apply to all new code written in the project.  
-> Legacy code is governed by `legacy-rules.md` (brownfield only).
+> Legacy code is governed by `61-legacy-rules.md` (brownfield only).
 
 ---
 
@@ -29,7 +29,7 @@ To adapt per project:
 
 ### Legacy code → tolerate existing `require` but never create new ones
 
-See `legacy-rules.md` for the migration strategy.
+See `61-legacy-rules.md` for the migration strategy.
 
 ## Naming conventions
 
@@ -212,5 +212,5 @@ public function findAll(): array
 ## Legacy code
 
 For existing legacy code, see:
-- `refactoring-guard.md`: rules to avoid breaking what exists
-- `legacy-rules.md`: coexistence of legacy and new code
+- `60-refactoring-guard.md`: rules to avoid breaking what exists
+- `61-legacy-rules.md`: coexistence of legacy and new code

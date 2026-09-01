@@ -63,7 +63,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 ## Angular frontend
 
-See `angular-conventions.md` for full details.
+See `40-angular-conventions.md` for full details.
 
 In summary:
 - Standalone components + `OnPush` by default

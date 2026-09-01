@@ -10,7 +10,7 @@ description: Scaffold a JPA entity with Flyway migration from a SDD spec
 
 - Active SDD feature with `tasks.md` `status: approved`
 - Current task mentions the creation/modification of this entity
-- Conventions available: `.claude/rules/10-code-conventions.md`, `.claude/rules/jpa-conventions.md`
+- Conventions available: `.claude/rules/10-code-conventions.md`, `.claude/rules/30-jpa-conventions.md`
 
 ## Steps
 
@@ -41,7 +41,7 @@ Read `spec.md` (Design section → Entity/entities / DB changes) to retrieve:
 
 ### 3. Load the JPA conventions
 
-Read `.claude/rules/jpa-conventions.md` to comply with:
+Read `.claude/rules/30-jpa-conventions.md` to comply with:
 - Explicit `@Table`/`@Column` names in snake_case
 - `SEQUENCE` identifier strategy
 - No Lombok `@Data` on entities: `@Getter` + protected no-arg constructor + factory or builder

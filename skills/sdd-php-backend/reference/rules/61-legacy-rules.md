@@ -158,7 +158,7 @@ This makes it possible to:
 ### Rule 5 — Any modification of a legacy file goes through a SDD refactor
 
 - No "quick" bugfix that worsens coupling
-- If you modify a legacy file, it's an opportunity to extract it into new code (see `refactoring-guard.md`)
+- If you modify a legacy file, it's an opportunity to extract it into new code (see `60-refactoring-guard.md`)
 - At minimum, add a characterization test before the modification
 
 ## The `docs/legacy-debt.md` file

@@ -283,7 +283,7 @@ npx openapi-generator-cli generate \
   -o <generated-output-dir>
 ```
 
-See `api-contracts.md` for details.
+See `50-api-contracts.md` for details.
 
 ### No `any`
 

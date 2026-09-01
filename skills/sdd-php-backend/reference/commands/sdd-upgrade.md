@@ -41,7 +41,7 @@ Layer 1 scope within `reference/`:
 - `reference/commands/` → **two owners**: every `sdd-*.md` plus `retro-spec.md` is a **universal command** (framework-owned — audit and upgrade it, step 1.1); **every other command file present in the reference** is a **Layer 2 stack command** (skill-owned — audit and update it, step 1.6). A project command absent from both sets is the project's own — **never touched**. Reference membership decides, never the filename prefix.
 - `reference/rules/` → **ownership is decided by the canonical list and by reference membership — never by filename prefix**:
   - the **canonical Layer-1 rules** — `00-sdd-framework.md`, `01-git-conventions.md`, `02-security.md`, `03-code-quality.md` — are framework-owned: audit and upgrade them; after migration the project's copies must equal the reference exactly;
-  - **every other rule file present in the reference** is **Layer 2** (owned by the selected skill): audit it and update it from the reference once project truth is preserved (step 2b) — its name may be numbered (`10-…`) or not (`api-contracts.md`); the name decides nothing;
+  - **every other rule file present in the reference** is **Layer 2** (owned by the selected skill): audit it and update it from the reference once project truth is preserved (step 2b) — canonical Layer-2 rules carry their functional-decade name (`10-…`, `30-…`, `50-…`…), but the numeric prefix is visual classification only: reference membership decides ownership, never the name;
   - a project rule file **absent from the reference** is **Layer 3** (project-owned) — never touched (step 2);
   - a project `01-constitution.md` **or `05-constitution.md`** is a **legacy constitution carrier**, handled only by the dedicated migration (step 2c) — neither is part of the final Layer-1 set, neither is ever deployed to new projects, and neither is ever renamed into another slot.
 - `reference/templates/` → all files; they deploy to `.claude/sdd/_template/<name>.md`, except `sdd-readme.md` which deploys to `.claude/sdd/README.md` **only if that file does not exist yet**. `.claude/sdd/README.md` is a **static SDD guide** — live feature state is derived by `/sdd-status` from the feature folders and their frontmatter, never stored in that file. A project still carrying the older framework-generated **dynamic index** schema is migrated in step 4b.
@@ -69,6 +69,22 @@ The toolkit may have renamed Layer 1/Layer 2 files between versions. **This step
 | `04-code-quality.md` | `03-code-quality.md` |
 | `30-tests-strategy.md` | `11-tests-strategy.md` |
 | `40-quality-gates.md` | `12-quality-gates.md` |
+
+**Layer-2 canonical functional decades — selected-skill-scoped entries:**
+
+| Old name (in `.claude/rules/`) | New name |
+|---|---|
+| `node-conventions.md` | `20-node-conventions.md` |
+| `doctrine-conventions.md` | `30-doctrine-conventions.md` |
+| `jpa-conventions.md` | `30-jpa-conventions.md` |
+| `angular-conventions.md` | `40-angular-conventions.md` |
+| `api-contracts.md` | `50-api-contracts.md` |
+| `shared-types.md` | `51-shared-types.md` |
+| `refactoring-guard.md` | `60-refactoring-guard.md` |
+| `legacy-rules.md` | `61-legacy-rules.md` |
+| `migration-guard.md` | `62-migration-guard.md` |
+
+**Layer-2 entries are selected-skill-scoped.** A Layer-2 entry applies **only when the selected skill's reference ships the new canonical artifact** (the logical artifact belongs to this skill's Layer-2 set). When it does, a project file under the old name is a **historical Layer-2 artifact of that skill — never Layer 3**, whatever its current bytes: an older framework revision of the artifact is still Layer 2, and hash mismatch with the current reference proves nothing about ownership. When it does not (e.g. `angular-conventions.md` in a project whose selected skill is `sdd-php-backend`), the entry is **ignored for this project**: the file is Layer 3 — never renamed, never path-repaired through this map, never classified as historical Layer 2 on basename alone. Conditional artifacts (e.g. a brownfield-only `62-migration-guard.md`) keep the *Ownership is not applicability* contract unchanged: with condition FALSE, an old-named present file follows `CONDITIONAL_LAYER2_PRESENT_NOT_APPLICABLE` — preserved, reported, `USER_DECISION_REQUIRED` before any removal **or relocation, including this rename** — and the new canonical file is never force-installed.
 
 **`05-constitution.md` is deliberately NOT in this map**: like `01-constitution.md`, it is a **legacy constitution carrier** (in `.claude/rules/`), handled **directly** by the step 2c constitution migration — it never passes through an intermediate structural rename, and the old `05 → 01 → project-constitution` route no longer exists.
 
@@ -174,7 +190,8 @@ Compare every **non-universal** command file of `reference/commands/` **within t
 
 1. R is one of the four canonical Layer-1 files → **framework-owned** (upgraded, step 1.2);
 2. else R exists at the same relative path in the selected skill's `reference/rules/` → **Layer 2, skill-owned** (updated, steps 1.5/2b);
-3. else → **Layer 3, project-owned**: **NEVER byte-replaced**, never audited against the reference — its absence from the reference is expected ownership, not drift. A numbered project rule (`13-*.md`…) absent from the reference is still Layer 3: the prefix decides nothing. Special case: `01-constitution.md` and `05-constitution.md` → legacy constitution carriers, step 2c only.
+3. else R is a **known historical canonical alias** (step 0b map, selected-skill-scoped) of a Layer-2 artifact the selected skill ships → **historical Layer 2** (`STRUCTURAL_LEGACY_MIGRATION`: convergence planned in step 0b, applied in step 4.4 under the ONE coexistence rule and the conditional-artifact contract) — never Layer 3;
+4. else → **Layer 3, project-owned**: **NEVER byte-replaced**, never audited against the reference — its absence from the reference is expected ownership, not drift. A numbered project rule (`13-*.md`…) absent from the reference is still Layer 3: the prefix decides nothing. Special case: `01-constitution.md` and `05-constitution.md` → legacy constitution carriers, step 2c only.
 
 Also never touched:
 
@@ -182,7 +199,7 @@ Also never touched:
 - `.claude/commands/` files absent from both the universal set and the selected skill's `reference/commands/` → the project's own commands
 - `.claude/agents/<non-reference>.md` → the developer's own agents
 
-Illustrations of the ownership algorithm (non-exhaustive): `10-code-conventions.md`, `angular-conventions.md`, `api-contracts.md`, `migration-guard.md` are Layer 2 **when the selected skill's reference ships them**; the same names in a project whose skill does not ship them — or any name the reference has never heard of — are Layer 3.
+Illustrations of the ownership algorithm (non-exhaustive): `10-code-conventions.md`, `40-angular-conventions.md`, `50-api-contracts.md`, `62-migration-guard.md` are Layer 2 **when the selected skill's reference ships them**; the same names in a project whose skill does not ship them — or any name the reference has never heard of — are Layer 3.
 
 ### 2b. Layer triage of the divergences
 
@@ -269,7 +286,7 @@ After confirmation, in this order — **nothing structural is written before pre
 
 After structural convergence, an eligible **active** preserved artifact may still reference an OLD canonical Layer-1 filename. Content ownership (frozen Layer 2, `PRESERVE_PROJECT`, Layer 3, `USER_DECISION_REQUIRED`) forbids replacing the file's content — it does **not** license keeping a dangling pointer to a canonical framework path. Content ownership ≠ canonical reference validity. This repair changes **only** a proven canonical path token, and nothing else.
 
-- **Map — one source of truth**: the repair reuses the step 0b structural migration map, restricted to its canonical Layer-1 entries — `02-git-conventions.md → 01-git-conventions.md`, `03-security.md → 02-security.md`, `04-code-quality.md → 03-code-quality.md`. The legacy constitution carriers (`01-constitution.md`, `05-constitution.md`) are **never** path-only aliases: they belong exclusively to the step 2c decision model.
+- **Map — one source of truth**: the repair reuses the step 0b structural migration map — its canonical Layer-1 entries (`02-git-conventions.md → 01-git-conventions.md`, `03-security.md → 02-security.md`, `04-code-quality.md → 03-code-quality.md`) **plus its selected-skill-scoped Layer-2 entries**, each eligible only when the selected skill ships the new canonical artifact (the step 0b scoping rule): an alias of an artifact this skill does not own is **never** repaired — no basename-only, fuzzy or cross-skill replacement. The legacy constitution carriers (`01-constitution.md`, `05-constitution.md`) are **never** path-only aliases: they belong exclusively to the step 2c decision model.
 - **Eligible artifacts** — ACTIVE textual artifacts that legitimately survived without replacement: preserved/frozen Layer-2 rules and stack commands, Layer-3 project rules, the project's own active commands, agents and skills, and other active project-owned operational artifacts the SDD workflow consumes. Not every file under `.claude/` is active.
 - **Excluded — historical feature artifacts**: `.claude/sdd/<feature>/spec.md`, `tasks.md`, `notes.md`, archived features and retrospective records are project history — their content is **never** rewritten because canonical filenames later changed. (`.claude/sdd/README.md` and `_template/**` are active framework artifacts, not history, and keep their own sync rules.)
 - **Excluded — reference-owned installs**: an artifact just installed `REPLACE_FROM_FRAMEWORK` or `REPLACE_FROM_SKILL` must equal its reference; a stale canonical path inside such a copy is a **`SOURCE_REFERENCE_DEFECT`** → `❌ UPDATE INCOMPLETE` — never patch the project copy locally to hide a source problem.

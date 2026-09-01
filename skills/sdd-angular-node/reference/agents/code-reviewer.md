@@ -42,7 +42,7 @@ The anti-pattern catalogs live in the **rules**, not in this agent — you read 
 1. `.claude/rules/03-code-quality.md` — the universal baseline (leftover debug output, commented-out code, anonymous TODOs, swallowed exceptions, dead code, duplicated business logic, quality bypasses, test-only branches…)
 2. `.claude/rules/02-security.md` — the security baseline (input validation, injection, secrets, auth)
 3. `.claude/rules/10-code-conventions.md` — the stack's conventions and its **anti-patterns section** (the concrete forbidden constructs of this project's technology)
-4. Any stack extra rule present in `.claude/rules/` (unnumbered files)
+4. Every other applicable Layer-2 stack rule present in `.claude/rules/` — membership in the selected skill's reference (and its applicability) decides what to apply; the canonical functional-decade prefix (`20`–`69`) is visual classification only, never the selection criterion
 
 Flag every violation with its file and line. A rule file you did not read is a rule you did not check — never review from memory of another stack's conventions.
 

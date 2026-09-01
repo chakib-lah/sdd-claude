@@ -1,5 +1,23 @@
 # Changelog — SDD Claude
 
+## [1.16.0] — 2026-09-01
+
+Structural naming and fresh-install semantics release.
+
+### Changed
+
+- **Permanent rule-file naming convention** — `00–09` Layer 1; Layer-2 functional decades (`10–19` fundamentals, `20–29` runtime/backend, `30–39` persistence/ORM, `40–49` frontend/UI, `50–59` API/contracts, `60–69` brownfield/change protection); `project-*` Layer 3. Numbering is human-facing visual classification only: ownership stays resolved by reference membership, and numbers establish no precedence.
+- **Canonical Layer-2 path normalization** — the nine pre-decade Layer-2 rule names are renamed to their functional-decade paths across the six skills (pure renames, content preserved); every active reference is repaired by exact path token. `/sdd-upgrade` migrates historical Layer-2 names as selected-skill-scoped entries: a same-named project-owned file in an unrelated skill is never renamed or misclassified, and old/new coexistence follows the single coexistence rule.
+
+### Fixed
+
+- **Fresh installs enforce the ownership and persistence model end to end** — installation proposals label every artifact by its actual owner; detected technical state stays rediscoverable on demand instead of being persisted as project rules; gaps and debt remain reported follow-ups, never silently repaired and never promoted to policy; durable human-owned decisions remain fully eligible for Layer 3.
+- **Approval-faithful Layer-3 materialization** — the first displayed proposal is the normalized, approval-ready one (atomic clauses, one disposition and one owner per clause, empty candidates never shown); developer approval freezes the Layer-3 set verbatim; the write phase is transcription plus formatting, never semantic authorship (a rule that seems wrong during rendering stops materialization and goes back for re-approval); written files are verified against the approved records, never against reconstructed intent.
+- **Architecturally valid choices only** — an option that would override or negate Layer 1/2 or redefine the selected skill's target baseline is never offered; brownfield preservation keeps existing scope without redefining the target for new work.
+- **Evidence-safe discovery** — configuration, generated artifacts, tracked state, workflow and human policy are independent evidence dimensions: an absent generated artifact never proves a capability is unconfigured, and inferences are labeled as risks, never asserted as facts.
+
+---
+
 ## [1.15.0] — 2026-08-31
 
 Java backend Layer-2 stabilization: `sdd-java-backend` adopts the discovery-aware ownership architecture.

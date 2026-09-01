@@ -73,6 +73,75 @@ for s in $SKILLS; do
   for t in $(grep -hoE '_template/[a-z0-9-]+\.md' "skills/$s/SKILL.md" 2>/dev/null | sed 's|_template/||' | sort -u); do
     [ -f "skills/$s/reference/templates/$t" ] || fail "$s: SKILL.md deploys ghost template _template/$t"
   done
+  # Fresh-install disposition contract (anchor-based bounded net — see the Known-Limits
+  # Register): every SKILL.md must carry the ownership-labeling block, the non-blocking
+  # clarification semantics, the semantic-disposition contract and the canonical
+  # Layer-3 fresh-install owners; and must not assert frontend/backend drift as a fact.
+  for a in 'never present them as skill-owned' 'non-blocking developer choices' 'Semantic disposition — classify every finding' 'project-git-workflow.md' 'project-security.md'; do
+    grep -qF -- "$a" "skills/$s/SKILL.md" || fail "$s: SKILL.md missing fresh-install contract anchor: $a"
+  done
+  grep -qE 'drifting from the backend' "skills/$s/SKILL.md" && fail "$s: SKILL.md asserts drift as fact (must be a drift risk unless a comparison proved it)"
+  # Agent ownership: exactly 4 universal framework-owned agents; test-generator
+  # is stack-adapted and selected-skill-owned — never framework-owned/Layer 1.
+  grep -qF -- '4 universal SDD agents' "skills/$s/SKILL.md" || fail "$s: SKILL.md missing the 4-universal-agents ownership anchor"
+  grep -qF -- 'stack-adapted `test-generator` agent' "skills/$s/SKILL.md" || fail "$s: SKILL.md missing the selected-skill-owned test-generator anchor"
+  grep -E 'test-generator' "skills/$s/SKILL.md" | grep -qiE 'framework-owned|Layer 1' && fail "$s: SKILL.md classifies test-generator as framework-owned/Layer 1"
+  grep -E '5 SDD agents' "skills/$s/SKILL.md" | grep -qiE 'framework-owned|Layer 1' && fail "$s: SKILL.md flattens the 5 agents into framework ownership"
+  # Layer-3 disposition contradiction net (bounded — see the Known-Limits
+  # Register): a correct Class A-E anchor does NOT excuse contradictory active prose —
+  # a Layer-3 disposition line must never promote detected/observed technical state.
+  grep -E 'Layer 3' "skills/$s/SKILL.md" | grep -qiE 'detected |observed |patterns in use|repository shape' && fail "$s: SKILL.md promotes detected/observed technical state to Layer 3"
+  # Runtime reasoning contracts (anchor-based bounded nets, see the Known-Limits
+  # Register): the final Layer-3 sanitization gate and the evidence-dimension separation
+  # must ship in every installer; known contradictory formulations must be absent.
+  for a in 'Final Layer-3 sanitization gate' 'Independent evidence dimensions' 'never proves the capability is unconfigured' 'do not create' ; do
+    grep -qiF -- "$a" "skills/$s/SKILL.md" || fail "$s: SKILL.md missing runtime-reasoning anchor: $a"
+  done
+  grep -qiE '(universal|layer-? ?1)[^.]*(may|can) (remain|be restated|be kept|stay)[^.]*(project-|layer-? ?3)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows a universal invariant to remain in Layer 3"
+  grep -qiE '(task names?|technical (current )?state|rediscoverable state)[^.]*(may|can) be persisted' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows rediscoverable technical state to be persisted"
+  grep -qiE '(missing|absent|no)[^.]*(artifact|lock ?file)[^.]*(means|implies|=>)[^.]*(not configured|disabled|unconfigured)' "skills/$s/SKILL.md" && fail "$s: SKILL.md infers configuration absence from artifact absence"
+  # Final proposal materialization (anchor-based bounded nets, see the
+  # Known-Limits Register): the rendered proposal must be the normalized one; known
+  # contradiction formulations are rejected.
+  for a in 'render only the normalized result' 'One final disposition per clause' 'moved, never copied' 'neither displayed nor created' 'second manual sanitization pass must never be needed'; do
+    grep -qiF -- "$a" "skills/$s/SKILL.md" || fail "$s: SKILL.md missing proposal-materialization anchor: $a"
+  done
+  grep -qiE '(raw|intermediate) candidate[^.]*(may|can) be (rendered|displayed|shown)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows rendering a raw candidate set"
+  grep -qiE '(may|can) (remain|stay|appear|be kept) (in|under) (both|two|multiple)[^.]*owners' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows one clause under multiple subject owners"
+  grep -qiE 'relocat[a-z]*[^.]*(may|can) (remain|stay|be kept|also be copied)|(may|can) (also )?be copied (to|into|across)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows a relocated clause to remain/copy in its source owner"
+  grep -qiE 'empty (candidate|project rule)[^.]*(may|can) (remain|be displayed|be created|be kept)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows an empty candidate in the proposal"
+  grep -qiE '(may|can) appear (as|in) both (kept|KEPT) and (removed|REMOVED)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows a clause in both kept and removed sets"
+  # Approved-set materialization (anchor-based bounded nets, see the Known-Limits
+  # Register): approval freezes the Layer-3 set; Phase 4 writes only that set and a
+  # post-write fidelity check is mandatory; known reconstruction prose is rejected.
+  for a in 'Approval freezes the Layer-3 set' 'immutable for the rest of the install run' 'materialization — never reclassification' 'source of truth for what gets written' 'Post-write fidelity check' 'never re-run to add content'; do
+    grep -qiF -- "$a" "skills/$s/SKILL.md" || fail "$s: SKILL.md missing approved-set materialization anchor: $a"
+  done
+  grep -qiE 'enrich (the )?(Layer-? ?3|project rules?)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows enriching Layer 3 from discovery"
+  grep -qiE '(violation|gap|follow-?up)s?[^.]*(may|can) be (documented|persisted|recorded|written) as[^.]*(exception|Layer-? ?3|project rule)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows promoting a violation/gap into a Layer-3 exception"
+  grep -qiE '(may|can) be added[^.]*for completeness' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows adding rediscoverable context for completeness"
+  grep -qiE '(FOLLOW_UP|REDISCOVER_ON_DEMAND|REMOVED_L[12])[^.]*(may|can) (become|be promoted|transition|be reclassified)[^.]*(KEPT|Layer-? ?3)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows a post-approval disposition transition"
+  # Semantic boundaries (anchor-based bounded nets, see the Known-Limits
+  # Register): semantic-claim atomicity before disposition (one independently meaningful
+  # assertion = one disposition; attached rediscoverable evidence never rides inside kept
+  # policy); choice validity before display (an option overriding/negating Layer 1/2 or
+  # redefining the selected-skill target baseline is INVALID_OPTION, never shown; brownfield
+  # preservation never redefines the target for new work); verbatim immutable
+  # APPROVED_LAYER3_RECORDS at approval; renderer non-authorship with the semantic-vs-
+  # structural classification and the render-time amend/re-approve path; post-write
+  # fidelity compared against the pre-write records, never reconstructed intent.
+  for a in 'one independently meaningful assertion = one disposition' 'merely because it was attached to a durable decision' 'ownership validation precedes user choice presentation' 'INVALID_OPTION' 'brownfield preservation does not redefine the target baseline' 'never negate or redefine Layer-1 or Layer-2 target policy for new work' 'APPROVED_LAYER3_RECORDS' 'captured verbatim' 'transcription plus formatting, never semantic authorship' 'semantic content, never structural formatting' 'stop materializing that rule' 'ask the developer to re-approve' 'against those same pre-write records'; do
+    grep -qiF -- "$a" "skills/$s/SKILL.md" || fail "$s: SKILL.md missing semantic-boundary anchor: $a"
+  done
+  grep -qiE '(mixed|mixing|combined|combining)[^.]*(may|can) (remain|stay|survive)[^.]*(KEPT|kept)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows a mixed-disposition clause to survive as one KEPT clause"
+  grep -qiE '(counts?|paths?|versions?|observed values?|inventor(y|ies))[^.]*(may|can) (ride|survive|remain|stay|be kept|be persisted)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows rediscoverable evidence to ride inside kept policy"
+  grep -qiE 'layer-? ?3[^.]*(may|can)[^.]*(override|negate|take precedence)[^.]*layer-? ?[12]' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows Layer 3 to override Layer 1/2"
+  grep -qiE '(option|choice)[^.]*(may|can) (override|negate|redefine)[^.]*(layer-? ?[12]|universal|target baseline)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows offering a choice that overrides Layer 1/2"
+  grep -qiE '(offer|present|display|propose|show)[a-z]*[^.]*(option|choice)[^.]*layer-? ?3[^.]*(overrid|negat|take precedence)[a-z]*[^.]*layer-? ?[12]' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows presenting an option where Layer 3 overrides Layer 1/2"
+  grep -qiE '(legacy|frozen migration|exception)s?[^.]*(may|can) (redefine|override|negate)[^.]*(target|layer-? ?[12])' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows a legacy exception to redefine the Layer-2 target"
+  grep -qiE 'render[a-z]*[^.]*(may|can) (clarify|complete|enrich|repair|add|extend|broaden|narrow)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows the renderer to author semantic content"
+  grep -qiE '(responsibilit|accountabilit|carve-?out|rationale)[a-z-]*s?( statements?)?[^.]*(is|are|remains?|counts? as|treated as) (structural|formatting|plain formatting|non-semantic)' "skills/$s/SKILL.md" && fail "$s: SKILL.md classifies semantic content as structural formatting"
+  grep -qiE '(fidelity|verification|comparison|baseline)[^.]*(may|can)[^.]*(reconstruct|remember|infer|recall)' "skills/$s/SKILL.md" && fail "$s: SKILL.md allows a reconstructed-intent fidelity baseline"
 done
 [ -d global-agents ] || fail "global-agents/ missing"
 for d in core/commands core/agents core/rules core/templates; do
@@ -122,11 +191,38 @@ for t in sdd-methodology.md 50-team-templates.md; do
   c=$(grep -rl "$t" core skills 2>/dev/null | wc -l)
   [ "$c" -eq 0 ] || fail "remaining ghost reference: $t ($c files)"
 done
-# 3a-ter. rules renamed in v1.3.0: old names may appear ONLY in sdd-upgrade.md
-#         (its migration map documents them); anywhere else is drift
+# 3a-ter. renamed rules (v1.3.0 slots): old names may appear ONLY in sdd-upgrade.md
+#         (its migration map documents them); anywhere else is drift.
+#         CHANGELOG.md is historical evidence and is deliberately outside this net.
 for t in 05-constitution.md 20-git-conventions.md 50-security.md 30-tests-strategy.md 40-quality-gates.md 02-git-conventions.md 03-security.md 04-code-quality.md; do
   c=$(grep -rlF -- "$t" core skills 2>/dev/null | grep -v '/sdd-upgrade\.md$' | wc -l)
   [ "$c" -eq 0 ] || fail "renamed rule still cited under its old name: $t ($c files)"
+done
+# 3a-quater. Layer-2 canonical-decade old names (pre-decade aliases). The old names are
+# SUBSTRINGS of their canonical successors (jpa-conventions.md ⊂ 30-jpa-conventions.md),
+# so the net matches the old token only when NOT already carrying its canonical numeric
+# prefix ([^-0-9] before it). The allowance is CONTEXT-SCOPED, never file-scoped:
+#   - outside sdd-upgrade.md: any occurrence is drift;
+#   - inside sdd-upgrade.md: aliases are allowed ONLY within the §0b migration-map
+#     section (from the '### 0b.' heading to the next '### ' heading) where they are
+#     migration-map DATA; the same token in any other sdd-upgrade prose fails.
+# CHANGELOG.md stays outside this net (historical evidence).
+L2_OLD_RE='(^|[^-0-9])(node-conventions|doctrine-conventions|jpa-conventions|angular-conventions|api-contracts|shared-types|refactoring-guard|legacy-rules|migration-guard)\.md'
+for t in node-conventions doctrine-conventions jpa-conventions angular-conventions api-contracts shared-types refactoring-guard legacy-rules migration-guard; do
+  c=$(grep -rlE -- "(^|[^-0-9])$t\.md" core skills 2>/dev/null | grep -v '/sdd-upgrade\.md$' | wc -l)
+  [ "$c" -eq 0 ] || fail "renamed Layer-2 rule still cited under its old name: $t.md ($c files)"
+done
+for f in core/commands/sdd-upgrade.md skills/*/reference/commands/sdd-upgrade.md; do
+  [ -f "$f" ] || continue
+  c=$(awk '/^### /{inmap=(/^### 0b\./)?1:0} !inmap{print}' "$f" | grep -cE -- "$L2_OLD_RE")
+  [ "$c" -eq 0 ] || fail "historical Layer-2 alias outside the §0b migration map: $f ($c line(s))"
+done
+# 3a-quinquies. Bounded stale-naming prose net (SECONDARY guard — boundary documented in
+# the Known-Limits Register): catches only the known obsolete formulations reproduced
+# around v1.16.0; it is deliberately NOT a general semantic prose checker.
+for pat in 'unnumbered file' 'unnumbered rule' 'unnumbered stack' 'may be numbered'; do
+  c=$(grep -rli -- "$pat" core skills 2>/dev/null | wc -l)
+  [ "$c" -eq 0 ] || fail "known stale Layer-2 naming formulation ('$pat') in active prose ($c files)"
 done
 # 3a-bis. blanked references: list items with EMPTY inline code (e.g. "- `` if present")
 #         — residue of a deleted file whose path was blanked instead of the line removed
@@ -521,7 +617,7 @@ for cf in core/commands/*.md core/agents/*.md core/templates/*.md core/rules/*.m
 done
 # 6b. Shared files OUTSIDE core that must be identical across the relevant skills.
 #     Legitimate exclusions (per-stack divergence): 10-code-conventions, 11-tests-strategy,
-#     12-quality-gates, api-contracts; migration-guard diverges between the symfony pair
+#     12-quality-gates, 50-api-contracts; 62-migration-guard diverges between the symfony pair
 #     but is shared verbatim between the two java skills (hash-checked in the java group).
 check_shared(){
   local label="$1"; local skills="$2"; shift 2
@@ -590,13 +686,13 @@ $af
 EOF_AF
 check_shared "angular" "sdd-symfony-angular sdd-angular-node sdd-java-angular" \
   commands/angular-component.md commands/angular-service.md commands/angular-test.md \
-  rules/angular-conventions.md
+  rules/40-angular-conventions.md
 check_shared "symfony" "sdd-php-symfony sdd-symfony-angular" \
   commands/symfony-entity.md commands/symfony-service.md commands/symfony-controller.md commands/symfony-test.md \
-  rules/doctrine-conventions.md
+  rules/30-doctrine-conventions.md
 check_shared "java" "sdd-java-backend sdd-java-angular" \
   commands/java-entity.md commands/java-service.md commands/java-controller.md commands/java-test.md \
-  rules/jpa-conventions.md rules/migration-guard.md
+  rules/30-jpa-conventions.md rules/62-migration-guard.md
 [ $err -eq $before ] && ok "$mcount core masters + angular/symfony/java groups identical (hash)"
 
 # =====================================================================

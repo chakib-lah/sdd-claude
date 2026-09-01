@@ -1,7 +1,7 @@
 # Code Conventions — Symfony + Angular
 
 > **Layer 2 — Specific to the Symfony backend + Angular frontend stack.**  
-> This rule covers both sides. For details, see also `doctrine-conventions.md`, `angular-conventions.md`, `api-contracts.md`.
+> This rule covers both sides. For details, see also `30-doctrine-conventions.md`, `40-angular-conventions.md`, `50-api-contracts.md`.
 
 ---
 
@@ -120,7 +120,7 @@ final readonly class UserResponse
 }
 ```
 
-See `doctrine-conventions.md` for details on entities, repositories and migrations.
+See `30-doctrine-conventions.md` for details on entities, repositories and migrations.
 
 ---
 
@@ -248,7 +248,7 @@ frontend/
 │   └── main.ts
 ```
 
-See `angular-conventions.md` for the full details.
+See `40-angular-conventions.md` for the full details.
 
 ---
 
@@ -299,7 +299,7 @@ private string $email;
 private string $password;  // never in read
 ```
 
-See `api-contracts.md` for details.
+See `50-api-contracts.md` for details.
 
 ---
 

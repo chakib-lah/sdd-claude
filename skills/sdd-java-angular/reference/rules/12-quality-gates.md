@@ -22,7 +22,7 @@ This rule names the quality capabilities **required** by the full-stack skill. T
 | Frontend | Strict typing | **Required target** — TS `strict` + `strictTemplates` | current `tsconfig*.json` configuration |
 | Frontend | Deterministic formatting | **Required** | configured formatter (Prettier or other) |
 | Frontend | Production build / type check | **Required** | project build scripts |
-| Full-stack | API contract sync | **Required** | contract source mode and generator (see `api-contracts.md`) |
+| Full-stack | API contract sync | **Required** | contract source mode and generator (see `50-api-contracts.md`) |
 
 **Discovery is not optionality.** Two gap classes cover every deviation:
 
@@ -245,9 +245,9 @@ ng build --configuration production         # build + budgets
 
 ## Contract gate — OpenAPI ⇄ frontend types
 
-The designated machine-readable contract and the frontend TypeScript types must be **in sync**, per the discovered source mode of `api-contracts.md` (MODE A provider-generated — with or without a tracked snapshot — or MODE B project-owned; no source at all is a PROJECT_TOOLING_GAP; a valid source without frontend automation is an API_CONTRACT_AUTOMATION_GAP).
+The designated machine-readable contract and the frontend TypeScript types must be **in sync**, per the discovered source mode of `50-api-contracts.md` (MODE A provider-generated — with or without a tracked snapshot — or MODE B project-owned; no source at all is a PROJECT_TOOLING_GAP; a valid source without frontend automation is an API_CONTRACT_AUTOMATION_GAP).
 
-**Gate**: any MR that changes a `@RestController`, a Request/Response record, or a frontend API interface must show the two sides updated together. Run `/api-contract` (`.claude/commands/api-contract.md`) to check and re-sync; the full workflow is in the `api-contracts.md` rule.
+**Gate**: any MR that changes a `@RestController`, a Request/Response record, or a frontend API interface must show the two sides updated together. Run `/api-contract` (`.claude/commands/api-contract.md`) to check and re-sync; the full workflow is in the `50-api-contracts.md` rule.
 
 ```bash
 # Typical drift check where the generated types are versioned — discovered

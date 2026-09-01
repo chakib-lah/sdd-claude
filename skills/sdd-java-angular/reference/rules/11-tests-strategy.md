@@ -302,7 +302,7 @@ Tag the covering test with a `// Covers AC-n` comment on both sides.
 ### Shared fixtures backend ↔ frontend
 
 For tests that depend on API payloads, keep one canonical JSON example per DTO
-(from the OpenAPI contract, see `api-contracts.md`) and reuse it:
+(from the OpenAPI contract, see `50-api-contracts.md`) and reuse it:
 - Backend: as the expected body in `@WebMvcTest` assertions
 - Frontend: as the `req.flush(...)` payload and E2E fixture
 

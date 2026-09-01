@@ -10,7 +10,7 @@ description: Scaffold a Doctrine entity with migration from a SDD spec
 
 - Active SDD feature with `tasks.md` `status: approved`
 - Current task mentions the creation/modification of this entity
-- Conventions available: `.claude/rules/10-code-conventions.md`, `.claude/rules/doctrine-conventions.md`
+- Conventions available: `.claude/rules/10-code-conventions.md`, `.claude/rules/30-doctrine-conventions.md`
 
 ## Steps
 
@@ -30,7 +30,7 @@ Read `spec.md` (Design section → Entity/entities / DB changes) to retrieve:
 
 ### 3. Load the Doctrine conventions
 
-Read `.claude/rules/doctrine-conventions.md` to comply with:
+Read `.claude/rules/30-doctrine-conventions.md` to comply with:
 - PHP 8+ attribute format
 - `DateTimeImmutable` for dates
 - Explicit constructor with invariants

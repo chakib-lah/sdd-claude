@@ -10,7 +10,7 @@ description: Scaffold an Angular standalone component from a SDD spec
 
 - Active SDD feature with `tasks.md` `status: approved`
 - Current task mentioning the creation of this component
-- Available conventions: `.claude/rules/angular-conventions.md`
+- Available conventions: `.claude/rules/40-angular-conventions.md`
 
 ## Steps
 
@@ -33,7 +33,7 @@ Read `spec.md` (Design section → Angular Component(s)):
 
 ### 3. Load the conventions
 
-Read `.claude/rules/angular-conventions.md`:
+Read `.claude/rules/40-angular-conventions.md`:
 - Standalone new components (where the installed Angular version supports it)
 - `ChangeDetectionStrategy.OnPush`
 - Signals preferred over local RxJS

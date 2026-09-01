@@ -22,5 +22,5 @@ Generates controller + route + middleware + integration tests from the API contr
 
 - Thin controller: no business logic
 - Zod validation before any operation
-- Uniform error format (see `api-contracts.md`)
-- Correct HTTP codes per `api-contracts.md`
+- Uniform error format (see `50-api-contracts.md`)
+- Correct HTTP codes per `50-api-contracts.md`

@@ -8,8 +8,8 @@
 
 The toolkit stacks **3 layers**. The boundary is not a feeling — it is a decision test, applied sentence by sentence:
 
-- **Layer 1 — Universal methodology**: true for every project, whatever the technology. **If a sentence names anything stack-dependent — an application framework, a programming language, a package or build tool (`composer install`, `npm audit`, `./gradlew check`) — it is not Layer 1. Naming an SDD command (`/sdd-verify`) or stack-agnostic workflow tooling (`git`) is expected: those ARE Layer 1 vocabulary — the boundary is stack-dependent vs stack-agnostic, not tool vs no tool.** Content: the 17 SDD commands, the 5 SDD agents, the templates and the 4 process rules (`00-sdd-framework.md`, `01-git-conventions.md`, `02-security.md`, `03-code-quality.md`). Identical everywhere, never adapted.
-- **Layer 2 — Technology**: true for the whole stack, whatever the project. **If a sentence names a branch, a ticket prefix, a host or a project path, it is not Layer 2.** Content: code rules, test strategy, quality gates and scaffolding commands specific to the stack — **every rule file the skill ships in `reference/rules/` that is not one of the four canonical Layer-1 files**; some are numbered (`10-…`), some are not (`api-contracts.md`): the name decides nothing, reference membership does.
+- **Layer 1 — Universal methodology**: true for every project, whatever the technology. **If a sentence names anything stack-dependent — an application framework, a programming language, a package or build tool (`composer install`, `npm audit`, `./gradlew check`) — it is not Layer 1. Naming an SDD command (`/sdd-verify`) or stack-agnostic workflow tooling (`git`) is expected: those ARE Layer 1 vocabulary — the boundary is stack-dependent vs stack-agnostic, not tool vs no tool.** Content: the 17 SDD commands, the 4 universal SDD agents (`test-generator` is stack-adapted and selected-skill-owned — a stack-dependent artifact is never Layer 1), the templates and the 4 process rules (`00-sdd-framework.md`, `01-git-conventions.md`, `02-security.md`, `03-code-quality.md`). Identical everywhere, never adapted.
+- **Layer 2 — Technology**: true for the whole stack, whatever the project. **If a sentence names a branch, a ticket prefix, a host or a project path, it is not Layer 2.** Content: code rules, test strategy, quality gates and scaffolding commands specific to the stack — **every rule file the skill ships in `reference/rules/` that is not one of the four canonical Layer-1 files**; canonical Layer-2 rules carry their functional-decade name (`10-…`, `30-…`, `50-…` — see *Rule-file naming contract*), but the name decides nothing: reference membership does.
 - **Layer 3 — Project**: everything else — business skills, house conventions, project-specific code templates (added by the team).
 
 In a deployed project, **ownership is resolved mechanically, never by filename prefix**: a rule is Layer 1 if it is one of the four canonical files (`00-sdd-framework.md`, `01-git-conventions.md`, `02-security.md`, `03-code-quality.md`); else Layer 2 if the selected skill's `reference/rules/` ships the same relative path; else Layer 3 (project-owned — `/sdd-upgrade` never byte-replaces it). Layer 1 carries no project-override block: project truth lives in Layer 3. A rule that fails its layer's test is in the wrong file, whatever its name says.
@@ -43,13 +43,40 @@ skills/sdd-<stack>/
     │   ├── 10-code-conventions.md    ← stack-specific (Layer 2)
     │   ├── 11-tests-strategy.md      ← stack-specific (Layer 2)
     │   ├── 12-quality-gates.md       ← stack-specific (Layer 2)
-    │   └── <stack extras>.md         ← e.g. doctrine-conventions, angular-conventions, migration-guard…
+    │   └── <stack extras>.md         ← e.g. 30-doctrine-conventions, 40-angular-conventions, 62-migration-guard…
     └── templates/                    ← 9 process templates
         └── spec.md, plan.md, tasks.md, notes.md, sdd-readme.md,
             jira-story-{fr,en}.md, spec-doc-{fr,en}.md   ← MASTERS (copied from core)
 ```
 
 > **"MASTER"** = Layer 1 file whose source of truth is `core/`. It is **copied byte for byte**, never rewritten. See the next section.
+
+---
+
+## Rule-file naming contract (permanent)
+
+Rule filenames under `rules/` follow one permanent visual namespace:
+
+| Range / prefix | Meaning |
+|---|---|
+| `00–09` | **Layer 1** — universal framework rules |
+| `10–19` | Layer 2 — stack fundamentals / transversal skill rules |
+| `20–29` | Layer 2 — runtime / backend platform |
+| `30–39` | Layer 2 — persistence / ORM |
+| `40–49` | Layer 2 — frontend / UI framework |
+| `50–59` | Layer 2 — API / contracts / cross-stack integration |
+| `60–69` | Layer 2 — brownfield / legacy / compatibility / change protection |
+| `70–89` | **reserved** for future Layer-2 functional domains |
+| `90–99` | **globally reserved** — no current semantic meaning |
+| `project-*` | **Layer 3** — durable project-owned specialization |
+
+Normative invariants:
+
+- **Numbering is human-facing visual classification only.** Ownership comes from canonical Layer-1 membership, selected-skill reference membership and project ownership — never from the prefix (`/sdd-upgrade`'s ownership algorithm and the audit ignore the number).
+- Numbers establish **no precedence**: a higher number never overrides a lower one, and Layer 3 **specializes** Layer 2 — it never negates it.
+- The numeric sequence is **intentionally non-contiguous** (a skill may ship `10, 11, 12, 30, 62`): no consumer may assume contiguous numbering.
+- New Layer-2 rules take the lowest free slot of their functional decade; `70–89` opens only when a genuinely new functional domain is defined; `90–99` stays unassigned.
+- Historical pre-decade names (the same Layer-2 artifacts without their numeric prefix, as shipped before this contract) survive only as `/sdd-upgrade` migration aliases — never as active canonical references; the audit enforces this.
 
 ---
 
@@ -79,7 +106,7 @@ These 34 files are not to be touched: no renaming, no rephrasing, no "local impr
 
 Everything else — and **only** the rest — is stack-specific:
 
-- The Layer 2 rules: `10-code-conventions.md`, `11-tests-strategy.md`, `12-quality-gates.md`, plus possible stack extras (`doctrine-conventions.md`, `angular-conventions.md`, `node-conventions.md`, `api-contracts.md`, `migration-guard.md`, `legacy-rules.md`, `shared-types.md`, …). Numbering is a **naming convention for authoring only** (`0x` historically Layer 1, `1x` stack rules, extras unnumbered — never renumber existing files): in a deployed project, ownership is resolved by the canonical Layer-1 list and by reference membership, never by the prefix.
+- The Layer 2 rules: `10-code-conventions.md`, `11-tests-strategy.md`, `12-quality-gates.md`, plus possible stack extras (`30-doctrine-conventions.md`, `40-angular-conventions.md`, `20-node-conventions.md`, `50-api-contracts.md`, `62-migration-guard.md`, `61-legacy-rules.md`, `51-shared-types.md`, …). Filenames follow the permanent **Rule-file naming contract** (see above): the prefix is a visual classification for humans — in a deployed project, ownership is resolved by the canonical Layer-1 list and by reference membership, never by the prefix.
 - The `<stack>-*` **scaffolding commands** (e.g. `symfony-entity`, `angular-component`, `node-endpoint`).
 - The `test-generator` agent (point b).
 
@@ -135,6 +162,12 @@ The **stack-purity vocabulary** below is the canonical, machine-enforced list of
 | CI pipeline exclusion | GitLab-shaped markers (shipped `*.yml`, `stages:`, `# .gitlab-ci.yml`, indented `stage:`) | a GitHub-Actions or Jenkins pipeline embedded in a `.md` | the toolkit was only ever GitLab-oriented, and the boundary is stated next to the net. Revisit if the toolkit targets another CI platform. |
 | ghost references (§3b/3c) | every cited `.claude/rules\|commands/X.md` exists globally (in core or any skill) | per-skill resolvability: a file cited by one skill but existing only in another passes | per-skill checking false-positives on legitimate cross-stack illustrations (e.g. `sdd-upgrade.md`). Revisit if a deployed project hits a dangling per-skill reference in practice. |
 | delegations (§4) | `plan-architect`/`test-generator` description-line citations (`/sdd-plan`, `/X-test`) exist | prose citations elsewhere in agent bodies (covered only by the global §3c net) | the description line is where Claude Code routes delegation; body prose is illustrative. Revisit if a body-level citation ever misroutes a real delegation. |
+| fresh-install disposition (§1 SKILL anchors + contradiction nets) | every SKILL.md carries the exact anchor strings of the installer contract (ownership labeling with 4 universal agents + selected-skill-owned `test-generator`, non-blocking clarification semantics, semantic-disposition block, canonical `project-git-workflow.md` / `project-security.md` owners); and bounded contradiction nets reject drift-as-fact wording, any line tying `test-generator` or "5 SDD agents" to framework ownership, and any Layer-3 disposition line promoting detected/observed technical state (`detected `/`observed `/`patterns in use`/`repository shape` on a `Layer 3` line) — because a correct normative anchor does not excuse contradictory prose elsewhere in the same file | a future SKILL.md that paraphrases the contract away while keeping the anchor strings, or promotes observed state to Layer 3 in wording the bounded patterns do not match ("the layout we found", "as configured today"…) | anchor + bounded-pattern checks prove the contract text ships and the known contradictions are absent, not that an installer session obeys it, and not that every paraphrase is caught — a prose paraphrase detector is the race the register already rejects. Revisit if a real fresh install violates the disposition contract while the checks pass, when the contradiction wording evolves past the bounded patterns, or when a new skill is added (its SKILL.md must carry the same anchors). |
+| fresh-install runtime reasoning (§1 gate/evidence/materialization anchors) | every SKILL.md ships the final Layer-3 sanitization gate, its **final proposal materialization** contract (render only the normalized result; one disposition record per clause with kept/removed/follow-up views derived from it; atomic clauses; move-never-copy relocation; empty-candidate deletion; consistency assertions before display), the **approval-freeze + write-fidelity** contract (approval makes the normalized Layer-3 set immutable; Phase 4 materializes exactly that set — no reclassification, no discovery enrichment, no gap-to-exception promotion; a post-write fidelity check compares written `project-*` files against the approved set) and the independent-evidence-dimensions contract (exact anchors); bounded nets reject the known contradictory formulations (a universal invariant allowed to remain in Layer 3, rediscoverable state allowed to be persisted, configuration absence inferred from artifact absence, raw candidates allowed to render, a clause under multiple owners or in both kept and removed sets, a relocated clause left in its source, an empty candidate displayed, Layer-3 enrichment from discovery, violation-to-exception promotion, post-approval disposition transitions) | whether an actual autonomous installer session **obeys** the shipped contract — static text checks cannot prove LLM runtime reasoning; only an unbiased autonomous replay proves the FIRST displayed proposal is the normalized one **and** that the written `project-*` files match the approved set — plus contradictory paraphrases outside the bounded patterns | runtime behavior is only provable by an unbiased autonomous replay on a disposable project; the audit's role is to guarantee the normative contract ships intact and the known contradictions are absent. Revisit after each real autonomous replay that reveals a reasoning or write-fidelity failure despite green anchors, or when the disposition/evidence/materialization contract wording evolves. |
+| fresh-install semantic boundaries | every SKILL.md ships the **semantic-claim atomicity** contract (one independently meaningful assertion = one disposition; durable policy and its attached rediscoverable evidence are separate claims split before disposition; a developer decision promotes only the decision itself, never its supporting evidence; no over-sanitization of durable policy that must name a technology to express itself), the **choice-validity gate** (ownership validation precedes user choice presentation; an option that would override or negate Layer 1/2 or redefine the selected-skill target baseline is `INVALID_OPTION` and never displayed; brownfield preservation never redefines the target for new work), the **verbatim immutable `APPROVED_LAYER3_RECORDS`** capture at the approval boundary, the **renderer non-authorship** contract (transcription plus formatting; rationale, exceptions, responsibility/accountability statements, scope carve-outs, clarifications and normative examples are semantic content, never structural formatting; render-time semantic repair is forbidden — stop materializing, amend, re-approve) and the **pre-write fidelity baseline** (written files compared against the same pre-write records, never against reconstructed or remembered intent); bounded nets reject the known contradictory formulations (a mixed-disposition clause surviving as one KEPT clause, evidence riding inside kept policy, Layer 3 allowed to override Layer 1/2, an offered choice that overrides ownership, a legacy exception redefining the Layer-2 target, a renderer allowed to clarify/complete/enrich, semantic content classified as structural, a reconstructed-intent fidelity baseline) | whether an autonomous installer session **obeys** the shipped contract, and contradictory paraphrases outside the bounded patterns | static audit proves the normative contract ships intact and catches the known contradictory instruction patterns; only an unbiased autonomous fresh-install replay through discovery, proposal, approval and write proves runtime obedience. Revisit after each real autonomous replay revealing a semantic-boundary failure despite green anchors, or when the contract wording evolves past the bounded patterns. |
+| stale Layer-2 naming prose (§3a-quater/quinquies) | context-scoped alias allowance: pre-decade Layer-2 aliases pass only as migration-map data inside sdd-upgrade's §0b section (historical CHANGELOG entries stay outside the net) — never through a whole-file exemption; plus a bounded prose net rejecting the known obsolete formulations (the "unnumbered …" wordings, the "may-be-numbered-or-not" phrasing) while a pre-decade alias used as a current example is caught by the alias net itself | arbitrary semantic paraphrases carrying none of the bounded tokens ("certain rules carry prefixes", "some stack rules use a numeric form", future equivalent wording) | detecting paraphrases needs semantics, not patterns — the context-scoped alias enforcement is the actual mechanical protection; the prose net is a bounded regression guard, not a general semantic prose validator, and the Layer-2 migration algorithm itself carries no known functional defect here. Revisit if a stale naming formulation ships that bypasses the bounded net, if the public Layer naming terminology changes, or if the §0b migration-map structure changes materially. |
+
+**Terminal stop policy — fresh-install micro-correction cycle closed.** The fresh-install correction series ends with the semantic-boundary release. Wording, style, heading choice, harmless rationale presentation, non-semantic formatting, report-only rediscoverable context and minor phrasing preferences are **not** release blockers and justify no new patch. A new release requires one of: reproducible materially wrong ownership or policy semantics; broken install/write/upgrade behavior; a broken SDD workflow; safety-relevant policy corruption; or an explicit product-owner decision.
 
 ---
 
@@ -271,8 +304,8 @@ reference/rules/
   10-code-conventions.md       ← PHP 8.x strict_types, PSR-12, Symfony conventions
   11-tests-strategy.md         ← PHPUnit, WebTestCase, fixtures, conventions
   12-quality-gates.md          ← PHPStan level X, CS-fixer, Rector, make quality
-  doctrine-conventions.md      ← stack extra
-  migration-guard.md           ← brownfield extra
+  30-doctrine-conventions.md      ← stack extra
+  62-migration-guard.md           ← brownfield extra
 
 reference/commands/            ← fine granularity (option B)
   symfony-entity.md            ← scaffolds a Doctrine entity + mapping

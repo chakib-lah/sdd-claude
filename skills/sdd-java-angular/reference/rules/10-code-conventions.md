@@ -1,7 +1,7 @@
 # Code Conventions — Spring Boot + Angular
 
 > **Layer 2 — Specific to the Java/Spring Boot backend + Angular frontend stack.**  
-> This rule covers both sides. For details, see also `jpa-conventions.md`, `angular-conventions.md`, `api-contracts.md`.
+> This rule covers both sides. For details, see also `30-jpa-conventions.md`, `40-angular-conventions.md`, `50-api-contracts.md`.
 
 ---
 
@@ -151,7 +151,7 @@ Where dependency locking is enabled (the greenfield default — not every valid 
 project uses it), `gradle.lockfile` is committed and regenerated with
 `./gradlew dependencies --write-locks` after any build-file change — never edited by hand.
 
-See `jpa-conventions.md` for details on entities, repositories and migrations.
+See `30-jpa-conventions.md` for details on entities, repositories and migrations.
 
 ---
 
@@ -243,7 +243,7 @@ export type OrderStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
 - ✅ `readonly` on immutable properties
 - ❌ Never `any` — use `unknown` if the type is truly unknown
 
-See `angular-conventions.md` for the full details (control flow, inputs/outputs,
+See `40-angular-conventions.md` for the full details (control flow, inputs/outputs,
 routing, interceptors).
 
 ---
@@ -313,7 +313,7 @@ application error.
 | 422 | Semantically invalid request (business rule) |
 | 500 | Server error (details in backend logs only) |
 
-See `api-contracts.md` for the OpenAPI contract workflow (contract source discovery, type sync).
+See `50-api-contracts.md` for the OpenAPI contract workflow (contract source discovery, type sync).
 
 ---
 

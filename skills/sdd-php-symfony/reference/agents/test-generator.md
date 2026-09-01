@@ -68,7 +68,7 @@ public function testCreateUserReturns422WhenEmailInvalid(): void
 Conventions:
 - HTTP behavior: extend `WebTestCase` ; container services without HTTP: `KernelTestCase`
 - Doctrine fixtures for test data, dedicated test database reset between tests
-- Migrations applied on the test schema before the suite (see `.claude/rules/migration-guard.md`)
+- Migrations applied on the test schema before the suite (see `.claude/rules/62-migration-guard.md`)
 
 ## Bash restrictions
 

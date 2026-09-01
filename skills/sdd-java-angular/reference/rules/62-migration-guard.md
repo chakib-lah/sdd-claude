@@ -261,7 +261,7 @@ Upgrade one axis at a time, reading the official release notes at each step:
 - **Java**: 17 → 21 → 25 (LTS to LTS; check bytecode-sensitive libs)
 - **Spring Boot**: 3.3 → 3.5 → 4.x — Boot 4 splits several starters into finer-grained modules, expect starter renames
 - **Gradle**: 7 → 9 (run with `--warning-mode all` first, fix deprecations before jumping)
-- **Flyway**: 9 → 10 — add the split database artifact (`flyway-database-postgresql`), see `.claude/rules/jpa-conventions.md`
+- **Flyway**: 9 → 10 — add the split database artifact (`flyway-database-postgresql`), see `.claude/rules/30-jpa-conventions.md`
 
 After each step: full test round + regenerated lockfile before the next step.
 

@@ -10,7 +10,7 @@ description: Scaffold an Angular service (HTTP API or state) from a SDD spec
 
 - Active SDD feature with `tasks.md` `status: approved`
 - Current task mentioning the creation of the service
-- Available conventions: `.claude/rules/angular-conventions.md` and `.claude/rules/api-contracts.md`
+- Available conventions: `.claude/rules/40-angular-conventions.md` and `.claude/rules/50-api-contracts.md`
 
 ## Steps
 
@@ -33,7 +33,7 @@ Read `spec.md`:
 
 ### 3. Load the conventions
 
-Read `.claude/rules/angular-conventions.md` and `.claude/rules/api-contracts.md`:
+Read `.claude/rules/40-angular-conventions.md` and `.claude/rules/50-api-contracts.md`:
 - `@Injectable({ providedIn: 'root' })`
 - `inject()` rather than constructor
 - Explicit types on all requests/responses
@@ -196,7 +196,7 @@ export interface UpdateUserRequest {
 }
 ```
 
-⚠️ Do not create the models manually if the project already provides its types: generated OpenAPI contract (the skill's contract command, e.g. `/api-contract`) or shared types from a monorepo (`packages/shared/types/`). See `.claude/rules/api-contracts.md`.
+⚠️ Do not create the models manually if the project already provides its types: generated OpenAPI contract (the skill's contract command, e.g. `/api-contract`) or shared types from a monorepo (`packages/shared/types/`). See `.claude/rules/50-api-contracts.md`.
 
 ### 9. Generate the test skeleton
 
