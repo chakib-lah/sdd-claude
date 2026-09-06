@@ -22,7 +22,7 @@ h3. (on) Summary
 <condensed "Context and problem" from the spec>
 
 +*BR01:*+
-<business rule — from the rules found in the ACs and the Design
+<business rule — from the rules found in the ACs and the Functional behavior section
 (computations, entitlements, list-building rules)>
 
 +*BR02:*+

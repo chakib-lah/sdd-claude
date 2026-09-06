@@ -67,5 +67,5 @@ quality:
 
 - `console.log` (backend and frontend — use a logger)
 - `debugger`
-- `TODO` without an associated ticket
+- `TODO` / `FIXME` introduced by the change (deferred work lives in the issue tracker or SDD artifacts, not in source comments)
 - `any` in new files

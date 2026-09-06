@@ -167,7 +167,17 @@ Without a project constitution, these checks are skipped ("no constitution"). No
 
 ---
 
+## Working language
+
+Project-facing SDD communication — `spec.md`, `plan.md`, `tasks.md`, `notes.md`, the retro-spec exports and any project-facing SDD analysis — is written in the project's **working language**, declared in the project-owned Layer-3 rule `.claude/rules/project-working-language.md` (the canonical subject owner; an existing equivalent project rule counts). When no such rule exists, use the language the user works in. The framework hard-codes no universal SDD language: French, English or another language are equally valid project choices.
+
+The working language never overrides the universal engineering invariants: **Git commit subjects are written in English** (`01-git-conventions.md`) and **source-code comments are written in English**, concise, and explain the code — never the SDD process (`03-code-quality.md`). The working-language rule owns **project-facing SDD communication only**: it never changes the language of product source, source comments, technical documentation or other engineering artifacts — English remains the default engineering language for those domains unless a future explicit framework policy establishes another owner. A working-language rule is never evidence about source-comment language.
+
+---
+
 ## Anatomy of a spec
+
+A spec states the **WHAT and the WHY** — the expected behavior and its rationale, readable by product/business stakeholders and developers alike. It is never an implementation plan: exact source paths, impacted files, class/service/method names, code snippets, build commands and DB implementation details belong to `plan.md`, even when specification-time exploration discovered them. An externally observable contract requirement (e.g. "the existing API response stays backward compatible", or a business calculation formula that is itself the required behavior) legitimately belongs in the spec — implementation code and internal design never do.
 
 A valid spec contains these sections, in this order:
 
@@ -175,10 +185,10 @@ A valid spec contains these sections, in this order:
 2. **Context and problem**: what we want to solve and why
 3. **Objectives**: what the feature must accomplish
 4. **Out of scope**: what we are **not** doing in this feature
-5. **Acceptance criteria**: measurable criteria in the format *"When X, the system Y and Z"*
-6. **Design**: technical sections (endpoints, entities, components — depending on the stack)
-7. **Security considerations**: data sensitivity, authorization impact, external inputs, abuse cases — filled, or its non-applicability justified in one line
-8. **Technical constraints**: decisions and justifications
+5. **Functional behavior**: the expected business/functional behavior — business rules, user-visible flows, and the externally observable contracts that are part of the request
+6. **Acceptance criteria**: measurable criteria in the format *"When X, the system Y and Z"*
+7. **Security considerations**: data sensitivity, authorization impact, external inputs, abuse cases — at the observable requirement level; filled, or its non-applicability justified in one line
+8. **Technical constraints**: externally observable constraints that are part of the requested contract (standards, measurable thresholds, compatibility commitments)
 9. **Open questions**: what has not been settled
 
 ### Quality criteria for a spec
@@ -195,16 +205,19 @@ A valid spec contains these sections, in this order:
 
 ## Anatomy of a plan
 
+The plan is the **technical design artifact — it owns the HOW**: architecture and technical approach, endpoints and internal API implementation, entities/data-model implementation and migrations, services, repositories, mappers, controllers, frontend components/state, integrations, the exact impacted files and class/method placement, the migration strategy and the AC → test mapping. It references the approved behavior of the spec and explains how to implement it — it never duplicates the spec.
+
 A valid plan contains:
 
 1. **Frontmatter**: feature, status, created, author
 2. **Overall approach**: implementation strategy
-3. **Implementation order**: logical sequence
-4. **Impacted files**: list with annotation (created, modified, deleted)
-5. **Risks and mitigations**: what can go wrong
-6. **Test strategy**: which tests cover which ACs
-7. **Points of attention**: side effects, non-regressions to check
-8. **Remaining questions**: the spec's open questions to resolve before the Tasks phase
+3. **Technical design**: the concrete design — endpoints, data model and migrations, services/components, integrations, class/method placement
+4. **Implementation order**: logical sequence
+5. **Impacted files**: list with annotation (created, modified, deleted)
+6. **Risks and mitigations**: what can go wrong
+7. **Test strategy**: which tests cover which ACs
+8. **Points of attention**: side effects, non-regressions to check
+9. **Remaining questions**: the spec's open questions to resolve before the Tasks phase
 
 ---
 

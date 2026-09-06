@@ -117,24 +117,26 @@ For each class to extract, create a SDD feature:
 
 `EXTRACT-001` is an internal identifier (can be replaced by a Jira ticket `TICK-1234` if relevant).
 
-### 6. Fill in each feature's spec.md
+### 6. Fill in each feature's spec.md and plan.md
 
-For each class, generate a spec with:
+For each class, generate a spec (WHAT/WHY) with:
 
 #### Context
-- Legacy source code: path and lines concerned
-- Why extract: debt, readability, testability
+- The legacy behavior concerned and why extract it: debt, readability, testability
 
 #### Acceptance criteria
 - **Non-regression** AC: "When the old code calls `get_user_by_id($id)`, the behavior remains identical" (the most important case)
 - **Modern interface** AC: "When the new code calls `$repository->find(int $id)`, it returns `?User`"
 
-#### Design
+And a plan (HOW — the technical design lives here, never in the spec) with:
+
+#### Technical design
+- Legacy source: exact path and lines concerned
 - Full signature of the new class
 - Intermediate adapter if needed (for compatibility bridges)
 - Side effects to neutralize
 
-#### Progressive migration plan
+#### Progressive migration order
 - Step 1: create the new class
 - Step 2: create an adapter that calls the old legacy code
 - Step 3: test the adapter against existing usages
@@ -167,7 +169,7 @@ Debt tracked: docs/legacy-debt.md
 
 Next steps:
 1. Re-read and validate each spec.md (move to status: approved)
-2. /sdd-plan on each feature
+2. Re-read and validate each pre-filled plan.md (refine via /sdd-plan if needed)
 3. /sdd-tasks then /sdd-implement
 4. Progressive migration — no big bang
 ```

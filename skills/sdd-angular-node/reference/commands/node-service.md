@@ -4,11 +4,11 @@ description: Scaffold a Node.js service from the active SDD spec
 
 # /node-service
 
-Generates the service (business logic) from the "Backend" section of `spec.md`.
+Generates the service (business logic) from the plan's Technical design (services), honoring the behavioral requirements and ACs of `spec.md`.
 
 ## Prerequisites
 
-- `spec.md` with `status: approved`
+- `spec.md` and `plan.md` with `status: approved`
 
 ## Generates
 

@@ -26,7 +26,7 @@ Ask for:
 
 ### 2. Load the SDD context
 
-Read `spec.md`:
+Read `plan.md` (Technical design) — plus `spec.md` for the behavioral requirements and ACs — to retrieve:
 - Which endpoints the service calls (API side)
 - Which public methods it exposes
 - Which shared state it maintains (State side)

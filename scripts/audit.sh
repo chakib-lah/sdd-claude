@@ -12,11 +12,33 @@
 #                        stack-agnostic Layer 1, extension-guide command list complete
 #   6. Anti-drift      — core masters + shared groups byte-identical (hash)
 set -uo pipefail
+# Harness invariant — under `pipefail`, never write `producer | grep -q` when the
+# producer may keep writing after the first match: grep -q closes the pipe early,
+# SIGPIPEs the producer (exit 141), and turns a true check into a nondeterministic
+# failure. Use a single autonomous process (awk with END{exit}) or drain the
+# producer fully (command substitution) instead. Small single-write printf/echo
+# producers are exempt.
 cd "$(dirname "$0")/.." || exit 1   # move to the toolkit root
 err=0
 say(){ printf '%s\n' "$*"; }
 fail(){ printf '  ✗ %s\n' "$*"; err=$((err+1)); }
 ok(){ printf '  ✓ %s\n' "$*"; }
+# Self-guard: the harness invariant above is machine-enforced on this file
+# itself — any (re)introduced awk-to-early-exiting-grep pipeline in executable
+# code (same line, or an awk line ending in a pipe continued by a grep -q line)
+# fails the audit. Comment lines are exempt; grep -c (which drains its input)
+# is safe and deliberately not matched.
+sg=$(awk '
+  /^[[:space:]]*#/ { prev=""; next }
+  {
+    if (prev != "" && $0 ~ /^[[:space:]]*grep[[:space:]]+-q/) print pn ": split-line awk-to-grep-q pipeline"
+    if ($0 ~ /awk[^|]*\|[[:space:]]*grep[[:space:]]+-q/) print NR ": awk-to-grep-q pipeline"
+    if ($0 ~ /awk/ && $0 ~ /\|[[:space:]]*$/) { prev=$0; pn=NR } else prev=""
+  }' scripts/audit.sh)
+if [ -n "$sg" ]; then
+  printf '%s\n' "$sg"
+  fail "audit self-guard: early-exiting grep -q consuming a streaming awk producer (see harness invariant above)"
+fi
 # ---- Portable hash tool (resolved ONCE at startup) ----
 # The anti-drift check (section 6) is only as trustworthy as this function:
 # a missing tool must be a HARD failure, never a silent empty string
@@ -85,12 +107,12 @@ for s in $SKILLS; do
   # is stack-adapted and selected-skill-owned — never framework-owned/Layer 1.
   grep -qF -- '4 universal SDD agents' "skills/$s/SKILL.md" || fail "$s: SKILL.md missing the 4-universal-agents ownership anchor"
   grep -qF -- 'stack-adapted `test-generator` agent' "skills/$s/SKILL.md" || fail "$s: SKILL.md missing the selected-skill-owned test-generator anchor"
-  grep -E 'test-generator' "skills/$s/SKILL.md" | grep -qiE 'framework-owned|Layer 1' && fail "$s: SKILL.md classifies test-generator as framework-owned/Layer 1"
-  grep -E '5 SDD agents' "skills/$s/SKILL.md" | grep -qiE 'framework-owned|Layer 1' && fail "$s: SKILL.md flattens the 5 agents into framework ownership"
+  awk '/test-generator/ && tolower($0) ~ /framework-owned|layer 1/{found=1} END{exit !found}' "skills/$s/SKILL.md" && fail "$s: SKILL.md classifies test-generator as framework-owned/Layer 1"
+  awk '/5 SDD agents/ && tolower($0) ~ /framework-owned|layer 1/{found=1} END{exit !found}' "skills/$s/SKILL.md" && fail "$s: SKILL.md flattens the 5 agents into framework ownership"
   # Layer-3 disposition contradiction net (bounded — see the Known-Limits
   # Register): a correct Class A-E anchor does NOT excuse contradictory active prose —
   # a Layer-3 disposition line must never promote detected/observed technical state.
-  grep -E 'Layer 3' "skills/$s/SKILL.md" | grep -qiE 'detected |observed |patterns in use|repository shape' && fail "$s: SKILL.md promotes detected/observed technical state to Layer 3"
+  awk '/Layer 3/ && tolower($0) ~ /detected |observed |patterns in use|repository shape/{found=1} END{exit !found}' "skills/$s/SKILL.md" && fail "$s: SKILL.md promotes detected/observed technical state to Layer 3"
   # Runtime reasoning contracts (anchor-based bounded nets, see the Known-Limits
   # Register): the final Layer-3 sanitization gate and the evidence-dimension separation
   # must ship in every installer; known contradictory formulations must be absent.
@@ -239,13 +261,16 @@ for r in $(grep -rhoE "\.claude/rules/[a-z0-9-]+\.md" core skills 2>/dev/null | 
   # extend only for canonical Layer-3 names documented by the architecture.
   # 01-constitution.md is the retired LEGACY constitution carrier: it ships in no
   # reference anymore and is cited only by /sdd-upgrade's step 2c migration.
-  case "$r" in project-constitution.md|project-git-workflow.md|project-architecture.md|project-testing.md|project-quality.md|project-security.md|01-constitution.md) continue;; esac
-  { [ -f "core/rules/$r" ] || find skills -path "*/reference/rules/$r" 2>/dev/null | grep -q .; } \
+  # project-language.md is the retired LEGACY working-language alias: same status —
+  # it ships nowhere and is cited only by /sdd-upgrade's step 0b contract and its
+  # step 2d / 4c-bis canonicalization gates, which exist precisely to retire it.
+  case "$r" in project-constitution.md|project-git-workflow.md|project-architecture.md|project-testing.md|project-quality.md|project-security.md|project-working-language.md|project-language.md|01-constitution.md) continue;; esac
+  { [ -f "core/rules/$r" ] || [ -n "$(find skills -path "*/reference/rules/$r" 2>/dev/null)" ]; } \
     || fail "referenced rule not found anywhere: $r"
 done
 # 3c. every cited command `.claude/commands/X.md` exists in core/commands OR in a skill
 for c in $(grep -rhoE "\.claude/commands/[a-z0-9-]+\.md" core skills 2>/dev/null | sed 's|.*/||' | sort -u); do
-  { [ -f "core/commands/$c" ] || find skills -path "*/reference/commands/$c" 2>/dev/null | grep -q .; } \
+  { [ -f "core/commands/$c" ] || [ -n "$(find skills -path "*/reference/commands/$c" 2>/dev/null)" ]; } \
     || fail "referenced command not found anywhere: $c"
 done
 [ $err -eq $before ] && ok "no ghost references (rules + commands resolved)"
@@ -597,6 +622,187 @@ for c in core/commands/*.md; do
     || fail "extension-guide does not name command /$n"
 done
 [ $err -eq $before ] && ok "declared command counts match computed ($CMD_COUNT), carriers cite VERSION, 6 skills documented"
+
+# =====================================================================
+say "== 5b. Behavioral contracts (Git policy, working language, source isolation, spec/plan boundary, upgrade) =="
+before=$err
+# canonical working-language Layer-3 owner. Every installer must establish
+# project-working-language.md; the known legacy alias (project-language.md) is
+# upgrade-compatibility data and may appear ONLY in sdd-upgrade.md.
+for s in $SKILLS; do
+  grep -qF -- 'project-working-language.md' "skills/$s/SKILL.md" \
+    || fail "$s: SKILL.md missing the canonical working-language owner (project-working-language.md)"
+done
+c=$(grep -rlF -- 'project-language.md' core skills --include='*.md' 2>/dev/null | grep -v '/sdd-upgrade\.md$' | wc -l)
+[ "$c" -eq 0 ] || fail "non-canonical working-language filename (project-language.md) outside sdd-upgrade migration data ($c file(s))"
+# no SDD/AC traceability metadata may be required or generated in application
+# source. Deployable files must not instruct writing AC markers into tests/code.
+# The AC ↔ test mapping legitimately lives in SDD artifacts (plan/tasks/verify
+# displays) — those formulations do not contain these literal markers.
+for pat in 'Covers AC-' '@covers AC-' 'reference the AC it covers in a comment' 'Document each test with the AC'; do
+  c=$(grep -rlF -- "$pat" core skills global-agents --include='*.md' 2>/dev/null | wc -l)
+  [ "$c" -eq 0 ] || fail "AC-traceability-in-source instruction ('$pat') in a shipped file ($c file(s))"
+done
+# no source-tracking markers/backlog in product source. Mirror of the
+# the generated-trailer negation model: a shipped file may MENTION a tracking marker only on a
+# line that negates it (documentation of the prohibition); a line that mentions
+# it without negation reads as an instruction/example to add it and fails.
+for t in '// LEGACY:' '// MIGRATION:'; do
+  while IFS= read -r hit; do
+    line=${hit#*:}; line=${line#*:}
+    printf '%s' "$line" | grep -qiE 'never|forbid|prohibit|not allowed|no mandatory|❌' \
+      || fail "source-tracking marker instruction: $hit"
+  done < <(grep -rniF -- "$t" core skills global-agents --include='*.md' 2>/dev/null)
+done
+# no comment example carrying a ticket id, and no comment example pointing
+# at SDD artifacts for traceability (source comments explain code/domain only).
+while IFS= read -r hit; do
+  fail "ticket id inside a source-comment example: $hit"
+done < <(grep -rniE '^\s*(//|#) .*\(ticket [A-Z]+-?[0-9]*' core skills global-agents --include='*.md' 2>/dev/null)
+while IFS= read -r hit; do
+  fail "SDD-artifact reference inside a source-comment example: $hit"
+done < <(grep -rnE '^\s*// (see |See )?(spec|plan|tasks|notes)\.md' core skills global-agents --include='*.md' 2>/dev/null)
+# no commit producer may hard-code its own exact commit-message format:
+# a literal `git commit -m "..."` bypasses the effective Git policy resolution
+# of 01-git-conventions.md. Placeholder-only forms (`git commit -m "<resolved>"`,
+# `git commit -m "$MSG"`) stay allowed; plain `git commit` with the message
+# stated as policy-resolved is the sanctioned shape.
+while IFS= read -r hit; do
+  fail "hard-coded commit message bypassing the effective Git policy: $hit"
+done < <(grep -rnE 'git commit -m "[^<$]' core skills global-agents --include='*.md' 2>/dev/null)
+# /sdd-upgrade is autonomous when deterministic: no unconditional
+# confirmation gate; targeted USER_DECISION_REQUIRED semantics required.
+# /sdd-revert is deliberately NOT wired: its destructive confirmation is a
+# separate intentional contract.
+for f in core/commands/sdd-upgrade.md skills/*/reference/commands/sdd-upgrade.md; do
+  [ -f "$f" ] || continue
+  grep -qF -- 'Do you confirm this upgrade?' "$f" && fail "unconditional upgrade confirmation: $f"
+  grep -qF -- 'Wait for explicit confirmation before modifying anything' "$f" && fail "unconditional pre-write confirmation: $f"
+  grep -qF -- 'USER_DECISION_REQUIRED' "$f" || fail "missing USER_DECISION_REQUIRED semantics: $f"
+done
+# the .sdd-version marker is written LAST: the write instruction (its
+# 'create or overwrite' anchor) must appear exactly once, inside the dedicated
+# step placed AFTER the post-upgrade verification step (4c). The step-4 apply
+# phase carries no marker write anymore.
+for f in core/commands/sdd-upgrade.md skills/*/reference/commands/sdd-upgrade.md; do
+  [ -f "$f" ] || continue
+  n4c=$(awk '/^### 4c\./{print NR; exit}' "$f")
+  n4d=$(awk '/^### 4d\. Write the version marker/{print NR; exit}' "$f")
+  if [ -z "$n4c" ] || [ -z "$n4d" ] || [ "$n4d" -le "$n4c" ]; then
+    fail "version-marker step missing or not after verification: $f"
+  else
+    wcount=$(grep -c 'create or overwrite' "$f")
+    wline=$(grep -n 'create or overwrite' "$f" | head -1 | cut -d: -f1)
+    { [ "$wcount" -eq 1 ] && [ "$wline" -gt "$n4d" ]; } \
+      || fail "marker write instruction outside the post-verification step: $f ($wcount occurrence(s), first at line ${wline:-none})"
+  fi
+  grep -qF -- 'LAST filesystem mutation' "$f" || fail "marker-last anchor missing: $f"
+done
+# spec = WHAT/WHY, plan = HOW. The canonical spec surfaces must not require
+# technical Design/impacted files; the plan surfaces must own them. Skill copies
+# are guaranteed byte-identical by net 6, so the masters carry the contract.
+grep -q '^## Design' core/templates/spec.md && fail "spec template still carries a technical Design section"
+sp_anat=$(awk '/^## Anatomy of a spec/{f=1;next} /^## /{f=0} f' core/rules/00-sdd-framework.md)
+printf '%s\n' "$sp_anat" | grep -qF -- '**Design**' && fail "spec anatomy still declares a Design entry"
+printf '%s\n' "$sp_anat" | grep -qF -- '**Functional behavior**' || fail "spec anatomy missing the Functional behavior entry"
+grep -qF -- 'Indicate the exact files impacted' core/commands/sdd-spec.md && fail "sdd-spec still requests exact impacted files"
+grep -qF -- '#### Design' core/commands/sdd-spec.md && fail "sdd-spec still writes a Design block"
+grep -qF -- 'Reference REAL files' core/agents/spec-writer.md && fail "spec-writer still requires real file paths in the spec"
+grep -q '^## Technical design' core/templates/plan.md || fail "plan template does not own Technical design"
+grep -q '^## Impacted files' core/templates/plan.md || fail "plan template does not own Impacted files"
+awk '/^## Anatomy of a plan/{f=1;next} /^## /{f=0} f && index($0,"**Technical design**"){found=1} END{exit !found}' core/rules/00-sdd-framework.md \
+  || fail "plan anatomy missing the Technical design entry"
+# residual WHAT/WHY leaks. The interview must not ask for implementation
+# decisions; clarification answers that settle implementation go to planning context,
+# never into the spec; the retro spec carries no exact test/source evidence and no
+# generic implementation debt (both live in notes.md). Masters only — copies are
+# hash-identical by net 6.
+grep -qF -- 'decisions to make' core/commands/sdd-spec.md && fail "sdd-spec still asks for implementation decisions"
+grep -qF -- 'Record decisions and their rationale under "Technical constraints"' core/commands/sdd-clarify.md \
+  && fail "sdd-clarify still records technical decisions into the spec"
+grep -qF -- 'planning context' core/commands/sdd-clarify.md \
+  || fail "sdd-clarify missing the implementation-decision planning-context routing"
+grep -qE 'tests/[^ ]*::' core/commands/retro-spec.md && fail "retro-spec still shows exact test-path::method evidence in spec content"
+grep -qF -- 'exact evidence' core/commands/retro-spec.md || fail "retro-spec missing the exact-evidence-to-notes contract"
+grep -qF -- 'implementation debt is NOT spec content' core/commands/retro-spec.md \
+  || fail "retro-spec missing the debt-to-notes contract"
+grep -qF -- 'Debt lives inside this section' core/commands/retro-spec.md \
+  && fail "retro-spec still keeps the technical-debt register inside the spec"
+# authority-safe working-language alias migration: /sdd-upgrade must
+# classify the legacy alias clause-atomically and route Layer-1/2 clause conflicts
+# through a targeted USER_DECISION_REQUIRED, while keeping the compatible case
+# deterministic. Regression to an opaque whole-file rename must fail.
+for f in core/commands/sdd-upgrade.md skills/*/reference/commands/sdd-upgrade.md; do
+  [ -f "$f" ] || continue
+  for a in 'never treated as one opaque rename candidate' 'independently meaningful semantic clauses' 'Clause conflicting with Layer 1 or Layer 2' 'targeted at the conflicting clause only' 'deterministic and autonomous'; do
+    grep -qF -- "$a" "$f" || fail "working-language alias migration missing authority-safety anchor '$a': $f"
+  done
+  awk '/Layer-3 canonical working-language alias/{f=1} f && index($0,"USER_DECISION_REQUIRED"){found=1} END{exit !found}' "$f" \
+    || fail "working-language alias migration lacks USER_DECISION_REQUIRED semantics: $f"
+  grep -qF -- 'moves bytes, never rewrites them' "$f" \
+    && fail "working-language alias migration regressed to opaque byte-preserving whole-file rename: $f"
+done
+# REACHABILITY, not presence. The presence check above proves the alias contract TEXT
+# exists; the field replay proved that was insufficient, because the contract sat
+# in the step-0b rename-planning section while the main triage flow never invoked
+# it. These guards assert the control-flow contract structurally (section order),
+# so an isolated section elsewhere can no longer satisfy the audit.
+for f in core/commands/sdd-upgrade.md skills/*/reference/commands/sdd-upgrade.md; do
+  [ -f "$f" ] || continue
+  nm1=$(awk '/^## Step −1\. PROCEDURE SOURCE OF TRUTH/{print NR; exit}' "$f")
+  n0=$(awk '/^### 0\. Locate the toolkit reference/{print NR; exit}' "$f")
+  n2c=$(awk '/^### 2c\./{print NR; exit}' "$f")
+  n2d=$(awk '/^### 2d\. Working-language canonicalization gate/{print NR; exit}' "$f")
+  n3=$(awk '/^### 3\. Produce the upgrade plan/{print NR; exit}' "$f")
+  n4c=$(awk '/^### 4c\./{print NR; exit}' "$f")
+  n4cb=$(awk '/^#### 4c-bis\./{print NR; exit}' "$f")
+  n4d=$(awk '/^### 4d\. Write the version marker/{print NR; exit}' "$f")
+
+  # the working-language gate is a main-flow branch sitting between the
+  # triage (2c) and the plan (3), and it blocks the "no decision pending" and
+  # plan-finalization conclusions.
+  if [ -z "$n2d" ] || [ -z "$n2c" ] || [ -z "$n3" ] || [ "$n2d" -le "$n2c" ] || [ "$n2d" -ge "$n3" ]; then
+    fail "working-language gate is not a main-flow step between 2c and 3: $f"
+  else
+    gate=$(awk -v s="$n2d" -v e="$n3" 'NR>=s && NR<e' "$f")
+    for a in 'MANDATORY main-flow branch' 'Presence of the file is the trigger' 'takes precedence' 'may **not** declare `USER_DECISION_REQUIRED = none`' 'may **not** present or finalize the step 3 plan'; do
+      printf '%s\n' "$gate" | grep -qF -- "$a" || fail "working-language gate missing reachability anchor '$a': $f"
+    done
+  fi
+
+  # an INDEPENDENT filesystem postcondition exists after the ownership
+  # verification, and the old alias cannot survive into UPDATED.
+  if [ -z "$n4cb" ] || [ -z "$n4c" ] || [ -z "$n4d" ] || [ "$n4cb" -le "$n4c" ] || [ "$n4cb" -ge "$n4d" ]; then
+    fail "disk-state convergence gate missing or not between 4c and 4d: $f"
+  else
+    disk=$(awk -v s="$n4cb" -v e="$n4d" 'NR>s && NR<e' "$f")
+    for a in 'inspects the actual filesystem' 'Reasoning state is **not** evidence' 'project-language.md still present' 'Canonical authority check'; do
+      printf '%s\n' "$disk" | grep -qF -- "$a" || fail "disk-state gate missing convergence anchor '$a': $f"
+    done
+  fi
+
+  # the marker write is downstream of alias convergence. The generic marker-order check already proves
+  # marker-LAST generically; this only connects it to the alias gate.
+  if [ -n "$n4d" ]; then
+    awk -v s="$n4d" 'NR>s && index($0,"surviving `project-language.md` that has not converged"){found=1} END{exit !found}' "$f" \
+      || fail "marker step not gated on working-language convergence: $f"
+  fi
+
+  # the reference-procedure handoff is in the reachable bootstrap path:
+  # it precedes step 0, and carries the actual control-flow contract (normative
+  # adoption, no hybrid execution, idempotent runtime-only state).
+  if [ -z "$nm1" ] || [ -z "$n0" ] || [ "$nm1" -ge "$n0" ]; then
+    fail "reference-procedure handoff missing or not before step 0: $f"
+  else
+    boot=$(awk -v s="$nm1" -v e="$n0" 'NR>s && NR<e' "$f")
+    for a in 'never the stale project-local copy' 'as instructions' 'becomes normative for the remainder of this invocation' 'No hybrid execution' 'CURRENT_REFERENCE_PROCEDURE_ACTIVE'; do
+      printf '%s\n' "$boot" | grep -qF -- "$a" || fail "handoff missing control-flow anchor '$a': $f"
+    done
+    printf '%s\n' "$boot" | grep -qF -- 'Never persist it to disk' \
+      || fail "handoff does not forbid persisting runtime bookkeeping: $f"
+  fi
+done
+[ $err -eq $before ] && ok "behavioral contracts hold (language owner + authority-safe alias + gate reachability, source isolation, commit producers, upgrade autonomy + marker order + disk-state convergence, reference handoff, spec/plan boundary)"
 
 # =====================================================================
 say "== 6. Content equality of shared files (anti-drift) =="

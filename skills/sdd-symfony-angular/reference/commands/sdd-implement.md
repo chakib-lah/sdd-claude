@@ -132,9 +132,8 @@ Before committing, display the diff and validate it mentally:
 
 ### 10. Commit (local)
 
-This commit is a **local, per-task commit**: it will be squashed into the phase commit at step 11b when the phase completes. Stage any pending SDD-artifact bookkeeping (from the previous task's step 11) together with the task's changes. Strictly follow `.claude/rules/01-git-conventions.md` for:
-- The message format (subject line only, short)
-- Leading the subject with the ticket — and never repeating the branch's type in the message
+This commit is a **local, per-task commit**: it will be squashed into the phase commit at step 11b when the phase completes. Stage any pending SDD-artifact bookkeeping (from the previous task's step 11) together with the task's changes. Compose the message through the **effective Git policy** (`.claude/rules/01-git-conventions.md` § Effective Git policy resolution — semantic intent: the task summary, imperative; the resolved policy decides the exact format, ticket presence and placement — never impose a command-specific syntax):
+- Subject line only, short, in English
 - **No `Co-Authored-By` and no tool-generated trailer** — absolute prohibition, no exception; strip any trailer a harness injects before committing
 
 **Never use `--no-verify`**: if a pre-commit hook blocks, diagnose and fix.

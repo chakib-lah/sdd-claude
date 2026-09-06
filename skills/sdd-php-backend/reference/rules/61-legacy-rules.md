@@ -141,19 +141,18 @@ final class NewUserManager
 }
 ```
 
-### Rule 4 — Document every call to the legacy
+### Rule 4 — Legacy dependencies are tracked outside the source
 
-Every call to legacy code from new code must carry a `// LEGACY:` comment:
+Source comments are never a migration backlog: no mandatory marker (`// LEGACY:`, `// MIGRATION:`), no ticket id, no "to be replaced once migrated" promise in product source (see `.claude/rules/03-code-quality.md` § Source comments). Dependencies on legacy code and their migration priorities are tracked in the debt document below, the real issue tracker, and the SDD artifacts of the migration features.
+
+A comment at a legacy call site remains legitimate when a **non-obvious legacy constraint** genuinely needs explaining for the code to stay understandable — concise English, current code/domain intent only:
 
 ```php
-// LEGACY: call to get_user_legacy() — to be replaced by UserRepository once the migration is done (ticket TICK-1234)
+// Preserve the legacy data shape required by this integration.
 $rawData = get_user_legacy($userId);
 ```
 
-This makes it possible to:
-- Trace dependencies on the legacy
-- Identify priority migration points
-- Justify the call in code review
+The comment explains WHY the current code behaves that way — never WHEN someone should migrate it.
 
 ### Rule 5 — Any modification of a legacy file goes through a SDD refactor
 
@@ -241,4 +240,4 @@ To track in `legacy-debt.md` or a dashboard:
 - Number of referenced global variables (must decrease)
 - Number of adapters in place (may grow then shrink)
 - Test coverage on legacy modules (must increase)
-- Number of `// LEGACY:` in new code (must decrease)
+- Number of new-code call sites that depend on legacy modules, as inventoried in the debt document (must decrease) — never measured by counting tracking comments in source

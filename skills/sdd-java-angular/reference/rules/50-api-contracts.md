@@ -216,7 +216,7 @@ Jackson's `@JsonView` can filter fields of a single DTO per endpoint. It works, 
 
 ### When an endpoint changes
 
-1. **Update the SDD spec** first (Design section → Endpoint)
+1. **Update the SDD artifacts** first — the behavioral change in `spec.md`, the endpoint design in `plan.md` (Technical design → endpoints)
 2. **Update the contract on the Spring side** via the discovered mechanism — DTO records plus the provider's metadata convention (springdoc annotations where springdoc owns the contract), or the project-owned OpenAPI document directly
 3. **Check the resulting contract**: the discovered export (build task or runtime endpoint), or the validated project-owned document
 4. **Regenerate the types on the Angular side**: the project's sync script (e.g. `npm run api:sync`)

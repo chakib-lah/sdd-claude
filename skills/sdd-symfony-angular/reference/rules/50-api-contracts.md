@@ -217,7 +217,7 @@ return new JsonResponse(
 
 ### When an endpoint changes
 
-1. **Update the SDD spec** first (Design section → Endpoint)
+1. **Update the SDD artifacts** first — the behavioral change in `spec.md`, the endpoint design in `plan.md` (Technical design → endpoints)
 2. **Update the contract metadata via the discovered source mechanism** — Nelmio attributes or API Platform resource/operation metadata (provider-specific examples), or direct edits to the project-owned OpenAPI document
 3. **Check the generated docs**: export the contract via the discovered provider's mechanism (e.g. Nelmio's `api:doc:dump`, API Platform's export) or visit the project's docs endpoint
 4. **Regenerate the types on the Angular side**: `npm run api:sync`

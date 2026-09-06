@@ -33,7 +33,7 @@ Follow whichever convention the codebase already uses. Never introduce a new lay
 
 ### 2. Load the SDD context
 
-Read `spec.md` (Design section → Entity/entities / DB changes) to retrieve:
+Read `plan.md` (Technical design → entities / data model) — plus `spec.md` for the behavioral requirements and ACs — to retrieve:
 - List of fields with their types and constraints
 - Relations with other entities
 - Required indexes

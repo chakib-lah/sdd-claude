@@ -18,6 +18,19 @@ Concise paragraph (5-10 lines) describing the implementation strategy.
 - What are the integration constraints with the existing code?
 -->
 
+## Technical design
+
+<!--
+The concrete technical design — the HOW the spec deliberately does not contain.
+Where relevant to the feature:
+- Endpoints and internal API implementation (method, route, payloads, codes)
+- Entities / data-model implementation and DB migrations (and reversibility)
+- Services, repositories, mappers, controllers
+- Frontend components and state management
+- External integrations
+- Class/method placement and migration strategy
+-->
+
 ## Implementation order
 
 <!--

@@ -25,7 +25,7 @@ Ask for:
 
 ### 2. Load the SDD context
 
-Read `spec.md` (Design section → Angular Component(s)):
+Read `plan.md` (Technical design → frontend components) — plus `spec.md` for the behavioral requirements and ACs — to retrieve:
 - Role of the component
 - Data displayed
 - User actions (clicks, forms)

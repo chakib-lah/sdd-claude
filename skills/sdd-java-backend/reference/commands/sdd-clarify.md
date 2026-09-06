@@ -31,9 +31,9 @@ Scan the spec for, in priority order:
 2. **Security ambiguities** — unstated data sensitivity, unstated authorization/ownership rules (who can access what), unvalidated external input, missing abuse cases
 3. **Vague terms without a measurable threshold** — "fast", "performant", "user-friendly", "robust", "soon", "many"…
 4. **ACs missing their error/edge cases** — an AC that only describes the nominal path
-5. **Contradictions** — between Objectives, ACs, Out of scope and Design
+5. **Contradictions** — between Objectives, ACs, Out of scope and Functional behavior
 6. **Undefined jargon** — domain terms never explained
-7. **Silent assumptions** — behaviors the Design implies but no AC pins down (permissions, empty states, concurrency, i18n, pagination…)
+7. **Silent assumptions** — behaviors the Functional behavior section implies but no AC pins down (permissions, empty states, concurrency, i18n, pagination…)
 
 ### 4. Ask at most 5 targeted questions
 
@@ -47,7 +47,8 @@ Apply each answer where it belongs:
 - Sharpen the affected AC (or add the missing error-case AC). A new AC takes the **next free number** — AC identifiers are stable for life: never renumber existing ACs; a removed AC leaves a hole
 - Move newly excluded items to "Out of scope"
 - Record security answers (data sensitivity, authorization rules, input validation, abuse cases) under "Security considerations" — any resulting AC is tagged `[SEC]`
-- Record decisions and their rationale under "Technical constraints"
+- Record **externally observable constraints** (compatibility requirements, measurable thresholds, required standards) under "Technical constraints" — the spec stays WHAT/WHY
+- If an answer settles an **implementation decision or technical rationale** (architecture pattern, class placement, framework choice…): note it in `notes.md` as planning context for `/sdd-plan` — never as normative spec content
 - Remove the resolved entries from "Open questions"
 
 Keep `status` unchanged (`draft` or `in-review`).
@@ -68,7 +69,7 @@ Next step:
 ## Stop rules
 
 - **Maximum 5 questions per run** — re-run the command rather than interrogate in bulk
-- **Read-only on the project's source code** — only `spec.md` is modified
+- **Read-only on the project's source code** — only `spec.md` (and `notes.md`, for implementation decisions recorded as planning context) are modified
 - **Never set the status to `approved`** — that is a human act
 - **Refuse on an approved spec** — de-approving is a conscious human decision
 - If an ambiguity cannot be resolved by the user, leave it explicitly in "Open questions" rather than inventing an answer

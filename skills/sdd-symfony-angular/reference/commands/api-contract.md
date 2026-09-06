@@ -89,7 +89,7 @@ Read `.claude/rules/50-api-contracts.md`:
 
 ### 3. Load the SDD context (if a feature is active)
 
-Read `spec.md` (Design section → Endpoint(s)) to retrieve:
+Read `plan.md` (Technical design → endpoints) — plus `spec.md` for the behavioral requirements and ACs — to retrieve:
 - Endpoints to add/modify
 - Expected schemas for requests and responses
 - Documented HTTP codes
@@ -288,19 +288,12 @@ Broken tests indicate a contract break. To analyze:
 
 ### 9. Commit the diff
 
-Propose a commit with an explicit message:
+Compose the commit through the **effective Git policy** (`.claude/rules/01-git-conventions.md` § Effective Git policy resolution) — semantic intent: *commit the generated API contract synchronization*. The resolved policy decides the exact message format, whether a ticket is required and where it appears (when the sync stems from a feature in progress, the feature's ticket is the natural candidate) — never impose a command-specific syntax:
 
 ```bash
 git add <repo-root>/<contract-path> <repo-root>/<frontend-root>/<generated-output-dir>/
 
-# Commit
-git commit -m "chore(api): sync OpenAPI contract"
-```
-
-If the sync stems from a feature in progress, include the ticket:
-
-```bash
-git commit -m "feat(<TICKET>): sync API types after endpoint update"
+git commit   # message already resolved through the effective Git policy — subject line only, no trailer
 ```
 
 ### 10. Announce

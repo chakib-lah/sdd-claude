@@ -14,7 +14,7 @@ export on it and OFFERS (asks first) to save it as the project's override of thi
 | | |
 |---|---|
 | **Application** | <application name> |
-| **Écran / URL** | <screens and URLs, from the spec's `target` and Design endpoints> |
+| **Écran / URL** | <screens and URLs, from the spec's `target` and the endpoints described in its functional behavior> |
 | **Route** | <route name(s)> |
 | **Branche de référence** | <analyzed_branch> |
 | **Commit de référence** | <analyzed_commit> |
@@ -86,4 +86,4 @@ export on it and OFFERS (asks first) to save it as the project's override of thi
 
 ## Annexe technique — fichiers sources analysés
 
-<!-- From the spec's implemented_in plus the context files listed in its Design. -->
+<!-- From the spec's `implemented_in` frontmatter (all resolved paths). -->

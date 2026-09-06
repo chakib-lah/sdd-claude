@@ -25,7 +25,7 @@ Ask for:
 
 ### 2. Load the SDD context
 
-Read `spec.md` (Design section → Endpoint(s)) to retrieve:
+Read `plan.md` (Technical design → endpoints) — plus `spec.md` for the behavioral requirements and ACs — to retrieve:
 - Request payload format
 - Response format
 - Expected HTTP status codes (200, 201, 422, 404, etc.)

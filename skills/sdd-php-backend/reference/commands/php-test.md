@@ -156,19 +156,14 @@ final class UserRepositoryTest extends TestCase
 ### 6. Generate one test per acceptance criterion
 
 Read the AC from `spec.md` and generate for each:
-- A test named following the `test<ActionExpectedResult>` pattern
-- A comment indicating the covered AC
-- An AAA skeleton with a TODO if the implementation is not obvious
+- A test named following the `test<ActionExpectedResult>` pattern — the name attests the behavior; the AC ↔ test mapping is reported in the validation display and lives in the SDD artifacts, **never as a source comment** (see `.claude/rules/03-code-quality.md` § Source comments)
+- An AAA skeleton, explicitly incomplete if the implementation is not obvious
 
 Example:
 
 ```php
-/**
- * Covers: AC-3 (When the email already exists, throws UserAlreadyExistsException)
- */
 public function testThrowsExceptionOnDuplicateEmail(): void
 {
-    // TODO: implement
     self::markTestIncomplete('To implement');
 }
 ```

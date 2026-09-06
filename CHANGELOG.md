@@ -1,5 +1,23 @@
 # Changelog — SDD Claude
 
+## [1.17.0] — 2026-09-06
+
+Semantic ownership release, validated on real production projects: effective Git policy, canonical working language, SDD-metadata-free source code, the spec/plan responsibility boundary, and deterministic `/sdd-upgrade` behavior.
+
+### Changed
+
+- **Effective Git policy everywhere** — the universal Git layer owns only the true invariants (English subject, short, subject line only, no `Co-Authored-By` or tool-generated trailer, never `--no-verify`); ticket presence and placement, commit types/scopes, branch patterns and no-ticket formats are project policy resolved through `project-git-workflow.md`. Every commit/branch producer states a semantic intent and formats it through the effective policy. Fresh installers discover the current durable convention from real history and explicit project documentation — a framework example is never promoted to Layer 3, and inconclusive evidence yields a targeted developer question, never an invented policy.
+- **Canonical working language** — `project-working-language.md` is an established Layer-3 subject owner declared by all six installers, and `00-sdd-framework.md` defines its scope: project-facing SDD communication uses the declared working language; Git commit subjects and source-code comments stay English under the universal invariants. `/sdd-upgrade` gains a clause-atomic, authority-safe migration for the known legacy `project-language.md` filename: valid working-language clauses migrate verbatim to the canonical file, while a clause that would negate Layer 1/2 (e.g. non-English source comments) raises a `USER_DECISION_REQUIRED` targeted at that clause alone — never silent deletion, preservation or reinterpretation. The language gate is a mandatory main-flow branch of the upgrade, an independent disk-state check verifies the final filesystem before success, and the version marker is written only after convergence.
+- **No SDD metadata in application source** — universal source-comment baseline: comments are English, short, explain non-obvious code/domain intent only, and carry no AC, task, ticket or SDD-artifact reference added for traceability; tests are named for the behavior they attest. AC ↔ implementation/test traceability lives in the SDD artifacts and the `/sdd-verify` / `/sdd-review` gates. Migration progress is tracked in the debt document, the issue tracker and the SDD artifacts — never by counting tracking comments in source.
+- **Spec = WHAT/WHY, plan = HOW** — the standard `spec.md` loses its technical Design section and gains a Functional behavior section (business rules, user-visible flows, externally observable contracts); `plan.md` becomes the explicit technical-design owner (endpoints, data model and migrations, services and components, class/method placement, impacted files, AC → test mapping). The interview asks for externally observable constraints, never implementation decisions; clarification answers that settle implementation go to planning context; the retrospective spec keeps observed behavior in the spec while implementation discovery and the debt register live in `notes.md`.
+- **Deterministic `/sdd-upgrade`** — the unconditional plan confirmation is removed: the plan is displayed for transparency and a deterministic upgrade continues autonomously; `USER_DECISION_REQUIRED` is reserved for genuine non-deterministic ambiguity and freezes only its own artifacts. The `.sdd-version` marker is written LAST, after complete post-upgrade verification. The path-only canonical reference repair distinguishes active from archived feature artifacts: archives and historical prose are never rewritten.
+
+### Fixed
+
+- **Deterministic audit verification** — consistency checks no longer depend on pipeline timing: the same tree yields the same verdict on every run, and the harness enforces that invariant on itself.
+
+---
+
 ## [1.16.0] — 2026-09-01
 
 Structural naming and fresh-install semantics release.

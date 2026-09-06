@@ -64,6 +64,8 @@ Task numbering stays global and continuous (T001…TN across all phases).
 
 ### 6. Write `tasks.md`
 
+Write the tasks in the project's **working language** (resolved per `.claude/rules/00-sdd-framework.md` § Working language).
+
 Fill in the template `.claude/sdd/_template/tasks.md` with:
 
 #### Frontmatter

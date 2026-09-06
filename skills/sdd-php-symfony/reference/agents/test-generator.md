@@ -12,7 +12,7 @@ Produce tests that cover exactly the acceptance criteria in `spec.md`. Each AC g
 
 ## Prerequisites
 
-Read `spec.md` before generating anything. Each test must reference the AC it covers in a comment.
+Read `spec.md` before generating anything. Map each generated test to the AC it covers in your **response** (AC ↔ test table) — the mapping lives in the SDD artifacts, **never in the source**: generated tests carry no AC, ticket, task or spec/plan reference in comments or names; the test name and content describe the behavior (see `.claude/rules/03-code-quality.md` § Source comments).
 
 Discover the project's test layout before writing a file: read the PHPUnit configuration (`phpunit.xml.dist`, `phpunit.xml` or `phpunit.dist.xml`) for suite names and directories, inspect existing tests for base classes and namespaces, and use the project's established test execution wrapper (Make/Docker/Composer, or direct `vendor/bin/phpunit`). Generate into the existing suites — never invent a parallel test tree (see `.claude/rules/11-tests-strategy.md`). If the test infrastructure is missing entirely, report **PROJECT_TOOLING_GAP** (see `.claude/rules/12-quality-gates.md`) — do not silently bootstrap it.
 
@@ -27,7 +27,6 @@ Discover the project's test layout before writing a file: read the PHPUnit confi
 ## PHPUnit — unit tests
 
 ```php
-/** @covers AC-3: When the user is not found, the service returns null */
 public function testReturnsNullWhenUserNotFound(): void
 {
     // Arrange
@@ -50,7 +49,6 @@ Conventions:
 ## PHPUnit — functional tests (WebTestCase / KernelTestCase)
 
 ```php
-/** @covers AC-2: When the email is invalid, the system returns 422 */
 public function testCreateUserReturns422WhenEmailInvalid(): void
 {
     // Arrange

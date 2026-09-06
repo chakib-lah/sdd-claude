@@ -22,7 +22,7 @@ h3. (on) Résumé
 <condensed "Context and problem" from the spec>
 
 +*RG01 :*+
-<management rule — from the business rules found in the ACs and the Design
+<management rule — from the business rules found in the ACs and the Functional behavior section
 (computations, entitlements, list-building rules)>
 
 +*RG02 :*+

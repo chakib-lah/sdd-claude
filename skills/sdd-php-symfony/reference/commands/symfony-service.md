@@ -23,7 +23,7 @@ Ask for:
 
 ### 2. Load the SDD context
 
-Read `spec.md` (Design section → Services involved) to retrieve:
+Read `plan.md` (Technical design → services) — plus `spec.md` for the behavioral requirements and ACs — to retrieve:
 - Responsibility of the service (a single one)
 - Dependencies to inject
 - Expected public methods

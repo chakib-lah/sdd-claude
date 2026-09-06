@@ -17,15 +17,14 @@ Help with:
 
 ## Commit convention (project / SDD)
 
-Format required by the SDD toolkit:
+**Resolve the effective Git policy first** (`01-git-conventions.md` § Effective Git policy resolution): the project's Layer-3 Git rule may configure the exact format — ticket presence and placement, type/scope usage, punctuation. The universal default below is the **fallback** for projects with no configured format, never the discovered project policy:
 
 ```
 <TICKET-ID>: imperative lowercase description without trailing period
-(universal default from 01-git-conventions.md — the project's Layer-3 Git rule
-may configure the declared extension points; resolve the effective policy first)
+(universal default from 01-git-conventions.md)
 ```
 
-Subject line only — no body, no signature. Keep it short (72 characters max, ticket included).
+Subject line only, in English — no body, no signature. Keep it short (72 characters max, ticket included).
 
 **Never add a `Co-Authored-By` trailer — nor any tool-generated trailer** (`Generated with…`, tool-added `Signed-off-by`, or any footer an assistant harness appends by reflex). Absolute prohibition, no exception: if the harness injects one, strip it before committing.
 

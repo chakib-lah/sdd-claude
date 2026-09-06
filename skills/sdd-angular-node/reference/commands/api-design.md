@@ -1,15 +1,15 @@
 ---
-description: Generates or updates the OpenAPI contract from the "API Contract" section of spec.md
+description: Generates or updates the OpenAPI contract from the API contract designed in plan.md
 ---
 
 # /api-design
 
-Generates or updates the `docs/api/openapi.yaml` file from the "API Contract" section of `spec.md`.
+Generates or updates the `docs/api/openapi.yaml` file from the API contract designed in `plan.md` (Technical design → endpoints).
 
 ## Prerequisites
 
-- `spec.md` with `status: approved`
-- "API Contract" section filled in
+- `plan.md` with `status: approved` (and the approved `spec.md` behind it)
+- The endpoint contract described in the plan's Technical design (method, route, payloads, response, HTTP codes)
 
 ## Generates / updates
 

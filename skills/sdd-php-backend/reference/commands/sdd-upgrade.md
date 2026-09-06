@@ -6,6 +6,27 @@ description: SDD maintenance — updates the framework-owned Layer 1 and the sel
 
 **Maintenance command**: bring an existing project's SDD deployment back in line with its owners — **Layer 1 updates from the framework reference, Layer 2 (rules AND stack commands) updates from the selected skill reference, Layer 3 is preserved byte-for-byte** — always preserving project truth before replacing anything (step 2b).
 
+## Step −1. PROCEDURE SOURCE OF TRUTH — reference handoff (do this before anything else)
+
+The file you are executing is almost always the **project-local** `.claude/commands/sdd-upgrade.md`, deployed by a *previous* upgrade. It can be arbitrarily old, and an old copy does not know the current decision rules — it only knows that it might be old. That is the one thing it must act on.
+
+**The execution procedure's source of truth is the current selected-skill reference `commands/sdd-upgrade.md` — never the stale project-local copy that happened to be invoked.**
+
+Mandatory bootstrap, in this order, **before** any inventory classification, any semantic triage, any decision and any write:
+
+1. Resolve the reference directory exactly as step 0 prescribes (that resolution is version-stable and safe to run from any copy).
+2. **Read `<reference>/commands/sdd-upgrade.md` in full, as instructions** — not as a file to diff, not as a byte comparison, not as an artifact to copy later. Reading it is a *procedural* act, and it is the only step of this command that is allowed to happen before step 0's scope enumeration.
+3. Compare it with the copy you are running. If they are identical, you are already current: set `CURRENT_REFERENCE_PROCEDURE_ACTIVE = YES` and continue normally.
+4. If they differ, the reference file **becomes normative for the remainder of this invocation**. Adopt its steps, its triage rules, its gates, its postconditions and its output contract, and continue the *same* run under it from its step 0. Set `CURRENT_REFERENCE_PROCEDURE_ACTIVE = YES`.
+
+**No hybrid execution.** Once the reference procedure is active, the invoked copy is void as a decision authority — not merely supplemented. Its checklists, its confirmation behavior, its triage vocabulary, its verification list and its stop rules are all replaced. The characteristic failure this rule exists to prevent is: *an old procedure discovers some new reference facts, applies some new files, and then keeps reasoning with its own old decision rules.* Adopting new **file contents** while retaining old **decision logic** is the defect, not a partial success.
+
+**Idempotence.** `CURRENT_REFERENCE_PROCEDURE_ACTIVE` is a **runtime** state of the current invocation only. Once it is `YES`, never bootstrap again — no re-read, no re-entry, no restart. Never persist it to disk, to the project's source, or to any SDD artifact: it is not project state, and `.claude/sdd/.sdd-version` records a deployed version, never a runtime flag.
+
+**Behavioral signal.** After a successful handoff, the run is deterministic and autonomous: a generic "do you confirm this upgrade?" is **forbidden** (step 3), and only a genuine targeted `USER_DECISION_REQUIRED` may interrupt execution. A generic confirmation appearing in an upgrade run is proof that the handoff did not occur.
+
+> ⚠️ If you are reading this file *because a stale copy sent you here*: you are the current procedure. Start at step 0 below and ignore the file that invoked you.
+
 ## When to use it
 
 - When Layer 1 (the toolkit's `core/`) has evolved (new command, changed behavior)
@@ -87,6 +108,14 @@ The toolkit may have renamed Layer 1/Layer 2 files between versions. **This step
 **Layer-2 entries are selected-skill-scoped.** A Layer-2 entry applies **only when the selected skill's reference ships the new canonical artifact** (the logical artifact belongs to this skill's Layer-2 set). When it does, a project file under the old name is a **historical Layer-2 artifact of that skill — never Layer 3**, whatever its current bytes: an older framework revision of the artifact is still Layer 2, and hash mismatch with the current reference proves nothing about ownership. When it does not (e.g. `angular-conventions.md` in a project whose selected skill is `sdd-php-backend`), the entry is **ignored for this project**: the file is Layer 3 — never renamed, never path-repaired through this map, never classified as historical Layer 2 on basename alone. Conditional artifacts (e.g. a brownfield-only `62-migration-guard.md`) keep the *Ownership is not applicability* contract unchanged: with condition FALSE, an old-named present file follows `CONDITIONAL_LAYER2_PRESENT_NOT_APPLICABLE` — preserved, reported, `USER_DECISION_REQUIRED` before any removal **or relocation, including this rename** — and the new canonical file is never force-installed.
 
 **`05-constitution.md` is deliberately NOT in this map**: like `01-constitution.md`, it is a **legacy constitution carrier** (in `.claude/rules/`), handled **directly** by the step 2c constitution migration — it never passes through an intermediate structural rename, and the old `05 → 01 → project-constitution` route no longer exists.
+
+**Layer-3 canonical working-language alias — clause-atomic and authority-safe.** `project-working-language.md` is the canonical Layer-3 owner of the working-language subject (`00-sdd-framework.md` § Working language). A project file named `project-language.md` is a known non-canonical alias of that subject — but it is **never treated as one opaque rename candidate**. Before any migration, split its content into **independently meaningful semantic clauses** (one independently meaningful assertion = one disposition; a sentence mixing several language domains — e.g. "French for docs, comments and SDD specs" — is decomposed by domain when those domains have different owners) and classify **each clause** against Layer ownership:
+
+- **Valid working-language clause** — project-facing SDD communication (`spec.md`, `plan.md`, `tasks.md`, `notes.md`, project-facing SDD analysis) in a given language → migration candidate for `project-working-language.md`, preserved verbatim.
+- **Clause conflicting with Layer 1 or Layer 2** — e.g. "source comments → French" while the universal invariant owns source comments → English (Layer 3 never overrides or negates Layer 1/2): **never** preserved into the canonical file, **never** silently deleted, **never** reinterpreted → `USER_DECISION_REQUIRED`, **targeted at the conflicting clause only** (conceptually: *legacy project policy says source comments are French; the current universal framework requires English; Layer 3 cannot override Layer 1 — confirm removal of the conflicting legacy clause while preserving the valid SDD working-language policy*). Only the conflict is frozen — never a generic upgrade confirmation. **If the developer confirms removal**: preserve every valid working-language clause, create/rename to `project-working-language.md`, remove the obsolete alias, add **no** clause about a domain Layer 1/2 already owns (no source-comment clause — Layer 1 owns it), and continue the deterministic upgrade (verification, then marker, per steps 4c/4d). **If the developer declines**: an authority-valid final Layer 3 cannot be produced — the item stays `USER_DECISION_REQUIRED`, and the outcome is at best ⚠️ UPDATED PARTIALLY, never ✅ UPDATED.
+- **Clause outside the working-language subject** → not part of this alias migration; it follows the normal Layer-3 ownership reasoning.
+
+When **every** clause is compatible working-language policy, the migration stays **deterministic and autonomous** — no confirmation — provided (1) subject ownership is unambiguous, (2) the canonical target is absent or non-conflicting, and (3) semantic preservation is exact (a pure rename, or a text-verified merge into a non-conflicting existing target). When both `project-language.md` **and** `project-working-language.md` exist, compare their semantic clauses: equivalent → canonicalize without duplication; compatible/non-overlapping → merge only when semantic preservation is deterministic and authority-valid; conflicting → `USER_DECISION_REQUIRED` (preserve both, no silent merge, no silent overwrite). Policies are never duplicated. Project-owned content is otherwise **never** renamed or rewritten — this alias migration is the single sanctioned exception.
 
 **Slot-01 order — blocking.** Planned entries that rename a Git rule into the `01` slot are applied (step 4) **only after** every legacy constitution carrier (`01-constitution.md`, `05-constitution.md`) has been safely resolved by the step 2c migration (removed if an empty scaffold, migrated verbatim to `project-constitution.md` if meaningful, `USER_DECISION_REQUIRED` on conflict or ambiguity). While that resolution is pending, the project's old Git rule path stays in place untouched — the outcome is then at best ⚠️ partial, never a destructive reuse of the `01` slot.
 
@@ -211,7 +240,7 @@ For **every divergent artifact that is framework-owned or selected-skill-owned, 
 - **`STRUCTURAL_LEGACY_MIGRATION`** — the renames planned by the step 0b map and the step 2c constitution migration (both applied only in the ordered step 4 phases).
 - **`USER_DECISION_REQUIRED`** — implicit or mixed divergence whose boundary is not deterministic → the source file is **not replaced** until the user decides. Never guess; never merge.
 
-Present the triage table (divergence → action → destination → proof for any replacement) **before** the upgrade plan. Nothing is moved, replaced or deleted until the user confirms the plan in step 3.
+Present the triage table (divergence → action → destination → proof for any replacement) **before** the upgrade plan. Nothing is moved, replaced or deleted before the ordered application phase (step 4), and a `USER_DECISION_REQUIRED` item freezes its own artifacts until the user decides — the deterministic remainder proceeds.
 
 ### 2c. Legacy constitution carrier decision model
 
@@ -231,9 +260,27 @@ The **legacy constitution carriers** are `01-constitution.md` and `05-constituti
 - **D8** — `ambiguous_count = 0` AND `P = NO` AND `meaningful_count = 2` AND equivalence `PROVEN` → preserve the constitution **once** (source chosen deterministically: `01-constitution.md` first, then `05-constitution.md` — legitimate only because exact equivalence is proven); verify the resulting `project-constitution.md` against **both** sources; remove both carriers only after that double verification. No semantic merge.
 - **D9** — `ambiguous_count = 0` AND `P = NO` AND `meaningful_count = 2` AND equivalence `NOT_PROVEN` → `USER_DECISION_REQUIRED`: preserve both, no merge, no automatic choice, no deletion.
 
+### 2d. Working-language canonicalization gate — MANDATORY main-flow branch
+
+This gate is **not an optional side section**: it is a required branch of the main triage flow, and it runs **after** the step 2b/2c triage and **before** the plan of step 3 may be finalized.
+
+**Trigger — purely structural.** If either `.claude/rules/project-language.md` or `.claude/rules/project-working-language.md` exists, this gate **must run to completion**. Presence of the file is the trigger; nothing else. It is not conditioned on having *noticed* a language conflict while reading other diffs, and not conditioned on the alias appearing in the step 0b rename table (it never does — the table carries Layer-1/Layer-2 filename renames only).
+
+**Precedence over generic Layer-3 preservation.** The step 2 ownership algorithm classifies `project-language.md` as Layer 3 and would mark it "never touched". For this **one sanctioned canonicalization**, this gate takes precedence: a Layer-3 file may be an authority-invalid legacy alias, and generic byte preservation must not be allowed to finalize it as untouched before the gate has classified its clauses. Concluding "Layer 3 preserved byte-for-byte ✅" over an unexamined `project-language.md` is a gate failure, not a preservation success.
+
+**Procedure.** Apply the clause-atomic contract defined in step 0b (*Layer-3 canonical working-language alias — clause-atomic and authority-safe*) in full: decompose the file into independently meaningful clauses, split any sentence that mixes language domains with different owners, and classify each clause independently — project-facing SDD language (eligible Layer 3), source-comment language (Layer 1 owns English), technical-documentation / other engineering artifacts (current universal engineering-language contract). Layer 3 never negates Layer 1/2.
+
+**Blocking effect — this gate gates the conclusion, not just the file.** Until it has completed:
+
+- the run may **not** declare `USER_DECISION_REQUIRED = none`;
+- the run may **not** present or finalize the step 3 plan;
+- the run may **not** proceed to step 4d or announce ✅ UPDATED.
+
+A conflicting clause (e.g. *source comments → French* against the Layer-1 English invariant) yields a `USER_DECISION_REQUIRED` **targeted at that clause alone**. It is never resolved by preserving the conflict and merely reporting "Layer 1 wins" in the final message — that leaves an authority-invalid Layer 3 on disk and is exactly the outcome this gate forbids. It is equally never resolved by silent deletion, silent reinterpretation or silent migration.
+
 ### 3. Produce the upgrade plan
 
-Display in the chat (example — the actual lists come from the audit in step 1):
+Display in the chat (example — the actual lists come from the audit in step 1). The plan is displayed for **transparency, never as a confirmation gate**: a normal upgrade is deterministic and continues autonomously.
 
 ```
 SDD upgrade plan (ownership-based: Layer 1 from framework, Layer 2 from selected skill, Layer 3 preserved)
@@ -263,39 +310,38 @@ NOT TO TOUCH (Layer 3 — ownership algorithm of step 2, never a prefix rule):
     (project-constitution.md, project-git-workflow.md, any project rule — numbered or not)
   ✓ .claude/skills/ (in its entirety)
   ✓ project commands and agents absent from the framework and selected-skill references
-
-Do you confirm this upgrade?
 ```
 
-**Wait for explicit confirmation before modifying anything.**
+**Autonomous continuation — no generic confirmation.** When every planned item is deterministic (no `USER_DECISION_REQUIRED` anywhere) and preservation is mechanically safe, **continue immediately to step 4** — never ask a generic "do you confirm" merely because files will be written. Reserve `USER_DECISION_REQUIRED` for a genuine non-deterministic ambiguity: conflicting project-owned policies, a project-owned divergence whose correct destination cannot be determined, content that cannot be preserved mechanically, an ambiguous canonical migration with conflicting targets. Such an item stops **only its own artifacts** (they stay preserved untouched, the outcome is then at best ⚠️ UPDATED PARTIALLY) — the deterministic remainder is applied. A migration already defined in the REFERENCE migration map is **never** a user decision merely because the currently running old copy of this command does not know it: the reference is the source of truth.
 
 ### 4. Apply the upgrade
 
-After confirmation, in this order — **nothing structural is written before preservation is verified**:
+In this order — **nothing structural is written before preservation is verified** (artifacts frozen by a pending `USER_DECISION_REQUIRED` are skipped throughout):
 1. **Execute the step 2c decision model's resulting action** for the legacy constitution carriers (`01-constitution.md`, `05-constitution.md`) — the safe removals, verbatim migration and verifications exactly as the matched D-rule prescribes; a `USER_DECISION_REQUIRED` outcome (D1/D2/D9) leaves everything in place and freezes every slot-01 planned rename
-2. **Apply the confirmed `SAFE_PROJECT_RELOCATION`s** — copy project content to its Layer-3 destination **before any source file is touched**
+2. **Apply the planned `SAFE_PROJECT_RELOCATION`s** — copy project content to its Layer-3 destination **before any source file is touched**
 3. **Verify preservation** (constitution + relocations): any mechanical verification failure here is `❌ UPDATE INCOMPLETE` — do **not** continue to any destructive step
-4. **Apply the planned structural renames/convergence from the step 0b map** (pure renames, content untouched; slot-01 entries only if step 1 resolved the constitution; coexisting old/new pairs handled by the ONE coexistence rule — a proven-redundant old path is removed only after verification)
+4. **Apply the planned structural renames/convergence from the step 0b map** (pure renames, content untouched; slot-01 entries only if step 1 resolved the constitution; coexisting old/new pairs handled by the ONE coexistence rule — a proven-redundant old path is removed only after verification), plus the planned **Layer-3 working-language alias migration** (step 0b — clause-atomic, its own preconditions verified, a Layer-1/2 clause conflict freezes it under `USER_DECISION_REQUIRED`)
 5. Replace the canonical Layer-1 files from the framework reference (`REPLACE_FROM_FRAMEWORK`) — after this step the project's Layer 1 equals the reference exactly
 6. Replace/add the Layer-2 files — **rules and stack commands, effective Layer-2 set only** — from the selected skill reference (`REPLACE_FROM_SKILL`), skipping any file with a pending `USER_DECISION_REQUIRED`; a conditional artifact whose condition is FALSE is neither added nor removed
 7. Update the toolkit-owned commands, templates and **SDD agents** per their existing ownership contracts
-8. **Repair dangling canonical references** in eligible preserved active artifacts — see *Path-only canonical reference repair* below; this phase runs **only after** the new canonical paths exist and never before preservation verification
-9. Preserve every Layer-3 file byte-for-byte (relocations only ever **add** a new Layer-3 file or append to a confirmed target; the **sole sanctioned mutation** of a preserved file is the path-only canonical reference repair of step 8 — never a rewrite)
+8. **Migrate the legacy `sdd/README.md` dynamic index** if applicable (step 4b)
+9. **Repair dangling canonical references** in eligible preserved active artifacts — see *Path-only canonical reference repair* below; this phase runs **only after** the new canonical paths exist and never before preservation verification
+10. Preserve every Layer-3 file byte-for-byte (two sanctioned mutations only: the step 0b working-language alias migration, and the path-only canonical reference repair of step 9 — relocations only ever **add** a new Layer-3 file or append to a confirmed target, never a rewrite)
 
 #### Path-only canonical reference repair
 
 After structural convergence, an eligible **active** preserved artifact may still reference an OLD canonical Layer-1 filename. Content ownership (frozen Layer 2, `PRESERVE_PROJECT`, Layer 3, `USER_DECISION_REQUIRED`) forbids replacing the file's content — it does **not** license keeping a dangling pointer to a canonical framework path. Content ownership ≠ canonical reference validity. This repair changes **only** a proven canonical path token, and nothing else.
 
 - **Map — one source of truth**: the repair reuses the step 0b structural migration map — its canonical Layer-1 entries (`02-git-conventions.md → 01-git-conventions.md`, `03-security.md → 02-security.md`, `04-code-quality.md → 03-code-quality.md`) **plus its selected-skill-scoped Layer-2 entries**, each eligible only when the selected skill ships the new canonical artifact (the step 0b scoping rule): an alias of an artifact this skill does not own is **never** repaired — no basename-only, fuzzy or cross-skill replacement. The legacy constitution carriers (`01-constitution.md`, `05-constitution.md`) are **never** path-only aliases: they belong exclusively to the step 2c decision model.
-- **Eligible artifacts** — ACTIVE textual artifacts that legitimately survived without replacement: preserved/frozen Layer-2 rules and stack commands, Layer-3 project rules, the project's own active commands, agents and skills, and other active project-owned operational artifacts the SDD workflow consumes. Not every file under `.claude/` is active.
-- **Excluded — historical feature artifacts**: `.claude/sdd/<feature>/spec.md`, `tasks.md`, `notes.md`, archived features and retrospective records are project history — their content is **never** rewritten because canonical filenames later changed. (`.claude/sdd/README.md` and `_template/**` are active framework artifacts, not history, and keep their own sync rules.)
+- **Eligible artifacts** — ACTIVE textual artifacts that legitimately survived without replacement: preserved/frozen Layer-2 rules and stack commands, Layer-3 project rules, the project's own active commands, agents and skills, other active project-owned operational artifacts the SDD workflow consumes, and the **active feature artifacts** below. Not every file under `.claude/` is active.
+- **Feature artifacts — active vs archived, never a blanket exclusion.** Archived material is history and is **never semantically rewritten**: everything under `.claude/sdd/_archive/**`, historical provenance prose (e.g. *"relocated from an older rule file in 2025"* — the old filename is part of the historical statement), and retrospective evidence whose old filename is part of what it attests. **Non-archived feature artifacts** (`spec.md`, `plan.md`, `tasks.md`, `notes.md` of features the active SDD workflow still consumes) are **eligible** for this repair — but only for occurrences that are **active operational pointers** (a reference the workflow still follows, e.g. a task's rule pointer), never historical prose, and only under every predicate below. When active-vs-historical meaning is genuinely ambiguous: **preserve** and report `AMBIGUOUS_CANONICAL_PATH_MENTION` — never rewrite historical prose to make it look current. (`.claude/sdd/README.md` and `_template/**` are active framework artifacts, not history, and keep their own sync rules.)
 - **Excluded — reference-owned installs**: an artifact just installed `REPLACE_FROM_FRAMEWORK` or `REPLACE_FROM_SKILL` must equal its reference; a stale canonical path inside such a copy is a **`SOURCE_REFERENCE_DEFECT`** → `❌ UPDATE INCOMPLETE` — never patch the project copy locally to hide a source problem.
 - **An occurrence is auto-repaired only when ALL hold**: the file is eligible; the occurrence is an **exact old canonical filename/path token** of the map (the bare filename `03-security.md`, its `rules/`-prefixed or fully `.claude/rules/`-prefixed form, or an equivalent unambiguous Markdown path form) — never an arbitrary substring (`my03-security.md.bak`, `103-security.md`, `example-03-security.md` never match); the mapping is deterministic 1 → 1; the OLD canonical target no longer exists and the NEW one exists (structural convergence completed successfully); the change is exactly old token → new token. When the context does not deterministically prove an active reference (e.g. prose recalling a legacy filename), **preserve it** and report it as `AMBIGUOUS_CANONICAL_PATH_MENTION` — never guess.
 - **Byte-preservation guarantee**: snapshot the file first; after repair, verify that reverting only the substituted token(s) reconstructs the original byte-for-byte — whitespace, line endings, headings, punctuation, wording, examples, stack facts, code, ordering and metadata are untouched. Verification failure → restore the original and `❌ UPDATE INCOMPLETE`, no destructive continuation.
 - **Multiple occurrences** in one file are each repaired independently under the same predicates.
 - **Decisions unchanged**: a repaired file keeps its classification — a frozen Layer-2 file remains `USER_DECISION_REQUIRED`; this repair never turns ⚠️ into ✅ while any unrelated ownership/content decision is pending; if preservation verification or structural convergence failed, this phase does not run at all.
 
-At the end of the apply step, **write the deployed version marker**: put the toolkit's `VERSION` value into `.claude/sdd/.sdd-version` (single line, create or overwrite). It lives under `.claude/sdd/` — a framework-owned directory — as a dotfile so it can never collide with a feature folder, and the next `/sdd-upgrade` reads it to apply only the relevant part of the migration map.
+The version marker is **not** written here: it is the LAST filesystem mutation of the upgrade, written in step 4d only after the step 4c verification fully passes.
 
 ### 4b. Migrate the legacy `sdd/README.md` dynamic index
 
@@ -312,13 +358,42 @@ After the apply (and the step 4b migration), verify the final ownership state ag
 
 - every canonical Layer-1 file equals the framework reference exactly (no `PROJECT OVERRIDE` block remains inside Layer 1);
 - every Layer-2 path of the **effective Layer-2 set** — rules **and** stack commands — equals the reference; the absence of a conditional skill artifact whose condition is FALSE is **valid**, never a failure;
-- every Layer-3 file is byte-identical to its pre-upgrade content (two sanctioned exceptions: relocation targets, which only gained the relocated content verified in step 4.2, and the path-only canonical reference repairs of step 4.8, byte-verified token substitutions);
+- every Layer-3 file is byte-identical to its pre-upgrade content (three sanctioned exceptions: relocation targets, which only gained the relocated content verified in step 4.2; the path-only canonical reference repairs of step 4.9, byte-verified token substitutions; and the step 0b working-language alias migration — every valid clause preserved verbatim under the canonical name, a Layer-1/2-conflicting clause removed **only** on the developer's explicit targeted decision);
 - no active legacy constitution carrier remains — neither `01-constitution.md` nor `05-constitution.md` (removed empty, or migrated to `project-constitution.md` with preservation verified);
 - the project constitution, when one existed or was migrated, is preserved with its status and metadata;
 - no `USER_DECISION_REQUIRED` item is pending (constitution conflict, ambiguous divergence, ambiguous README ownership from step 4b);
-- no eligible preserved active artifact keeps a dangling old canonical Layer-1 reference (step 4.8 applied; `AMBIGUOUS_CANONICAL_PATH_MENTION`s are reported, never guessed, and do not block by themselves).
+- no eligible preserved active artifact keeps a dangling old canonical Layer-1 reference (step 4.9 applied; `AMBIGUOUS_CANONICAL_PATH_MENTION`s are reported, never guessed, and do not block by themselves).
 
 Report every unresolved item honestly, with what is pending and why the framework refuses to decide alone. This verification is recomputed fresh at each upgrade and produces no persistent manifest.
+
+#### 4c-bis. Independent disk-state convergence gate (working-language alias)
+
+Reasoning state is **not** evidence. A run can believe it resolved the alias and still leave the old file on disk. This gate therefore **inspects the actual filesystem** after all writes and migrations, independently of what the run believes it did.
+
+**Known alias convergence.** If `project-language.md` existed at the **beginning** of the run, the final on-disk state must satisfy exactly one of:
+
+- **A — successful authority-valid canonicalization**: `.claude/rules/project-language.md` **ABSENT**; `.claude/rules/project-working-language.md` **PRESENT**; its content authority-valid; no unresolved conflicting clause remaining.
+- **B — unresolved user decision**: a `USER_DECISION_REQUIRED` is still pending, the upgrade is **not** successful, `.sdd-version` keeps its old value (or stays absent), and the result is **not** ✅ UPDATED.
+
+**Forbidden final state** — this exact combination is always a RED postcondition:
+
+```
+project-language.md still present
+  +  no pending USER_DECISION_REQUIRED
+  +  result announced as UPDATED
+```
+
+**Canonical authority check.** Verify the final `project-working-language.md` **by reading it**, not by trusting that a rename occurred. It must contain no clause that overrides or negates a current Layer-1/Layer-2 invariant — in particular the commit-subject English invariant, the source-comment English invariant, or any other universal/skill-owned language invariant. A file that merely carries the canonical *name* while still asserting `source comments → French` fails this gate.
+
+A failure here is a **mechanical postcondition failure** (❌), not a pending decision.
+
+### 4d. Write the version marker — LAST, only after full verification
+
+The marker represents a **successfully deployed** version, never an attempted one — it records successful convergence, never attempted synchronization.
+
+- If the step 4c verification **or the 4c-bis disk-state convergence gate** reports any failure or any pending item (mechanical failure OR pending `USER_DECISION_REQUIRED`): **stop here** — do **not** create or update `.claude/sdd/.sdd-version`; it keeps its previous value (or stays absent). The announced outcome is ❌ or ⚠️ per step 6. In particular, a surviving `project-language.md` that has not converged per 4c-bis **forbids the marker write**.
+- Only on **full success**: write the toolkit's `VERSION` value into `.claude/sdd/.sdd-version` (single line, create or overwrite) as the **LAST filesystem mutation of the upgrade** — nothing is written to disk after it. It lives under `.claude/sdd/` — a framework-owned directory — as a dotfile so it can never collide with a feature folder, and the next `/sdd-upgrade` reads it to state which reference was deployed last (the on-disk state still drives the migration map).
+- Optionally re-read the marker (read-only) to verify its value before committing.
 
 ### 5. Commit
 
@@ -353,6 +428,7 @@ Updated:    <list of updated files>
 Pending:    <USER_DECISION_REQUIRED items — or (none)>
 README:     <static guide already / migrated (step 4b) / ⚠️ manual review required>
 Constitution: <none / migrated to project-constitution.md / preserved / ⚠️ decision required>
+Marker:     <.sdd-version updated (full success only) / kept at its previous value — verification not fully passed>
 
 Layer 3 (project rules, skills, own agents): preserved byte-for-byte ✅
 ```
@@ -367,4 +443,7 @@ Layer 3 (project rules, skills, own agents): preserved byte-for-byte ✅
 - ❌ **Never touch** the developer's own agents (`.claude/agents/` files absent from the reference)
 - ❌ **Never merge, rewrite or overwrite constitutions** — every legacy-constitution action follows the step 2c decision model (D1–D9) and nothing else; no carrier is ever deployed to any project nor renamed into another slot
 - ❌ **Never overwrite** `.claude/sdd/README.md` blindly — deploy it only where missing; the one sanctioned rewrite is the step 4b migration of the known framework-owned dynamic-index schema (framework-owned tables replaced, custom project prose preserved, ambiguous ownership → manual review, never a blind overwrite)
-- ✅ **Always wait** for explicit confirmation before writing anything
+- ✅ **Autonomous when deterministic** — never require a generic confirmation before writing; a `USER_DECISION_REQUIRED` (genuine non-deterministic ambiguity only) freezes exactly the artifacts it concerns, and the rest of the upgrade proceeds
+- ❌ **Never write `.claude/sdd/.sdd-version` before the step 4c verification fully passes** — the marker is the LAST filesystem mutation of the upgrade (step 4d); a failed or partial upgrade keeps the previous marker value
+- ❌ **Never run the triage under the invoked copy's rules when the reference procedure differs** — step −1 hands authority to the reference `commands/sdd-upgrade.md` before any classification, decision or write; adopting new file contents while keeping old decision logic is the hybrid-execution defect
+- ❌ **Never conclude an upgrade with `project-language.md` still on disk and no pending decision** — the step 2d gate is mandatory whenever the alias exists, and the 4c-bis disk-state gate is verified against the filesystem, never against what the run believes it did

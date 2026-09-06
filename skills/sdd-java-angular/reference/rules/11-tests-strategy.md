@@ -50,7 +50,6 @@ class UserServiceImplTest {
 
     @Test
     void shouldReturnEmptyWhenUserNotFound() {
-        // Covers AC-1
         when(userRepository.findById(42L)).thenReturn(Optional.empty());
 
         Optional<UserResponse> result = sut.findById(42L);
@@ -74,7 +73,6 @@ class UserControllerTest {
 
     @Test
     void shouldReturn404WhenUserNotFound() throws Exception {
-        // Covers AC-2
         when(userService.findById(99L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/users/99"))
@@ -297,7 +295,7 @@ Each acceptance criteria (AC) in the spec must have at minimum:
 - A unit test on the frontend side if the logic lives in the frontend
 - An E2E smoke test only if the AC is a complete user workflow
 
-Tag the covering test with a `// Covers AC-n` comment on both sides.
+The AC ↔ test mapping lives in the SDD artifacts (`plan.md` test strategy, `tasks.md`) and the verification gates — never as a comment or SDD reference in test source on either side; tests are named for the behavior they attest.
 
 ### Shared fixtures backend ↔ frontend
 

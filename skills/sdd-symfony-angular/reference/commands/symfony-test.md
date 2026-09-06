@@ -81,9 +81,6 @@ final class <Name>ServiceTest extends TestCase
         $this->sut = new <Name>Service($this->repository, $this->logger);
     }
 
-    /**
-     * Covers AC-1: <AC statement>
-     */
     public function testReturnsNullWhenEntityNotFound(): void
     {
         // Arrange
@@ -99,9 +96,6 @@ final class <Name>ServiceTest extends TestCase
         self::assertNull($result);
     }
 
-    /**
-     * Covers AC-2: <AC statement>
-     */
     public function testThrowsExceptionOnDuplicate(): void
     {
         self::markTestIncomplete('To implement via /sdd-implement');
@@ -141,9 +135,6 @@ final class <Entity>RepositoryTest extends KernelTestCase
         $this->em->getConnection()->executeStatement('TRUNCATE TABLE <table> CASCADE');
     }
 
-    /**
-     * Covers AC-1: <statement>
-     */
     public function testPersistsAndRetrieves<Entity>(): void
     {
         // Arrange
@@ -191,9 +182,6 @@ final class <Action>ControllerTest extends WebTestCase
         $this->client = static::createClient();
     }
 
-    /**
-     * Covers AC-1: <statement>
-     */
     public function testGetReturns200WhenEntityExists(): void
     {
         // Arrange
@@ -247,12 +235,9 @@ final class <Action>ControllerTest extends WebTestCase
 
 ### 6. Generate one test per AC
 
-For each AC in `spec.md`, create a test method. If the implementation is not obvious, use `markTestIncomplete()`:
+For each AC in `spec.md`, create a test method **named for the behavior it attests** — the AC ↔ test mapping is reported in the validation display and lives in the SDD artifacts (`plan.md` test strategy, `tasks.md`), **never as a source comment** (see `.claude/rules/03-code-quality.md` § Source comments). If the implementation is not obvious, use `markTestIncomplete()`:
 
 ```php
-/**
- * Covers AC-X: <exact AC statement>
- */
 public function test<Description>(): void
 {
     self::markTestIncomplete('To implement via /sdd-implement');
@@ -326,4 +311,4 @@ Next step:
 - **No required execution order** between tests
 - **For integration and functional tests**: clean reset in `setUp()` (TRUNCATE or rollback)
 - **No tests that depend on the clock** without an injectable `Clock`
-- **Document each test with the AC it covers** (`Covers AC-N` comment)
+- **Tests are named for the behavior they attest** — no AC, ticket or SDD reference in test code or names; the AC ↔ test mapping lives in the SDD artifacts and the validation display

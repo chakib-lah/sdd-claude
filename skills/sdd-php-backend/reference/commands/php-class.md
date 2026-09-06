@@ -32,7 +32,7 @@ Read `.claude/rules/10-code-conventions.md` to comply with:
 
 ### 3. Load the SDD context
 
-Read `spec.md` and `plan.md` of the active feature to understand:
+Read `spec.md` (behavioral requirements, ACs) and `plan.md` (Technical design — class placement, dependencies, interface) of the active feature to understand:
 - What the responsibility of this class is
 - Which dependencies it will have
 - Which public interface it exposes

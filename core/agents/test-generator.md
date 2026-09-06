@@ -12,7 +12,7 @@ Produce tests that cover exactly the acceptance criteria of `spec.md`. Each AC g
 
 ## Prerequisite
 
-Read `spec.md` before generating anything. Each test must reference the AC it covers in a comment.
+Read `spec.md` before generating anything. Map each generated test to the AC it covers in your **response** (AC ↔ test table) — the mapping lives in the SDD artifacts, **never in the source**: generated tests carry no AC, ticket, task or spec/plan reference in comments or names; the test name and content describe the behavior (see `.claude/rules/03-code-quality.md` § Source comments).
 
 ## Universal rules
 
@@ -25,7 +25,6 @@ Read `spec.md` before generating anything. Each test must reference the AC it co
 ## PHPUnit (Symfony)
 
 ```php
-/** @covers AC-2: When the email is invalid, the system returns 422 */
 public function test_create_user_returns_422_when_email_invalid(): void
 {
     // Arrange
@@ -49,7 +48,6 @@ PHPUnit conventions:
 ## Jest / Vitest (Angular / Node.js)
 
 ```typescript
-// Covers AC-3: When the token is expired, the route returns 401
 it('should return 401 when token is expired', async () => {
   // Arrange
   const expiredToken = generateExpiredToken();
@@ -68,7 +66,6 @@ it('should return 401 when token is expired', async () => {
 ## Angular Testing Library
 
 ```typescript
-// Covers AC-4: When the list is empty, the component displays "No results"
 it('should display empty state when user list is empty', async () => {
   // Arrange
   mockUserService.list.mockReturnValue(of([]));
@@ -87,7 +84,6 @@ it('should display empty state when user list is empty', async () => {
 ## Playwright (E2E)
 
 ```typescript
-// Covers AC-1: When the user logs in with valid credentials
 test('should redirect to dashboard after valid login', async ({ page }) => {
   // Arrange
   await page.goto('/login');

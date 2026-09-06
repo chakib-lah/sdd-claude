@@ -13,7 +13,7 @@ If the project uses another name (`main`, `master`, `integration`), the project'
 
 ## Branch naming
 
-Strict format:
+Universal default format (a project Git rule may configure another — see the extension points below):
 
 ```
 <type>/<TICKET-ID>-<description-kebab-case>
@@ -52,7 +52,7 @@ A project may configure this branch model through its Layer-3 Git rule (see *Pro
 
 ## Commit convention
 
-Everything in this section states the **universal default** — the exact commit-message format is a **project-configurable extension point** (see below): a project's Layer-3 Git rule may adopt a different exact format (e.g. Conventional Commits). The *Absolute prohibitions* remain universal invariants under any configured format.
+Everything in this section states the **universal default** — the exact commit-message format is a **project-configurable extension point** (see below): a project's Layer-3 Git rule may adopt a different exact format (e.g. Conventional Commits). The *Absolute prohibitions* and the **universal subject invariants** — the subject is written in **English**, short and concise, subject line only — remain universal invariants under any configured format.
 
 Format: **the ticket, then the subject**.
 
@@ -67,6 +67,7 @@ The message is the **subject line only** — no body, no footer, no signature.
 ### Strict rules
 
 **Subject (1st line)**:
+- Written in **English**, whatever the project's SDD working language
 - Maximum **72 characters** (ticket included)
 - **Lowercase imperative**: "add", "fix", "refactor" (not "added" nor "addition of")
 - **No trailing period**
@@ -105,7 +106,7 @@ PROJ-101: add a new service that allows managing csv exports of business data   
 
 During development, each `T00X` task in `tasks.md` must result in **exactly one local commit**. If the implementation generated several micro-commits, squash them into the task's commit.
 
-When the last task of an implementation phase completes, `/sdd-implement` **squashes the phase's task commits into a single commit** — mandatory before the phase's first push. The pushed history contains **one commit per phase**, plus at most one final `<TICKET-ID>: update SDD artifacts` commit (bookkeeping only, no code). A single-phase feature is therefore reviewed as a single code commit. Note that the squash fires **only when the phase's last task is checked off**: mid-phase, seeing one commit per task on the branch is the expected state, not a missing squash.
+When the last task of an implementation phase completes, `/sdd-implement` **squashes the phase's task commits into a single commit** — mandatory before the phase's first push. The pushed history contains **one commit per phase**, plus at most one final SDD-bookkeeping commit (no code; semantic intent: update the SDD artifacts — formatted through the effective Git policy). A single-phase feature is therefore reviewed as a single code commit. Note that the squash fires **only when the phase's last task is checked off**: mid-phase, seeing one commit per task on the branch is the expected state, not a missing squash.
 
 The recipe (interactive rebase is not available to agents) — `reset --soft` rewrites history, so the two guards are part of the recipe, not optional:
 
@@ -119,7 +120,7 @@ git commit   # single phase commit
 
 A foreign commit in the `$BASE..HEAD` range (typically a merge from the integration or release branch pulled in mid-phase) or a staged change would be **silently swallowed** into the phase commit. If either guard fails, do not squash: keep the per-task commits and document the phase in `notes.md`, exactly as for a phase pushed mid-phase.
 
-The phase commit message follows the standard format — `<TICKET-ID>: <phase summary in imperative lowercase>` — subject line only; the squashed tasks stay traceable in `tasks.md`.
+The phase commit message is resolved through the **effective Git policy** (semantic intent: the phase summary, imperative) — subject line only; the squashed tasks stay traceable in `tasks.md`.
 
 If a task turns out to be more complex than expected and requires several commits, it is usually a sign that it should have been re-split. Document in `notes.md` for future adjustment of the task breakdown.
 

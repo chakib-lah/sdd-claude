@@ -12,7 +12,7 @@ Produce tests that cover exactly the acceptance criteria in `spec.md`. Each AC g
 
 ## Prerequisites
 
-Read `spec.md` before generating anything. Each test must reference the AC it covers in a comment.
+Read `spec.md` before generating anything. Map each generated test to the AC it covers in your **response** (AC ↔ test table) — the mapping lives in the SDD artifacts, **never in the source**: generated tests carry no AC, ticket, task or spec/plan reference in comments or names; the test name and content describe the behavior (see `.claude/rules/03-code-quality.md` § Source comments).
 
 ## Universal rules
 
@@ -25,7 +25,6 @@ Read `spec.md` before generating anything. Each test must reference the AC it co
 ## PHPUnit — unit tests
 
 ```php
-/** @covers AC-2: When the email is invalid, the system rejects the creation */
 public function testCreateUserThrowsWhenEmailInvalid(): void
 {
     // Arrange
@@ -47,7 +46,6 @@ PHPUnit conventions:
 Legacy code without a framework rarely has a test kernel: bootstrap explicitly.
 
 ```php
-/** @covers AC-1: When the user exists, the lookup returns their record */
 public function testFindUserReturnsRecordWhenUserExists(): void
 {
     // Arrange — dedicated test database, seeded by tests/bootstrap.php

@@ -93,9 +93,6 @@ describe('UserCardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  /**
-   * Covers AC-X: <statement>
-   */
   it('should display user email', () => {
     fixture.componentRef.setInput('user', mockUser);
     fixture.detectChanges();
@@ -104,9 +101,6 @@ describe('UserCardComponent', () => {
     expect(compiled.textContent).toContain('test@example.com');
   });
 
-  /**
-   * Covers AC-X: <statement>
-   */
   it('should emit edit event with user id when edit button clicked', () => {
     fixture.componentRef.setInput('user', mockUser);
     fixture.detectChanges();
@@ -120,9 +114,6 @@ describe('UserCardComponent', () => {
     expect(emittedId).toBe(1);
   });
 
-  /**
-   * Covers AC-X: <statement>
-   */
   it('should apply highlighted class when highlighted input is true', () => {
     fixture.componentRef.setInput('user', mockUser);
     fixture.componentRef.setInput('highlighted', true);
@@ -163,9 +154,6 @@ describe('UserApiService', () => {
 
   afterEach(() => httpMock.verify());
 
-  /**
-   * Covers AC-X: <statement>
-   */
   it('should GET user list', () => {
     const mockUsers: UserResponse[] = [
       { id: 1, email: 'a@b.c', firstName: null, lastName: null, createdAt: '2026-01-01', roles: [] },
@@ -180,9 +168,6 @@ describe('UserApiService', () => {
     req.flush(mockUsers);
   });
 
-  /**
-   * Covers AC-X: <statement>
-   */
   it('should POST to create a user', () => {
     const payload: CreateUserRequest = { email: 'new@example.com', password: 'secret123' };
     const mockResponse: UserResponse = {
@@ -250,9 +235,6 @@ describe('UserStateService', () => {
     expect(service.users()).toEqual([]);
   });
 
-  /**
-   * Covers AC-X: <statement>
-   */
   it('should add a user', () => {
     const user = { id: 1, email: 'a@b.c', firstName: null, lastName: null, createdAt: '2026-01-01', roles: [] };
     service.add(user);
@@ -291,14 +273,10 @@ describe('TruncatePipe', () => {
 
 ### 6. Generate one test per relevant acceptance criterion
 
-For ACs concerning the frontend (display, interaction, navigation):
+For ACs concerning the frontend (display, interaction, navigation), create one test **named for the behavior it attests** — the AC ↔ test mapping is reported in step 7's display and lives in the SDD artifacts, **never as a source comment** (see `.claude/rules/03-code-quality.md` § Source comments):
 
 ```typescript
-/**
- * Covers AC-X: <exact statement>
- */
 it('should <description>', () => {
-  // TODO: implement via /sdd-implement
   pending('To implement');
 });
 ```
@@ -352,4 +330,4 @@ Next step:
 - **No unfinished subscribe** in a test (use `done`, `async/await`, or the discovered environment's async facilities — see the timing rule below)
 - **No Angular mocks** (`MockNgZone`, etc.): use `TestBed`
 - **No tests that depend on real timing** — use the **discovered runner/environment's** deterministic timing facilities: on Vitest / zoneless-compatible projects prefer native `async/await`, with Vitest fake timers where deterministic timer advancement is needed; Angular ZoneJS utilities (`fakeAsync`/`tick`/`flush`/`waitForAsync`) only where the discovered test environment supports the ZoneJS testing integration and the project already uses that model (e.g. Karma/Jasmine brownfield); Jest projects use Jest's own timer APIs. Never add ZoneJS solely to make a test pattern work
-- **Document each test with the AC** it covers
+- **Tests are named for the behavior they attest** — no AC, ticket or SDD reference in test code or names; the AC ↔ test mapping lives in the SDD artifacts and the step 7 display

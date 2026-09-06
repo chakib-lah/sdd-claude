@@ -12,7 +12,7 @@ Produce tests that cover exactly the acceptance criteria in `spec.md`. Each AC g
 
 ## Prerequisites
 
-Read `spec.md` before generating anything. Each test must reference the AC it covers in a comment.
+Read `spec.md` before generating anything. Map each generated test to the AC it covers in your **response** (AC ↔ test table) — the mapping lives in the SDD artifacts, **never in the source**: generated tests carry no AC, ticket, task or spec/plan reference in comments or names; the test name and content describe the behavior (see `.claude/rules/03-code-quality.md` § Source comments).
 
 ## Universal rules
 
@@ -26,7 +26,6 @@ Read `spec.md` before generating anything. Each test must reference the AC it co
 ## JUnit 5 + Mockito (backend unit tests)
 
 ```java
-// Covers AC-2: When the email is invalid, the system rejects the creation
 @Test
 @DisplayName("createUser rejects the request when the email is invalid")
 void shouldRejectCreationWhenEmailInvalid() {
@@ -50,7 +49,6 @@ Unit test conventions:
 ## @WebMvcTest + MockMvc (controller slice tests)
 
 ```java
-// Covers AC-3: When the payload is invalid, the endpoint returns 400
 @WebMvcTest(UserController.class)
 class UserControllerTest {
 
@@ -83,7 +81,6 @@ For full-stack HTTP behavior use `@SpringBootTest(webEnvironment = RANDOM_PORT)`
 ## @ParameterizedTest (multiple cases)
 
 ```java
-// Covers AC-4: All malformed identifiers are rejected
 @ParameterizedTest(name = "identifier \"{0}\" is rejected")
 @ValueSource(strings = {"", "  ", "abc", "12-34", "9999999999999"})
 void shouldThrowExceptionWhenIdentifierFormatInvalid(String raw) {
@@ -97,7 +94,6 @@ Use `@ValueSource` for single-argument cases, `@CsvSource` or `@MethodSource` wh
 ## @DataJpaTest (repository slice — real PostgreSQL)
 
 ```java
-// Covers AC-1: The persisted user is found by its email
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
@@ -138,7 +134,6 @@ database strategy.
 ## Angular service tests (Jasmine / Jest / Vitest)
 
 ```typescript
-// Covers AC-3: When the token is expired, the service surfaces a session error
 it('should emit session-expired error when token is expired', () => {
   // Arrange
   const service = TestBed.inject(UserService);
@@ -161,7 +156,6 @@ Angular conventions:
 ## Component tests (TestBed)
 
 ```typescript
-// Covers AC-4: When the list is empty, the component displays "No results"
 it('should display empty state when user list is empty', async () => {
   // Arrange — hand-rolled stub, runner-agnostic (jasmine.createSpyObj / jest.fn() are alternatives)
   const userServiceStub = { list: () => of([]) };
@@ -185,7 +179,6 @@ it('should display empty state when user list is empty', async () => {
 ## Playwright (E2E)
 
 ```typescript
-// Covers AC-1: When the user logs in with valid credentials
 test('should redirect to dashboard after valid login', async ({ page }) => {
   // Arrange
   await page.goto('/login');

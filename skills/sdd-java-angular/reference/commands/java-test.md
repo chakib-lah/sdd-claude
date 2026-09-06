@@ -78,7 +78,6 @@ class UserServiceImplTest {
 
     @Test
     void shouldReturnUserWhenFound() {
-        // Covers AC-1: <AC statement>
         // Arrange
         User user = User.create("alice@example.com");
         given(repository.findById(42L)).willReturn(Optional.of(user));
@@ -93,7 +92,6 @@ class UserServiceImplTest {
 
     @Test
     void shouldThrowWhenUserNotFound() {
-        // Covers AC-2: <AC statement>
         // Arrange
         given(repository.findById(42L)).willReturn(Optional.empty());
 
@@ -105,7 +103,6 @@ class UserServiceImplTest {
     @Test
     @Disabled("To implement via /sdd-implement")
     void shouldRejectDuplicateEmail() {
-        // Covers AC-3: <AC statement>
         fail("Not yet implemented");
     }
 
@@ -138,7 +135,6 @@ class UserRepositoryIT {
 
     @Test
     void shouldPersistAndRetrieveUser() {
-        // Covers AC-1: <statement>
         // Arrange
         User user = em.persistFlushFind(User.create("alice@example.com"));
         em.clear();
@@ -181,7 +177,6 @@ class UserControllerTest {
 
     @Test
     void shouldReturn200WhenUserExists() throws Exception {
-        // Covers AC-1: <statement>
         given(service.getById(1L)).willReturn(new UserDto(1L, "alice@example.com"));
 
         mockMvc.perform(get("/api/users/1"))
@@ -236,7 +231,6 @@ class CreateUserFlowIT {
 
     @Test
     void shouldCreateUserEndToEnd() {
-        // Covers AC-1: <statement>
         // Arrange
         var request = new CreateUserRequest("alice@example.com", "s3cret-password");
 
@@ -253,13 +247,12 @@ class CreateUserFlowIT {
 
 ### 6. Generate one test per AC
 
-For each AC in `spec.md`, create a test method with a `// Covers AC-n` comment. If the implementation is not obvious, disable it explicitly:
+For each AC in `spec.md`, create a test method **named for the behavior it attests** — the AC ↔ test mapping is reported in step 8's display and lives in the SDD artifacts (`plan.md` test strategy, `tasks.md`), **never as a source comment** (see `.claude/rules/03-code-quality.md` § Source comments). If the implementation is not obvious, disable it explicitly:
 
 ```java
 @Test
 @Disabled("To implement via /sdd-implement")
 void should<Action>When<Condition>() {
-    // Covers AC-X: <exact AC statement>
     fail("Not yet implemented");
 }
 ```
@@ -344,4 +337,4 @@ Next step:
 - **Suite membership follows the discovered project convention**: a unit-suite class must not boot a full Spring context or a real database (web slices `@WebMvcTest` are fine); anything that does belongs to the integration suite (greenfield default: rename `<Class>Test` → `<Class>IT`)
 - **For slice and integration tests**: clean database state (`@DataJpaTest` rollback, or explicit cleanup in `@AfterEach`)
 - **No tests that depend on the clock** without an injectable `Clock`
-- **Document each test with the AC it covers** (`// Covers AC-n` comment)
+- **Tests are named for the behavior they attest** — no AC, ticket or SDD reference in test code or names; the AC ↔ test mapping lives in the SDD artifacts and the step 8 display

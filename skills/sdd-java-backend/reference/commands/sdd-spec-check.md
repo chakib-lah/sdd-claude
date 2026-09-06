@@ -51,7 +51,7 @@ For each criterion, display ✅ (OK) or ❌ (problem) with an actionable comment
 - [ ] **Objectives section**: present and not empty
 - [ ] **Out of scope section**: present and not empty (at least one item)
 - [ ] **Acceptance criteria section**: present with at least 2 ACs
-- [ ] **Design section**: present and references existing files/services/entities
+- [ ] **Functional behavior section**: present and describes the expected behavior in observable terms
 - [ ] **Open questions section**: present (empty = no open questions = a good sign)
 
 #### Acceptance criteria criteria
@@ -62,10 +62,10 @@ For each AC:
 - [ ] **Not vague**: no terms like "performant", "fast", "user-friendly" without a measurable threshold
 - [ ] **Non-regression**: at least one AC covers adjacent functionality
 
-#### Design criteria
+#### Content criteria
 
 - [ ] **No structural open questions**: no question in "Open questions" that would change the architecture or the scope if resolved differently
-- [ ] **Impacted files mentioned**: the Design section points to specific files/services/entities (not "the users service")
+- [ ] **WHAT/WHY only**: the spec contains no implementation design — no exact source paths, impacted-file lists, class/service/method names or code snippets (those belong to `plan.md`); an externally observable contract requirement is fine
 - [ ] **No undefined jargon**: domain-specific terms are explained at least once
 - [ ] **Constitution respected**: if `.claude/rules/project-constitution.md` exists with `status: ratified`, the spec violates none of its principles (cite the `PN` otherwise). If it exists with `status: draft`, note any violation **informatively** and count the criterion as ✅. If there is no project constitution, count this criterion as ✅ and note "no constitution".
 
@@ -92,8 +92,8 @@ Structure
   Context                   : ✅
   Objectives                : ✅
   Out of scope              : ❌ Section present but empty
+  Functional behavior       : ✅
   Acceptance criteria       : ✅ 4 ACs
-  Design                    : ✅
   Open questions            : ✅ section present
 
 Acceptance criteria
@@ -102,9 +102,9 @@ Acceptance criteria
   Not vague                 : ❌ AC-3 too vague: "the system must be responsive"
   Non-regression covered    : ✅
 
-Design
+Content
   No structural questions   : ❌ "What behavior if the user has no role?" would change the scope
-  Specific files mentioned  : ✅
+  WHAT/WHY only             : ✅ (no implementation design in the spec)
   No undefined jargon       : ✅
   Constitution respected    : ✅ (or ❌ violates P3 — <principle name>)
 

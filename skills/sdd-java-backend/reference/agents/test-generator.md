@@ -12,7 +12,7 @@ Produce tests that cover exactly the acceptance criteria in `spec.md`. Each AC g
 
 ## Prerequisites
 
-Read `spec.md` before generating anything. Each test must reference the AC it covers in a comment.
+Read `spec.md` before generating anything. Map each generated test to the AC it covers in your **response** (AC ↔ test table) — the mapping lives in the SDD artifacts, **never in the source**: generated tests carry no AC, ticket, task or spec/plan reference in comments or names; the test name and content describe the behavior (see `.claude/rules/03-code-quality.md` § Source comments).
 
 ## Universal rules
 
@@ -26,7 +26,6 @@ Read `spec.md` before generating anything. Each test must reference the AC it co
 ## JUnit 5 + Mockito (unit tests)
 
 ```java
-// Covers AC-2: When the email is invalid, the system rejects the creation
 @Test
 @DisplayName("createUser rejects the request when the email is invalid")
 void shouldThrowValidationExceptionWhenEmailInvalid() {
@@ -50,7 +49,6 @@ Unit test conventions:
 ## @WebMvcTest + MockMvc (controller slice tests)
 
 ```java
-// Covers AC-3: When the payload is invalid, the endpoint returns 400
 @WebMvcTest(UserController.class)
 class UserControllerTest {
 
@@ -81,7 +79,6 @@ class UserControllerTest {
 ## @ParameterizedTest (multiple cases)
 
 ```java
-// Covers AC-4: All malformed identifiers are rejected
 @ParameterizedTest(name = "identifier \"{0}\" is rejected")
 @ValueSource(strings = {"", "  ", "abc", "12-34", "9999999999999"})
 void shouldThrowExceptionWhenIdentifierFormatInvalid(String raw) {
@@ -95,7 +92,6 @@ Use `@ValueSource` for single-argument cases, `@CsvSource` or `@MethodSource` wh
 ## Integration tests (@DataJpaTest / @SpringBootTest)
 
 ```java
-// Covers AC-1: A persisted user can be found by email
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers

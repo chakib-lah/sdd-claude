@@ -12,7 +12,7 @@ Produce tests that cover exactly the acceptance criteria in `spec.md`. Each AC g
 
 ## Prerequisites
 
-Read `spec.md` before generating anything. Each test must reference the AC it covers in a comment.
+Read `spec.md` before generating anything. Map each generated test to the AC it covers in your **response** (AC ↔ test table) — the mapping lives in the SDD artifacts, **never in the source**: generated tests carry no AC, ticket, task or spec/plan reference in comments or names; the test name and content describe the behavior (see `.claude/rules/03-code-quality.md` § Source comments).
 
 Discover both sides before generating — roots included (never assume `backend/`/`frontend/`):
 - **Backend**: the PHPUnit configuration under the discovered backend root (`phpunit.xml.dist`, `phpunit.xml` or `phpunit.dist.xml` — suite names, directories) and the project's execution wrapper.
@@ -31,7 +31,6 @@ Generate into the existing layouts — never invent parallel test trees. Missing
 ## PHPUnit (Symfony backend)
 
 ```php
-/** @covers AC-2: When the email is invalid, the system returns 422 */
 public function testCreateUserReturns422WhenEmailInvalid(): void
 {
     // Arrange
@@ -54,7 +53,6 @@ Conventions:
 ## Angular — component tests (Testing Library or TestBed)
 
 ```typescript
-// Covers AC-4: When the list is empty, the component displays "No results"
 it('should display empty state when user list is empty', async () => {
   // Arrange
   mockUserService.list.mockReturnValue(of([]));
@@ -78,7 +76,6 @@ Conventions:
 ## E2E (cross-stack) — the project's configured tool (Playwright example)
 
 ```typescript
-// Covers AC-1: When the user logs in with valid credentials
 test('should redirect to dashboard after valid login', async ({ page }) => {
   // Arrange
   await page.goto('/login');

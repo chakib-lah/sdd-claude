@@ -37,6 +37,20 @@ This section is crucial to avoid scope creep.
 -
 -
 
+## Functional behavior
+
+<!--
+The expected business/functional behavior — the WHAT, never the HOW:
+- Business rules applied (a business formula that IS the required behavior belongs here)
+- User-visible flows, error handling as the user observes it
+- Externally observable contracts that are part of the request
+  (e.g. "the existing API response stays backward compatible")
+
+Never put implementation design here: no source paths, no impacted files,
+no class/service/method names, no code snippets, no build commands, no DB
+implementation details — those belong to plan.md (Technical design).
+-->
+
 ## Acceptance criteria
 
 <!--
@@ -60,60 +74,6 @@ the next free number. The [SEC] tag sits after the identifier:
 - [ ] AC-2: When
 - [ ] AC-3: When
 
-## Design
-
-<!--
-Technical sections to adapt depending on the nature of the feature and the project's stack.
-The examples below are suggestions to enable/disable depending on context.
--->
-
-### Endpoints / API
-
-<!--
-If the feature affects endpoints:
-- HTTP method
-- Exact route
-- Request payload (with types)
-- Response (with types and HTTP codes)
-- Required authentication
--->
-
-### Data model / DB
-
-<!--
-If the feature affects persistence:
-- Entities created or modified
-- Fields added / removed / modified
-- Required indexes
-- DB migration reversible or not
--->
-
-### UI / Frontend components
-
-<!--
-If the feature affects the frontend:
-- Components created or modified
-- Inputs / outputs
-- Managed states
-- Key user interactions
--->
-
-### Services and business logic
-
-<!--
-- New services to create
-- Existing services to modify (and impact on their other consumers)
-- Applied business rules
--->
-
-### External integrations
-
-<!--
-- Third-party APIs called
-- Authentication (keys, tokens, OAuth...)
-- Error / timeout / retry handling
--->
-
 ## Security considerations
 
 <!--
@@ -132,11 +92,12 @@ If truly not applicable, state why in one line instead of deleting the section.
 ## Technical constraints
 
 <!--
-- Technical decisions made and their justification
+Externally observable constraints that are part of the requested contract:
 - Standards to comply with (PCI, GDPR, accessibility, etc.)
 - Performance constraints (response time, data volume...)
 - Security constraints (encryption, RBAC...)
 - Compatibility constraints (browser versions, mobile, etc.)
+Implementation decisions and their justification belong to plan.md.
 -->
 
 ## Open questions

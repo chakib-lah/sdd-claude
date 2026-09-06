@@ -4,12 +4,12 @@ description: Scaffold a complete Node.js/Express endpoint from the active SDD sp
 
 # /node-endpoint
 
-Generates controller + route + middleware + integration tests from the API contract in `spec.md`.
+Generates controller + route + middleware + integration tests from the API contract designed in `plan.md` (Technical design → endpoints), honoring the behavioral requirements and ACs of `spec.md`.
 
 ## Prerequisites
 
-- `spec.md` with `status: approved`
-- "API Contract" section filled in with method, route, payload, response, HTTP codes
+- `spec.md` and `plan.md` with `status: approved`
+- The endpoint contract described in the plan's Technical design (method, route, payload, response, HTTP codes)
 
 ## Generates, in order
 

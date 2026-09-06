@@ -100,7 +100,6 @@ class UserServiceImplTest {
 
     @Test
     void shouldReturnEmptyWhenUserNotFound() {
-        // Covers AC-1
         // Arrange
         when(userRepository.findById(42L)).thenReturn(Optional.empty());
 
@@ -113,7 +112,6 @@ class UserServiceImplTest {
 
     @Test
     void shouldThrowWhenEmailAlreadyExists() {
-        // Covers AC-2
         // Arrange
         when(userRepository.existsByEmail("dup@example.com")).thenReturn(true);
         CreateUserRequest request = new CreateUserRequest("dup@example.com", "secret123", null);
@@ -141,7 +139,6 @@ class UserRepositoryIT {
 
     @Test
     void shouldFindUserByEmail() {
-        // Covers AC-3
         // Arrange
         sut.save(aUser().withEmail("test@example.com").build());
 
@@ -171,7 +168,6 @@ class UserControllerTest {
 
     @Test
     void shouldReturn404WhenUserNotFound() throws Exception {
-        // Covers AC-4
         // Arrange
         when(userService.findById(99L)).thenReturn(Optional.empty());
 
@@ -183,7 +179,6 @@ class UserControllerTest {
 
     @Test
     void shouldReturn400OnInvalidEmail() throws Exception {
-        // Covers AC-5
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"not-an-email\",\"password\":\"secret123\"}"))
@@ -206,7 +201,6 @@ class UserApiIT {
 
     @Test
     void shouldCreateUserAndRetrieveIt() {
-        // Covers AC-6
         // Arrange
         CreateUserRequest request = new CreateUserRequest("new@example.com", "secret123", "Jane");
 

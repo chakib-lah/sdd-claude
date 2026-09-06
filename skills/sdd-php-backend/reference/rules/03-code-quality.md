@@ -28,8 +28,15 @@
 ### Traces and cleanliness
 - No leftover debug output: print, dump or log statements added while debugging are removed before commit. The stack's concrete debug functions are listed in `10-code-conventions.md`.
 - No commented-out code — history lives in version control, not in comments.
-- `TODO` / `FIXME` only with an associated ticket referenced on the same line. An anonymous `TODO` is a task nobody owns.
+- No new `TODO` / `FIXME` as a substitute for tracked work: deferred work is tracked in the project's issue tracker or SDD artifacts, never as a source comment. Existing project markers are preserved as-is — this rule governs new and generated work, not source modernization.
 - No hardcoded secret — owned by `02-security.md` § Secrets management; apply it as written there.
+
+### Source comments
+- Comments are written in **English**, whatever the project's SDD working language.
+- A comment is short and explains non-obvious **code or domain intent** — never the SDD process, and never where a change came from.
+- **No SDD or ticket metadata in product source solely for traceability**: no acceptance-criterion, task, ticket, spec/plan/tasks/notes reference in production code or in tests. AC ↔ implementation/test traceability lives in the SDD artifacts (`plan.md` mappings, `tasks.md`, `notes.md`) and the verification gates (`/sdd-verify`, `/sdd-review`) — never in source comments or identifiers.
+- Tests are named for the behavior they attest (e.g. `shouldRejectDuplicateRegistration`), never for SDD bookkeeping (e.g. `shouldSatisfyAC4`).
+- Source files remain understandable without access to `.claude/`.
 
 ### Readability
 - Explicit naming: a name says what the thing is or does, without needing the surrounding code to decode it.
