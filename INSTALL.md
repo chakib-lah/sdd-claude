@@ -15,6 +15,7 @@ sdd-claude/
 │   ├── commands/           ← 17 universal SDD commands
 │   ├── rules/              ← Methodology + Git + security + code quality
 │   ├── templates/          ← spec/plan/tasks/notes + AMOA exports (jira-story, spec-doc)
+│   ├── upgrade/            ← canonical /sdd-upgrade procedure (read at run time, never deployed)
 ├── skills/                 ← 6 installable skills (Layer 2)
 │   ├── sdd-php-backend/
 │   │   ├── SKILL.md
@@ -28,6 +29,7 @@ sdd-claude/
 │   ├── sdd-angular-node/   ← same structure
 │   ├── sdd-java-backend/   ← same structure
 │   └── sdd-java-angular/   ← same structure
+├── global-commands/        ← global /sdd-upgrade bootstrap → ~/.claude/commands/
 ├── global-agents/          ← 9 global agents → ~/.claude/agents/
 │   ├── debugger.md
 │   ├── git-assistant.md
@@ -44,7 +46,7 @@ sdd-claude/
 ├── install.ps1            ← Windows installer
 ├── upgrade-global.sh      ← global ~/.claude updater (Linux / macOS / WSL2)
 ├── upgrade-global.ps1     ← global ~/.claude updater (Windows)
-├── VERSION                ← 1.17.0
+├── VERSION                ← 1.18.0
 └── CHANGELOG.md
 ```
 
@@ -60,7 +62,7 @@ cd ~/tools/sdd-claude
 bash install.sh
 ```
 
-The installer links the 6 skills via symlink (auto-updated on every `git pull`) and copies the 9 global agents; re-running is safe — symlinks and byte-identical files are refreshed silently. A real directory found at a skill path is backed up to `<name>.bak-<timestamp>` (never deleted), and a customized global agent is kept and reported (`--force` / `-Force` to overwrite).
+The installer links the 6 skills via symlink (auto-updated on every `git pull`), copies the 9 global agents, and installs the global `/sdd-upgrade` bootstrap into `~/.claude/commands/`; re-running is safe — symlinks and byte-identical files are refreshed silently. A real directory found at a skill path is backed up to `<name>.bak-<timestamp>` (never deleted), and a customized global agent is kept and reported (`--force` / `-Force` to overwrite).
 
 ### Windows (PowerShell)
 
@@ -90,6 +92,10 @@ ln -s ~/tools/sdd-claude/skills/sdd-java-angular    ~/.claude/skills/
 # 3. Copy the global agents
 mkdir -p ~/.claude/agents
 cp ~/tools/sdd-claude/global-agents/*.md ~/.claude/agents/
+
+# 4. Install the global /sdd-upgrade bootstrap
+mkdir -p ~/.claude/commands
+cp ~/tools/sdd-claude/global-commands/sdd-upgrade.md ~/.claude/commands/
 ```
 
 ---
@@ -112,6 +118,11 @@ foreach ($s in $skills) {
 $agentsDir = "$env:USERPROFILE\.claude\agents"
 New-Item -ItemType Directory -Force -Path $agentsDir
 Copy-Item "$env:USERPROFILE\tools\sdd-claude\global-agents\*.md" $agentsDir
+
+# 4. Install the global /sdd-upgrade bootstrap
+$commandsDir = "$env:USERPROFILE\.claude\commands"
+New-Item -ItemType Directory -Force -Path $commandsDir
+Copy-Item "$env:USERPROFILE\tools\sdd-claude\global-commands\sdd-upgrade.md" $commandsDir
 ```
 
 ---

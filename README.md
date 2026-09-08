@@ -118,7 +118,7 @@ The **3 ✋ MANUAL GATES** (spec → plan → tasks) guarantee that we never bui
 | `/sdd-archive` | Closure | Artifacts → `_archive/` post-merge |
 | `/sdd-status` | Tracking | Dashboard of features in progress |
 | `/sdd-hotfix` | Emergency | Lightweight workflow for a Production fix |
-| `/sdd-upgrade` | Maintenance | Updates Layer 1 without touching Layers 2/3 |
+| `/sdd-upgrade` | Maintenance | Stable bootstrap: loads and executes the current toolkit upgrade procedure |
 | `/sdd-changelog` | Release | CHANGELOG from archived specs |
 | `/sdd-revert` | Rollback | Un-ships a feature/phase via the tracked phase commit SHAs |
 | `/retro-spec` | Brownfield | Rebuilds a spec from existing code |
@@ -148,11 +148,15 @@ Installation is a single command (symlink of the skills + copy of the global age
 
 ```bash
 cd ~/tools/sdd-claude && git pull   # skill symlinks follow automatically
-./upgrade-global.sh                 # global ~/.claude: symlinks + global agents
+./upgrade-global.sh                 # global ~/.claude: symlinks + agents + /sdd-upgrade bootstrap
                                     # (Windows: .\upgrade-global.ps1)
 ```
 
-The script adds/repairs the skill symlinks, updates stale global agents, and never silently overwrites an agent you customized. Then, inside each project: `/sdd-upgrade` (updates Layer 1, preserves your customizations).
+The script adds/repairs the skill symlinks, updates stale global agents and the global `/sdd-upgrade` bootstrap, and never silently overwrites a file you customized. Then, inside each project: `/sdd-upgrade`.
+
+**How `/sdd-upgrade` works.** Both the global `~/.claude/commands/sdd-upgrade.md` bootstrap and the project-local `/sdd-upgrade` command deployed by a fresh install are the same tiny **stable shim with no upgrade business logic**: they resolve the project's installed skill and execute the **current** upgrade procedure shipped in the skill reference (`reference/upgrade/sdd-upgrade-procedure.md`). Every upgrade therefore runs the up-to-date procedure — a stale project-local updater can no longer drive an upgrade. For a very old project whose local `/sdd-upgrade` predates this architecture and cannot self-transition, run the explicit one-time migration `./upgrade-global.sh --project /path/to/project` (Windows: `.\upgrade-global.ps1 -ProjectPath C:\path\to\project`) — it replaces a **verified historical toolkit-owned** updater with the current shim and refuses safely otherwise.
+
+**SDD working language.** The framework default for project-facing SDD artifacts (`spec.md`, `plan.md`, `tasks.md`, `notes.md`, SDD analysis and exports) is **English**. Every fresh install explicitly resolves the language (the installer asks, or uses the language explicitly stated in your install request); choosing a non-English language creates the Layer-3 override `project-working-language.md`. Source code, source comments and Git commit subjects stay English regardless.
 
 ---
 
@@ -224,8 +228,8 @@ Framework examples stay neutral (`Order`, `User`, `Payment`, `PROJ-xxx`): replac
 | File | Contents |
 |---|---|
 | `INSTALL.md` | Detailed installation guide |
-| `upgrade-global.sh` / `.ps1` | Updates the global `~/.claude` (skills + agents) after a `git pull` |
+| `upgrade-global.sh` / `.ps1` | Updates the global `~/.claude` (skills + agents + `/sdd-upgrade` bootstrap) after a `git pull`; `--project` migrates one old project's updater |
 | `skills/README.md` | Skills decision tree |
 | `core/extension-guide.md` | Creating a new stack skill |
 
-Version 1.17.0 — September 2026.
+Version 1.18.0 — September 2026.

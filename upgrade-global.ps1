@@ -3,16 +3,36 @@
 # global agent copies. Stale unmodified agents are updated; customized
 # (or translated) agents are kept and reported, with a prompt.
 #
-# Usage: .\upgrade-global.ps1 [-Force] [-KeepCustom]
+# Usage: .\upgrade-global.ps1 [-Force] [-KeepCustom] [-ProjectPath C:\path\to\project]
+#   -ProjectPath performs a one-time migration of ONE project's
+#   .claude\commands\sdd-upgrade.md to the current stable shim (only when the
+#   existing file is a verified historical toolkit version).
 param(
     [switch]$Force,
-    [switch]$KeepCustom
+    [switch]$KeepCustom,
+    [string]$ProjectPath = ""
 )
 $ErrorActionPreference = "Stop"
 
 $ToolkitDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SkillsDst  = Join-Path $env:USERPROFILE ".claude\skills"
 $AgentsDst  = Join-Path $env:USERPROFILE ".claude\agents"
+$CommandsDst = Join-Path $env:USERPROFILE ".claude\commands"
+
+# True if the file's exact SHA-256 appears in the shipped manifest of known
+# toolkit-owned sdd-upgrade.md versions (works without git history).
+function Test-MatchesManifest([string]$File) {
+    # Manifest hashes are computed on LF content (git blobs): normalize CRLF -> LF
+    # before hashing so a Windows-checkout copy still matches exactly.
+    $manifest = Join-Path $ToolkitDir "scripts\sdd-upgrade.known-hashes"
+    if (-not (Test-Path $manifest)) { return $false }
+    $bytes = [System.IO.File]::ReadAllBytes($File)
+    $text  = [System.Text.Encoding]::UTF8.GetString($bytes).Replace("`r`n", "`n")
+    $norm  = [System.Text.Encoding]::UTF8.GetBytes($text)
+    $sha   = [System.Security.Cryptography.SHA256]::Create()
+    $h     = ([System.BitConverter]::ToString($sha.ComputeHash($norm)) -replace '-', '').ToLower()
+    return [bool](Select-String -Path $manifest -Pattern "^$h " -Quiet)
+}
 
 $Version = "?"
 $VersionFile = Join-Path $ToolkitDir "VERSION"
@@ -150,6 +170,70 @@ $agentFiles | ForEach-Object {
     }
 }
 Write-Host "  (files in $AgentsDst not shipped by the toolkit are never touched)"
+
+Write-Host "-> Global /sdd-upgrade bootstrap (copy):"
+New-Item -ItemType Directory -Force -Path $CommandsDst | Out-Null
+$gsrc = Join-Path $ToolkitDir "global-commands\sdd-upgrade.md"
+$gdst = Join-Path $CommandsDst "sdd-upgrade.md"
+if (-not (Test-Path $gsrc)) {
+    Write-Host "  X toolkit bootstrap missing: $gsrc"; exit 1
+} elseif (-not (Test-Path $gdst)) {
+    Copy-Item $gsrc $gdst
+    Write-Host "  +  sdd-upgrade.md (added)"
+} elseif ((Get-FileHash $gsrc).Hash -eq (Get-FileHash $gdst).Hash) {
+    Write-Host "  OK sdd-upgrade.md (current)"
+} elseif ((Test-MatchesManifest $gdst) -or (Test-MatchesHistory "global-commands/sdd-upgrade.md" $gdst)) {
+    Copy-Item $gsrc $gdst -Force
+    Write-Host "  ^  sdd-upgrade.md (stale toolkit bootstrap -> updated)"
+} elseif ($Force) {
+    Copy-Item $gsrc $gdst -Force
+    Write-Host "  ^  sdd-upgrade.md (divergent -> overwritten, -Force)"
+} elseif ($KeepCustom) {
+    Write-Host "  !  sdd-upgrade.md differs from every known toolkit version - kept (re-run with -Force to overwrite)"
+} else {
+    Write-Host "  !  global sdd-upgrade.md differs from every known toolkit version."
+    $answer = Read-Host "     Overwrite with the toolkit bootstrap? [y/N]"
+    if ($answer -eq "y" -or $answer -eq "Y") {
+        Copy-Item $gsrc $gdst -Force
+        Write-Host "  ^  sdd-upgrade.md (overwritten)"
+    } else {
+        Write-Host "  !  sdd-upgrade.md (kept)"
+    }
+}
+
+# -ProjectPath: ONE-TIME migration of a single project's local updater.
+# The ONLY project mutation performed: <project>\.claude\commands\sdd-upgrade.md
+# is replaced by the current stable shim IFF the existing file is proven
+# toolkit-owned (exact SHA-256 in the shipped manifest, or exact git object
+# match against toolkit history when available). Divergent/unverifiable files
+# are preserved and reported - ownership is never guessed.
+if ($ProjectPath -ne "") {
+    Write-Host "-> Project one-time /sdd-upgrade migration: $ProjectPath"
+    $pfile = Join-Path $ProjectPath ".claude\commands\sdd-upgrade.md"
+    $shim  = Join-Path $ToolkitDir "core\commands\sdd-upgrade.md"
+    if (-not (Test-Path (Join-Path $ProjectPath ".claude"))) {
+        Write-Host "  X $ProjectPath\.claude not found - is this an SDD project?"; exit 1
+    } elseif (-not (Test-Path $pfile)) {
+        Write-Host "  .  no local /sdd-upgrade command - nothing to migrate"
+    } elseif ((Get-FileHash $shim).Hash -eq (Get-FileHash $pfile).Hash) {
+        Write-Host "  OK already the current stable shim - nothing to do"
+    } elseif ((Test-MatchesManifest $pfile) `
+        -or (Test-MatchesHistory "core/commands/sdd-upgrade.md" $pfile) `
+        -or (Test-MatchesHistory "skills/sdd-php-backend/reference/commands/sdd-upgrade.md" $pfile) `
+        -or (Test-MatchesHistory "skills/sdd-php-symfony/reference/commands/sdd-upgrade.md" $pfile) `
+        -or (Test-MatchesHistory "skills/sdd-symfony-angular/reference/commands/sdd-upgrade.md" $pfile) `
+        -or (Test-MatchesHistory "skills/sdd-angular-node/reference/commands/sdd-upgrade.md" $pfile) `
+        -or (Test-MatchesHistory "skills/sdd-java-backend/reference/commands/sdd-upgrade.md" $pfile) `
+        -or (Test-MatchesHistory "skills/sdd-java-angular/reference/commands/sdd-upgrade.md" $pfile)) {
+        Copy-Item $shim $pfile -Force
+        Write-Host "  ^  known historical toolkit updater -> replaced with the current stable shim"
+        Write-Host "     Next step: run /sdd-upgrade inside the project (it now loads the current procedure)"
+    } else {
+        Write-Host "  !  $pfile differs from every known toolkit-owned version (customized, translated, or unverifiable)."
+        Write-Host "     Automatic migration refused - ownership is never guessed. Review the file manually,"
+        Write-Host "     or run /sdd-upgrade inside the project so its own triage handles it."
+    }
+}
 
 Write-Host ""
 Write-Host "Global upgrade complete (toolkit v$Version)."

@@ -1,5 +1,29 @@
 # Changelog — SDD Claude
 
+## [1.18.0] — 2026-09-08
+
+Architectural release: `/sdd-upgrade` becomes a stable bootstrap that always executes the current toolkit procedure, and the project-facing SDD working language becomes an explicit decision with English as the framework default.
+
+### Added
+
+- **Stable `/sdd-upgrade` bootstrap** — the deployed command (project-local `.claude/commands/sdd-upgrade.md` and the new global `~/.claude/commands/sdd-upgrade.md`) is a small stable shim with no upgrade business logic: it resolves the project's skill, loads the canonical procedure from the current reference and hands the run to it (idempotent, no hybrid execution, never persisted). The full upgrade behavior — ownership triage, Layer-3 preservation, constitution and alias migrations, the working-language gates, targeted `USER_DECISION_REQUIRED`, disk-state convergence, marker-last ordering, all postconditions — lives in `reference/upgrade/sdd-upgrade-procedure.md`, runtime reference material never deployed into projects. Stale project-local upgrade logic can no longer drive an upgrade, and every historical updater version has a proven transition path.
+- **Explicit project-facing SDD language resolution** — every interactive fresh install resolves the SDD language before the Layer-3 proposal, approval records and rendering: a language explicitly stated in the install request is the resolution; a durable documented project convention is surfaced for confirmation; otherwise the installer asks, presenting English as the framework default. English (chosen or default) creates no redundant Layer-3 file; a non-English choice becomes one atomic claim owned by `project-working-language.md`.
+- **One-time working-language migration for older projects** — upgrading a project installed before the explicit language resolution no longer silently switches future SDD artifacts to the English default when the existing active artifacts are written in another language: the upgrade observes the ACTIVE project-facing SDD artifacts only (never archives, README language, chat language or commit history) and, when they are predominantly non-English or mixed, asks the developer a targeted language question (keep the existing convention, adopt the English default, or choose another language) before any success can be announced. A non-English decision materializes as a minimal canonical `project-working-language.md` covering project-facing SDD communication only; an English decision creates no file. The question is one-time by construction and never repeats on later upgrades.
+- **Global bootstrap management in the install scripts** — `install.sh`/`install.ps1` and `upgrade-global.sh`/`upgrade-global.ps1` manage the global `/sdd-upgrade` bootstrap under `~/.claude/commands/` from the same ownership evidence (an exact-hash manifest of known historical toolkit versions, with an exact git-object history fallback): missing → install, identical → no-op, proven historical toolkit version → automatic update, divergent or unverifiable → preserved and reported (`--force`/`-Force` to overwrite). `upgrade-global` gains an explicit one-time `--project <path>` / `-ProjectPath` migration that converges an old project's updater to the current shim only when it is proven toolkit-owned — ownership is never guessed and no other project file is touched.
+
+### Changed
+
+- **English is the framework default SDD language** — when no project override exists, project-facing SDD artifacts (`spec.md`, `plan.md`, `tasks.md`, `notes.md`, SDD analysis and exports) are English; the default is never inferred from the chat language, UI language, README language alone, source comments, repository geography or commit history. A project may override it with any language through the optional Layer-3 `project-working-language.md` — no language is privileged. Engineering domains are untouched: source code, source comments, Git subjects and technical documentation stay English regardless.
+- **Upgrade semantics execute from the current toolkit reference** — the procedure a run obeys is always the one shipped by the currently installed reference, never the copy that happened to be invoked.
+
+### Fixed
+
+- **Specs are strictly functional** — `spec.md` states the WHAT and the WHY only: implementation cleanup ("remove the CSS override", "delete the obsolete selector"), source paths, class/method change targets, internal mechanisms and implementation-specific workarounds are excluded from spec content and from acceptance criteria; every AC asserts observable behavior. Identified implementation decisions are routed to `plan.md` and discovery evidence to `notes.md` — never deleted. Approved observable contract details (a design-system size, a visible icon, a breakpoint requirement, an unchanged accessible name) legitimately stay in the spec. `/sdd-spec-check` detects this semantic leakage and names the destination for each finding.
+- **Deterministic consistency verification** — the toolkit's consistency audit produces the same result on every run of the same tree, and safely proves the global-bootstrap dispositions on a disposable fixture without touching the user's `~/.claude`.
+- **Public vocabulary guard** — the shipped tree is verified to contain no internal validation identity; examples use neutral placeholders only.
+
+---
+
 ## [1.17.0] — 2026-09-06
 
 Semantic ownership release, validated on real production projects: effective Git policy, canonical working language, SDD-metadata-free source code, the spec/plan responsibility boundary, and deterministic `/sdd-upgrade` behavior.

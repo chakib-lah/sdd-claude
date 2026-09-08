@@ -104,6 +104,8 @@ Each AC must be:
 
 Always include non-regression ACs on adjacent functionality.
 
+Every AC asserts **observable behavior — never internal code state**: an AC that merely verifies implementation cleanup ("no obsolete selector remains", "no application CSS rule sets the button height") is not a functional criterion — state the approved observable result instead ("the button renders with the approved medium design-system size"). Cleanup verification belongs to `plan.md`, `tasks.md` and the review gates.
+
 AC identifiers are stable for life: never renumber an existing AC; a removed AC leaves a hole; a new AC takes the next free number. The `[SEC]` tag sits after the identifier (`- [ ] AC-4 [SEC]: When ...`).
 
 #### Functional behavior
@@ -112,7 +114,9 @@ The expected business/functional behavior, in observable terms:
 - User-visible flows and error handling as the user observes it
 - Externally observable contracts that are part of the request (e.g. backward compatibility of an existing API response)
 
-**Never implementation design**: no source paths, impacted files, class/service/method names, code snippets, build commands or DB implementation details — those belong to `plan.md`.
+**Never implementation design**: no source paths, impacted files, class/service/method names, code snippets, build commands or DB implementation details — those belong to `plan.md`. **Never implementation cleanup or internal mechanics either**: removing a CSS override, deleting an obsolete selector or dead rule, modifying a named component/service/file, choosing an internal API or mechanism, an implementation-specific browser workaround, exact migration or test-file placement. When such HOW content surfaces during the interview or exploration, route it — an implementation decision goes to `plan.md` (as planning context), discovery or current-state evidence goes to `notes.md` — never delete valuable information, and never leave it in the spec.
+
+An **approved observable contract detail is not implementation HOW**: a design-system size (`medium`), a visible icon (add, download), a breakpoint requirement ("the layout must not overflow at 768px"), an unchanged accessible name or a visible focus state legitimately stay in the spec when they are the observable result the stakeholders approved — library/design-system vocabulary is not automatically technical.
 
 #### Security considerations
 - State the data sensitivity of what the feature touches (personal, financial, credentials, none)

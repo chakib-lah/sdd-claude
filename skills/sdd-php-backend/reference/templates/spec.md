@@ -49,6 +49,15 @@ The expected business/functional behavior — the WHAT, never the HOW:
 Never put implementation design here: no source paths, no impacted files,
 no class/service/method names, no code snippets, no build commands, no DB
 implementation details — those belong to plan.md (Technical design).
+
+Never implementation cleanup or internal mechanics either: "remove the CSS
+override", "delete the obsolete selector", "modify Component X" describe the
+HOW — the implementation decision goes to plan.md, the supporting discovery
+evidence goes to notes.md; neither is deleted, neither stays here.
+
+An approved observable contract detail IS valid spec content: a design-system
+size ("medium"), a visible icon, "no overflow at 768px", an unchanged
+accessible name — when it is the observable result the stakeholders approved.
 -->
 
 ## Acceptance criteria
@@ -63,6 +72,10 @@ Each AC must be:
 - Precise (no "must be performant" without a threshold)
 
 Include non-regression ACs if the feature touches existing code.
+
+Every AC asserts observable behavior — never internal code state: an AC that
+merely verifies implementation cleanup ("no obsolete selector remains") is not
+a functional criterion; state the approved observable result instead.
 
 Numbering rule: identifiers are stable for life — never renumber an existing
 AC; a removed AC leaves a hole; a new AC (e.g. added by /sdd-clarify) takes

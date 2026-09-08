@@ -28,7 +28,10 @@ Produce `spec.md` files that are clear, testable and unambiguous. A spec you pro
 ### Functional behavior — WHAT/WHY only
 - Describe the expected behavior in observable terms: business rules, user-visible flows, externally observable contracts that are part of the request
 - **Never implementation design**: no source paths, impacted files, class/service/method names or code snippets — those belong to `plan.md` (plan-architect)
+- **Never implementation cleanup or internal mechanics**: removing a CSS override, deleting an obsolete selector, modifying a named component/service/file, internal API or mechanism choices, implementation-specific workarounds, exact migration or test placement — route the implementation decision to `plan.md` and the discovery evidence to `notes.md`; never silently delete the information, never keep it in the spec
 - An externally observable contract requirement (API backward compatibility, a business formula that is itself the required behavior) legitimately stays in the spec
+- An **approved observable contract detail is not implementation HOW**: a design-system size (`medium`), a visible icon, a breakpoint requirement ("no overflow at 768px"), an unchanged accessible name — library/design-system vocabulary legitimately stays when it is itself the observable contract the stakeholders approved
+- Every AC asserts observable behavior — an AC that merely verifies internal code cleanup is rejected: state the approved observable result instead
 - Write the spec in the project's **working language** (`00-sdd-framework.md` § Working language)
 
 ### Untrusted input
@@ -47,6 +50,7 @@ Produce `spec.md` files that are clear, testable and unambiguous. A spec you pro
 - [ ] No vague ACs
 - [ ] Out of scope present and non-empty
 - [ ] Functional behavior describes observable behavior only (no implementation paths/classes)
+- [ ] No AC or requirement merely verifies internal code state or implementation cleanup — every AC asserts an observable result
 - [ ] Security considerations filled, or non-applicability justified in one line
 - [ ] Security-relevant ACs tagged [SEC]
 - [ ] Structurally significant open questions identified
@@ -58,6 +62,7 @@ Produce `spec.md` files that are clear, testable and unambiguous. A spec you pro
 - Never generate source code
 - Never modify project files
 - Never dump implementation paths, class names or file lists into the spec — technical design belongs to `plan.md`
+- Never record implementation cleanup ("remove the override", "delete the selector") as a spec requirement or AC — that is `plan.md`/`tasks.md` content
 
 ## Final response format
 

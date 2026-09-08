@@ -4,29 +4,46 @@
 # toolkit evolves. Safe by default: a stale, unmodified agent is updated;
 # a customized (or translated) agent is kept and reported, with a prompt.
 #
-# Usage: ./upgrade-global.sh [--force] [--keep-custom]
-#   --force        overwrite customized agents without prompting
-#   --keep-custom  keep customized agents without prompting
+# Usage: ./upgrade-global.sh [--force] [--keep-custom] [--project <path>]
+#   --force            overwrite customized agents/bootstrap without prompting
+#   --keep-custom      keep customized agents/bootstrap without prompting
+#   --project <path>   one-time migration of ONE project's .claude/commands/
+#                      sdd-upgrade.md to the current stable shim (only when the
+#                      existing file is a verified historical toolkit version)
 set -euo pipefail
 shopt -s nullglob
 
 TOOLKIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_DST="$HOME/.claude/skills"
 AGENTS_DST="$HOME/.claude/agents"
+COMMANDS_DST="$HOME/.claude/commands"
 
 usage() {
-  sed -n '2,9p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  sed -n '2,12p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
-FORCE=0; KEEP=0
+FORCE=0; KEEP=0; PROJECT=""
+expect_project=0
 for arg in "$@"; do
+  if [ "$expect_project" = 1 ]; then PROJECT="$arg"; expect_project=0; continue; fi
   case "$arg" in
     --force) FORCE=1 ;;
     --keep-custom) KEEP=1 ;;
+    --project) expect_project=1 ;;
+    --project=*) PROJECT="${arg#--project=}" ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $arg" >&2; usage >&2; exit 1 ;;
   esac
 done
+[ "$expect_project" = 0 ] || { echo "--project requires a path" >&2; exit 1; }
+
+# Portable SHA-256 (manifest proof works without git history, e.g. ZIP install).
+sha256f() {
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum < "$1" | cut -d' ' -f1
+  elif command -v shasum >/dev/null 2>&1; then shasum -a 256 < "$1" | cut -d' ' -f1
+  elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 -r < "$1" | cut -d' ' -f1
+  else return 1; fi
+}
 
 # Without a tty we cannot prompt: default to keeping customized agents.
 if [ "$FORCE" = 0 ] && [ "$KEEP" = 0 ] && ! [ -r /dev/tty ]; then
@@ -129,6 +146,77 @@ for src in "$TOOLKIT_DIR"/global-agents/*.md; do
 done
 [ "$found_agent" = 1 ] || { echo "  ✗ no agents found under $TOOLKIT_DIR/global-agents/ — aborting" >&2; exit 1; }
 echo "  (files in $AGENTS_DST not shipped by the toolkit are never touched)"
+
+# True if the file's exact SHA-256 appears in the shipped manifest of known
+# toolkit-owned sdd-upgrade.md versions (works without git history).
+matches_manifest() {
+  local file="$1" h
+  [ -f "$TOOLKIT_DIR/scripts/sdd-upgrade.known-hashes" ] || return 1
+  h="$(sha256f "$file")" || return 1
+  grep -q "^$h " "$TOOLKIT_DIR/scripts/sdd-upgrade.known-hashes"
+}
+
+echo "→ Global /sdd-upgrade bootstrap (copy):"
+mkdir -p "$COMMANDS_DST"
+gsrc="$TOOLKIT_DIR/global-commands/sdd-upgrade.md"
+gdst="$COMMANDS_DST/sdd-upgrade.md"
+if [ ! -f "$gsrc" ]; then
+  echo "  ✗ toolkit bootstrap missing: $gsrc" >&2; exit 1
+elif [ ! -f "$gdst" ]; then
+  cp "$gsrc" "$gdst"; echo "  + sdd-upgrade.md (added)"
+elif cmp -s "$gsrc" "$gdst"; then
+  echo "  ✓ sdd-upgrade.md (current)"
+elif matches_manifest "$gdst" || matches_history "global-commands/sdd-upgrade.md" "$gdst"; then
+  cp "$gsrc" "$gdst"; echo "  ↑ sdd-upgrade.md (stale toolkit bootstrap → updated)"
+elif [ "$FORCE" = 1 ]; then
+  cp "$gsrc" "$gdst"; echo "  ↑ sdd-upgrade.md (divergent → overwritten, --force)"
+elif [ "$KEEP" = 1 ]; then
+  echo "  ⚠ sdd-upgrade.md differs from every known toolkit version — kept (re-run with --force to overwrite)"
+else
+  echo "  ⚠ ~/.claude/commands/sdd-upgrade.md differs from every known toolkit version." >&2
+  printf "    Overwrite with the toolkit bootstrap? [y/N] " >&2
+  read -r answer </dev/tty || answer="n"
+  if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+    cp "$gsrc" "$gdst"; echo "  ↑ sdd-upgrade.md (overwritten)"
+  else
+    echo "  ⚠ sdd-upgrade.md (kept)"
+  fi
+fi
+
+# --project <path>: ONE-TIME migration of a single project's local updater.
+# The ONLY project mutation performed: <project>/.claude/commands/sdd-upgrade.md
+# is replaced by the current stable shim IFF the existing file is proven
+# toolkit-owned (exact SHA-256 in the shipped manifest, or exact git object
+# match against toolkit history when available). Divergent/unverifiable files
+# are preserved and reported — ownership is never guessed, and no other
+# project file is touched (run /sdd-upgrade inside the project for the rest).
+if [ -n "$PROJECT" ]; then
+  echo "→ Project one-time /sdd-upgrade migration: $PROJECT"
+  pfile="$PROJECT/.claude/commands/sdd-upgrade.md"
+  shim="$TOOLKIT_DIR/core/commands/sdd-upgrade.md"
+  if [ ! -d "$PROJECT/.claude" ]; then
+    echo "  ✗ $PROJECT/.claude not found — is this an SDD project?" >&2; exit 1
+  elif [ ! -f "$pfile" ]; then
+    echo "  · no local /sdd-upgrade command — nothing to migrate"
+  elif cmp -s "$shim" "$pfile"; then
+    echo "  ✓ already the current stable shim — nothing to do"
+  elif matches_manifest "$pfile" \
+       || matches_history "core/commands/sdd-upgrade.md" "$pfile" \
+       || matches_history "skills/sdd-php-backend/reference/commands/sdd-upgrade.md" "$pfile" \
+       || matches_history "skills/sdd-php-symfony/reference/commands/sdd-upgrade.md" "$pfile" \
+       || matches_history "skills/sdd-symfony-angular/reference/commands/sdd-upgrade.md" "$pfile" \
+       || matches_history "skills/sdd-angular-node/reference/commands/sdd-upgrade.md" "$pfile" \
+       || matches_history "skills/sdd-java-backend/reference/commands/sdd-upgrade.md" "$pfile" \
+       || matches_history "skills/sdd-java-angular/reference/commands/sdd-upgrade.md" "$pfile"; then
+    cp "$shim" "$pfile"
+    echo "  ↑ known historical toolkit updater → replaced with the current stable shim"
+    echo "    Next step: run /sdd-upgrade inside the project (it now loads the current procedure)"
+  else
+    echo "  ⚠ $pfile differs from every known toolkit-owned version (customized, translated, or unverifiable)." >&2
+    echo "    Automatic migration refused — ownership is never guessed. Review the file manually," >&2
+    echo "    or run /sdd-upgrade inside the project so its own triage handles it." >&2
+  fi
+fi
 
 echo ""
 echo "✅ Global upgrade complete (toolkit v$VERSION)."

@@ -8,6 +8,7 @@ $ErrorActionPreference = "Stop"
 $ToolkitDir = $PSScriptRoot
 $SkillsDst  = "$env:USERPROFILE\.claude\skills"
 $AgentsDst  = "$env:USERPROFILE\.claude\agents"
+$CommandsDst = "$env:USERPROFILE\.claude\commands"
 $Skills = @("sdd-php-backend","sdd-php-symfony","sdd-symfony-angular","sdd-angular-node","sdd-java-backend","sdd-java-angular")
 
 # Byte-level comparison of two directories (same relative file set, same hashes).
@@ -22,9 +23,60 @@ function Test-DirIdentical($a, $b) {
   return $true
 }
 
+# Same classifiers as upgrade-global.ps1 — the ownership source of truth is the
+# shipped scripts/sdd-upgrade.known-hashes manifest plus exact git-object
+# history matching; ownership is never guessed from filename or content shape.
+# True if the file's exact SHA-256 appears in the shipped manifest of known
+# toolkit-owned sdd-upgrade.md versions (works without git history).
+function Test-MatchesManifest([string]$File) {
+  # Manifest hashes are computed on LF content (git blobs): normalize CRLF -> LF
+  # before hashing so a Windows-checkout copy still matches exactly.
+  $manifest = Join-Path $ToolkitDir "scripts\sdd-upgrade.known-hashes"
+  if (-not (Test-Path $manifest)) { return $false }
+  $bytes = [System.IO.File]::ReadAllBytes($File)
+  $text  = [System.Text.Encoding]::UTF8.GetString($bytes).Replace("`r`n", "`n")
+  $norm  = [System.Text.Encoding]::UTF8.GetBytes($text)
+  $sha   = [System.Security.Cryptography.SHA256]::Create()
+  $h     = ([System.BitConverter]::ToString($sha.ComputeHash($norm)) -replace '-', '').ToLower()
+  return [bool](Select-String -Path $manifest -Pattern "^$h " -Quiet)
+}
+
+# Stale-vs-customized history detection needs git and the toolkit's full history.
+$HaveHistory = $false
+$prevEap = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+try {
+  $null = git -C $ToolkitDir rev-parse --git-dir 2>$null
+  if ($LASTEXITCODE -eq 0) {
+    $shallow = (git -C $ToolkitDir rev-parse --is-shallow-repository 2>$null)
+    if ($LASTEXITCODE -eq 0 -and "$shallow".Trim() -ne "true") { $HaveHistory = $true }
+  }
+} catch { $HaveHistory = $false }
+$ErrorActionPreference = $prevEap
+
+# True if the installed copy matches ANY committed version of the file.
+# Compares git object IDs - no content pipeline, no encoding issues.
+function Test-MatchesHistory([string]$RelFile, [string]$Installed) {
+  if (-not $HaveHistory) { return $false }
+  $prev = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $oid = (git -C $ToolkitDir hash-object -- $Installed 2>$null)
+    if ($LASTEXITCODE -ne 0 -or -not $oid) { return $false }
+    $oid = "$oid".Trim()
+    $revs = git -C $ToolkitDir rev-list HEAD -- $RelFile 2>$null
+    foreach ($rev in @($revs)) {
+      $histOid = (git -C $ToolkitDir rev-parse "${rev}:$RelFile" 2>$null)
+      if ($LASTEXITCODE -eq 0 -and "$histOid".Trim() -eq $oid) { return $true }
+    }
+    return $false
+  } finally { $ErrorActionPreference = $prev }
+}
+
 Write-Host "SDD Claude - installing from $ToolkitDir"
 New-Item -ItemType Directory -Force -Path $SkillsDst | Out-Null
 New-Item -ItemType Directory -Force -Path $AgentsDst | Out-Null
+New-Item -ItemType Directory -Force -Path $CommandsDst | Out-Null
 
 foreach ($s in $Skills) {
   $src = Join-Path $ToolkitDir "skills\$s"
@@ -69,6 +121,23 @@ foreach ($f in Get-ChildItem "$ToolkitDir\global-agents\*.md") {
 Write-Host "  $copied agent(s) copied into $AgentsDst"
 if ($kept -gt 0) {
   Write-Host "  WARNING: $kept divergent agent(s) kept - re-run with -Force to overwrite"
+}
+
+$gsrc = Join-Path $ToolkitDir "global-commands\sdd-upgrade.md"
+$gdst = Join-Path $CommandsDst "sdd-upgrade.md"
+if (-not (Test-Path $gdst)) {
+  Copy-Item $gsrc $gdst
+  Write-Host "  global /sdd-upgrade bootstrap installed into $CommandsDst"
+} elseif ((Get-FileHash $gsrc).Hash -eq (Get-FileHash $gdst).Hash) {
+  # byte-identical toolkit bootstrap: nothing to do
+} elseif ((Test-MatchesManifest $gdst) -or (Test-MatchesHistory "global-commands/sdd-upgrade.md" $gdst)) {
+  Copy-Item $gsrc $gdst -Force
+  Write-Host "  global sdd-upgrade.md: known stale toolkit bootstrap - updated"
+} elseif ($Force) {
+  Copy-Item $gsrc $gdst -Force
+  Write-Host "  global sdd-upgrade.md overwritten (-Force)"
+} else {
+  Write-Host "  WARNING: existing global sdd-upgrade.md differs from every known toolkit version - kept (re-run with -Force to overwrite)"
 }
 
 Write-Host "Installation complete. Verify: dir $env:USERPROFILE\.claude\skills"

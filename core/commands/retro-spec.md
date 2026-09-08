@@ -118,7 +118,7 @@ Handling the answers:
 
 ### 6. Write `spec.md` in retrospective mode
 
-**Language**: write the spec in the project's working language (resolved per `.claude/rules/00-sdd-framework.md` § Working language — the project's `project-working-language.md` rule or existing equivalent; otherwise the language the user works in). Retrospective specs are read by business stakeholders, not only developers.
+**Language**: write the spec in the project's working language (resolved per `.claude/rules/00-sdd-framework.md` § Working language — the project's `project-working-language.md` rule or existing equivalent; otherwise **English, the framework default** — never inferred from the chat language). Retrospective specs are read by business stakeholders, not only developers.
 
 **Self-contained rule**: `spec.md` must never reference `plan.md`, `tasks.md` or `notes.md`, **nor any SDD command** (`/sdd-plan`, `/sdd-tasks`, `/sdd-implement`, `/retro-spec`…): the spec is a business document, and the retrospective marker already lives in the frontmatter. A short banner is allowed, limited to: reconstructed from the code, describes the observed behavior (not a target), code not modified, to be validated functionally — without naming any framework command. Everything a reader needs — including the open questions — lives in the spec itself.
 
